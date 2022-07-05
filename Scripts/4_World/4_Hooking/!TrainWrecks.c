@@ -1,4 +1,4 @@
-class StaticObject_Wreck_Train_742_Blue_Mil_DE extends House {
+class StaticObj_Wreck_Train_742_Blue_Mil_DE extends House {
         ref _Event _registeredInstance = new _Event(this.GetType(), "subway", this);
 
         override void EEInit() {
@@ -16,7 +16,7 @@ class StaticObject_Wreck_Train_742_Blue_Mil_DE extends House {
         }
 };
 
-class StaticObject_Wreck_Train_742_Blue_DE extends House {
+class StaticObj_Wreck_Train_742_Blue_DE extends House {
         ref _Event _registeredInstance = new _Event(this.GetType(), "subway", this);
 
         override void EEInit() {
@@ -34,7 +34,7 @@ class StaticObject_Wreck_Train_742_Blue_DE extends House {
         }
 };
 
-class StaticObject_Wreck_Train_742_Blue extends House {
+class StaticObj_Wreck_Train_742_Blue extends House {
         ref _Event _registeredInstance = new _Event(this.GetType(), "subway", this);
 
         override void EEInit() {
@@ -52,7 +52,7 @@ class StaticObject_Wreck_Train_742_Blue extends House {
         }
 };
 
-class StaticObject_Wreck_Train_742_Red_Mil_DE extends House {
+class StaticObj_Wreck_Train_742_Red_Mil_DE extends House {
         ref _Event _registeredInstance = new _Event(this.GetType(), "subway", this);
 
         override void EEInit() {
@@ -70,7 +70,7 @@ class StaticObject_Wreck_Train_742_Red_Mil_DE extends House {
         }
 };
 
-class StaticObject_Wreck_Train_742_Red_DE extends House {
+class StaticObj_Wreck_Train_742_Red_DE extends House {
         ref _Event _registeredInstance = new _Event(this.GetType(), "subway", this);
 
         override void EEInit() {
