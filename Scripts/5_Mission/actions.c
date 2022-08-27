@@ -120,3 +120,22 @@ class CFCloud_ExplodePlayer extends GameLabsContextAction {
             return true;
         }
 };
+
+class CFCloud_DeleteVehicle extends GameLabsContextAction {
+        void CFCloud_DeleteVehicle() {
+            this.actionCode = "CFCloud_DeleteVehicle";
+            this.actionName = "Delete vehicle";
+            this.actionIcon = "trash-alt";
+            this.actionColour = "danger";
+            this.actionContext = "vehicle";
+        }
+
+        static bool Execute(GameLabsActionContext context) {
+            Car vehicle;
+            Car.CastTo(vehicle, context.GetReferencedObject());
+
+            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", vehicle));
+            vehicle.Delete();
+            return true;
+        }
+};
