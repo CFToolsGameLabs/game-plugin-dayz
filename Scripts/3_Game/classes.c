@@ -156,6 +156,9 @@ class GameLabsContextAction {
 
     ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
+    // Internal
+    string referenceKey;
+
     void GameLabsContextAction() {
 
     }
@@ -177,4 +180,8 @@ class GameLabsContextAction {
     string GetActionIcon() {return this.actionIcon;}
     string GetActionColour() {return this.actionColour;}
     string ToJson() { return JsonFileLoader<GameLabsContextAction>.JsonMakeData(this); }
+
+    string InfoString() {
+        return string.Format("GameLabsContextAction<%1, %2, %3, %4, %5>", this.actionCode, this.actionName, this.actionIcon, this.actionColour, this.actionContext);
+    }
 };
