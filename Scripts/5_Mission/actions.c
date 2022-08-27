@@ -139,3 +139,18 @@ class CFCloud_DeleteVehicle extends GameLabsContextAction {
             return true;
         }
 };
+
+class GameLabsInternal_DummyAction extends GameLabsContextAction {
+        void GameLabsInternal_DummyAction() {
+            this.actionCode = "GameLabsInternal_DummyAction";
+            this.actionName = "Dummy action";
+            this.actionIcon = "accessible-icon";
+            this.actionColour = "danger";
+            this.actionContext = "world";
+        }
+
+        static bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Debug(string.Format("A dummy action was called"));
+            return true;
+        }
+};
