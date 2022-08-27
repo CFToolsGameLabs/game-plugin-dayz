@@ -93,7 +93,7 @@ class GameLabsAPI {
     RegisterResult Register() {
         this.restContext.SetHeader("application/json"); // Expected for auth request
 
-        _Payload_Register payload = new _Payload_Register(this.serverId, this.apiKey);
+        _Payload_Register payload = new _Payload_Register(this.serverId, this.apiKey, false);
         _Response_Register response = new _Response_Register(this.restContext.POST_now("/v1/auth/register?trace="+this.gamePort, payload.ToJson()));
         if(response.status == 2) {
             GetGameLabs()._PropagateFeatures(response); // Access features outside of API class
@@ -105,7 +105,7 @@ class GameLabsAPI {
 
     void RegisterAsync() {
         this.restContext.SetHeader("application/json"); // Expected for auth request
-        _Payload_Register payload = new _Payload_Register(this.serverId, this.apiKey);
+        _Payload_Register payload = new _Payload_Register(this.serverId, this.apiKey, true);
         this.restContext.POST(new _Callback_RegisterAsync(), "/v1/auth/register?trace="+this.gamePort, payload.ToJson());
     }
 
