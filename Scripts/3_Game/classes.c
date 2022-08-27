@@ -57,13 +57,14 @@ class _Event {
 
 class GameLabsActionContext {
     private string contextType = "world";
-    private Object referencedObject;
+    private Class referencedObject;
 
-    ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
+    ref map<string, GameLabsActionParameter> parameters = new map<string, GameLabsActionParameter>;
 
-    void GameLabsActionContext(string contextType, Object referencedObject) {
+    void GameLabsActionContext(string contextType, Class referencedObject, ref map<string, GameLabsActionParameter> parameters) {
         this.contextType = contextType;
         this.referencedObject = referencedObject;
+        this.parameters = parameters;
     }
 
     string GetContextType() {
@@ -154,14 +155,10 @@ class GameLabsContextAction {
     // world, player, vehicle
     string actionContext = "world";
 
-    ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
+    ref map<string, GameLabsActionParameter> parameters = new map<string, GameLabsActionParameter>;
 
     // Internal
     string referenceKey;
-
-    void GameLabsContextAction() {
-
-    }
 
     void Register() {
         GetGameLabs().AddGameLabsAction(this);
@@ -171,7 +168,7 @@ class GameLabsContextAction {
      * bool Execute()
      * Implement any action logic in here which gets triggered based on the API orders module
      */
-    static bool Execute(GameLabsActionContext context) {
+    bool Execute(GameLabsActionContext context) {
         return false;
     }
 

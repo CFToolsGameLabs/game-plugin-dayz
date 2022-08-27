@@ -188,37 +188,8 @@ class _Callback_ServerPoll : _Callback {
     };
 };
 
-// v2
-class _SP2Position {
-    float x;
-    float y;
-    float z;
-};
-class _SP2OrderParams {
-    int flags;
-    int type;
-    int quantity = 1;
-
-    string gameClass;
-    string entityId;
-
-    int hour;
-    int minute;
-
-    array<float> overcast;
-    array<float> fog;
-    array<float> rain;
-    float wind;
-
-    _SP2Position position;
-};
-class ServerPoll2Item {
-    int action;
-    string target;
-    _SP2OrderParams params;
-};
 class _Response_ServerPoll2 : _Response {
-    ref array<ServerPoll2Item> orders;
+    ref array<GameLabsContextAction> orders;
     void _Response_ServerPoll2(string content) { JsonFileLoader<_Response_ServerPoll2>.JsonLoadData(content, this); }
 };
 
@@ -244,44 +215,54 @@ class _Callback_ServerPoll2 : _Callback {
         PlayerBase player;
 
         vector position;
-        ServerPoll2Item order;
 
         bool orderStatus;
         bool requiresPlayer = false;
 
+        GameLabsContextAction orderAction;
+        GameLabsContextAction order;
+        GameLabsActionContext context;
+        Class referencedObject;
         for ( int i = 0; i < response.orders.Count(); i++ ) {
             order = response.orders.Get(i);
-            GetGameLabs().GetLogger().Debug(string.Format("Processing order %1/%2 action=%3", i+1, response.orders.Count(), order.action));
 
-            position[0] = order.params.position.x;
-            if(!order.params.position.z) {
-                position[1] = GetGame().SurfaceY(order.params.position.x, order.params.position.y) + 0.2;
-            } else {
-                position[1] = order.params.position.z;
-            }
-            position[2] = order.params.position.y;
+            GetGameLabs().GetLogger().Debug(string.Format("Processing order %1/%2 action=%3", i+1, response.orders.Count(), order.InfoString()));
 
-            if(order.target) {
-                requiresPlayer = true;
-                man = GetPlayerBySteam64(order.target);
-                if(man != NULL) {
-                    player = PlayerBase.Cast(man);
-                } else {
-                    player = NULL;
+            switch(order.actionContext) {
+                case "player": {
+                    referencedObject = GetPlayerBySteam64(order.referenceKey);
+                    if(referencedObject == NULL) {
+                        GetGameLabs().GetLogger().Warn(string.Format("Order requires PLAYER reference, but no player found by referenceKey=%1", order.referenceKey));
+                    }
+                    break;
                 }
+                case "vehicle": {
+                    referencedObject = GetGameLabs().GetVehicle(order.referenceKey);
+                    if(referencedObject == NULL) {
+                        GetGameLabs().GetLogger().Warn(string.Format("Order requires VEHICLE reference, but no vehicle found by referenceKey=%1", order.referenceKey));
+                    }
+                    break;
+                }
+                case "world": {
+                    referencedObject = GetGame().GetWorld();
+                    break;
+                }
+                default: {
+                    referencedObject = NULL;
+                }
+            }
+            if(referencedObject != NULL) {
+                context = new GameLabsActionContext(order.actionContext, referencedObject, order.parameters);
+
+                orderAction = GetGameLabs().GetGameLabsAction(order.actionCode);
+                orderStatus = orderAction.Execute(context);
             } else {
-                requiresPlayer = false;
-                player = NULL;
+                orderStatus = false;
             }
 
-            if(requiresPlayer && !player) {
-                GetGameLabs().GetLogger().Info(string.Format("Order %1/%2 [action=%3] skipped, no player found with identity=%4", i+1, response.orders.Count(), order.action, order.target));
-            } else {
-                orderStatus = APIOrderHandler(order.action, player, position, order.params);
-                GetGameLabs().GetLogger().Debug(string.Format("Order %1/%2 [action=%3] status=%4", i+1, response.orders.Count(), order.action, orderStatus));
-                if(!orderStatus) {
-                    GetGameLabs().GetLogger().Warn(string.Format("Order %1/%2 [action=%3] failed", i+1, response.orders.Count(), order.action));
-                }
+            GetGameLabs().GetLogger().Debug(string.Format("Order %1/%2 [action=%3] status=%4", i+1, response.orders.Count(), order.actionCode, orderStatus));
+            if(!orderStatus) {
+                GetGameLabs().GetLogger().Warn(string.Format("Order %1/%2 [action=%3] failed", i+1, response.orders.Count(), order.actionCode));
             }
         }
     };

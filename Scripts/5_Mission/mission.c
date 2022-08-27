@@ -73,6 +73,7 @@ modded class MissionServer {
         CFCloud_KillPlayer().Register();
         CFCloud_SpawnPlayerItem().Register();
         CFCloud_ExplodePlayer().Register();
+        CFCloud_StripPlayer().Register();
 
         // Vehicle
         CFCloud_DeleteVehicle().Register();
