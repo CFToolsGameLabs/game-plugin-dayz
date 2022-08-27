@@ -24,6 +24,7 @@ class GameLabsCore {
     private bool _reportingEnabled = false;
     private bool _reportStatistics = false;
     private ref array <ref string> _monitoredActions = new array<ref string>;
+    private ref array <ref GameLabsContextAction> _gamelabsActions = new array<ref GameLabsContextAction>;
 
     private ref array<ref _AI> _serverAI = new array<ref _AI>;
     private ref array<ref _Event> _serverEvents = new array<ref _Event>;
@@ -230,6 +231,14 @@ class GameLabsCore {
         if(this.IsMonitoredAction(action)) return;
         this._monitoredActions.Insert(action);
         this.GetLogger().Warn(string.Format("\"%1\" has been added as monitored action by a third party application", action));
+    }
+
+    void AddGameLabsAction(GameLabsContextAction action) {
+        this._gamelabsActions.Insert(action);
+    }
+
+    array <ref GameLabsContextAction> GetGameLabsActions() {
+        return this._gamelabsActions;
     }
 
     // Private calls, do not access
