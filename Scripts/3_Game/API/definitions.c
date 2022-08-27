@@ -35,7 +35,7 @@ class _Payload_Register : _Payload {
     string serverId;
     string apiKey;
     string localPort;
-    map<string, int> actions;
+    array<ref GameLabsContextAction> availableActions;
 
     void _Payload_Register(string serverId, string apiKey) {
         this.serverId = serverId;
@@ -46,7 +46,7 @@ class _Payload_Register : _Payload {
         } else {
             this.localPort = "0";
         }
-        this.actions = GetGameLabsActions().GetMap();
+        this.availableActions = GetGameLabs().GetGameLabsActions();
     }
     string ToJson() { return JsonFileLoader<_Payload_Register>.JsonMakeData(this); }
 };
