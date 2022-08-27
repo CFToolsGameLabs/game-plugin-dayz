@@ -1,7 +1,7 @@
 class CFCloud_TeleportPlayer extends GameLabsContextAction {
         void CFCloud_TeleportPlayer() {
             this.actionCode = "CFCloud_TeleportPlayer";
-            this.actionName = "Teleport a player to target location";
+            this.actionName = "Teleport player to target location";
             this.actionIcon = "map-marker-alt";
             this.actionColour = "default";
             this.actionContext = "player";
@@ -46,9 +46,9 @@ class CFCloud_HealPlayer extends GameLabsContextAction {
 class CFCloud_KillPlayer extends GameLabsContextAction {
         void CFCloud_KillPlayer() {
             this.actionCode = "CFCloud_KillPlayer";
-            this.actionName = "Kill a player character";
+            this.actionName = "Kill player character";
             this.actionIcon = "skull";
-            this.actionColour = "default";
+            this.actionColour = "warning";
             this.actionContext = "player"
         }
 
