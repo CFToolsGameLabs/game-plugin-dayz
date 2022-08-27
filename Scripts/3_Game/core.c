@@ -197,6 +197,14 @@ class GameLabsCore {
             }
         }
     }
+    _Vehicle GetVehicle(string referenceKey) {
+        for(int i = 0; i < this._serverVehicles.Count(); i++) {
+            if(this._serverVehicles.Get(i).GetID() == referenceKey) {
+                return this._serverVehicles.Get(i);
+            }
+        }
+        return NULL;
+    }
 
     array<ref _Event> GetEvents() {
         return this._serverEvents;
@@ -233,12 +241,21 @@ class GameLabsCore {
         this.GetLogger().Warn(string.Format("\"%1\" has been added as monitored action by a third party application", action));
     }
 
-    void AddGameLabsAction(GameLabsContextAction action) {
+    void AddGameLabsAction(ref GameLabsContextAction action) {
         this._gamelabsActions.Insert(action);
     }
 
     array <ref GameLabsContextAction> GetGameLabsActions() {
         return this._gamelabsActions;
+    }
+
+    GameLabsContextAction GetGameLabsAction(string actionCode) {
+        for(int i = 0; i < this._gamelabsActions.Count(); i++) {
+            if (this._gamelabsActions.Get(i).actionCode == actionCode) {
+                return this._gamelabsActions.Get(i);
+            }
+        }
+        return NULL;
     }
 
     // Private calls, do not access
