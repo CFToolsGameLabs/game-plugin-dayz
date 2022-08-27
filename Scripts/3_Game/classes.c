@@ -59,9 +59,9 @@ class GameLabsActionContext {
     private string contextType = "world";
     private Class referencedObject;
 
-    ref map<string, GameLabsActionParameter> parameters = new map<string, GameLabsActionParameter>;
+    ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
-    void GameLabsActionContext(string contextType, Class referencedObject, ref map<string, GameLabsActionParameter> parameters) {
+    void GameLabsActionContext(string contextType, Class referencedObject, ref map<string, ref GameLabsActionParameter> parameters) {
         this.contextType = contextType;
         this.referencedObject = referencedObject;
         this.parameters = parameters;
@@ -155,7 +155,7 @@ class GameLabsContextAction {
     // world, player, vehicle
     string actionContext = "world";
 
-    ref map<string, GameLabsActionParameter> parameters = new map<string, GameLabsActionParameter>;
+    ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
     // Internal
     string referenceKey;
