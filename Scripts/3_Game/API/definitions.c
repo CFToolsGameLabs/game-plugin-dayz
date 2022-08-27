@@ -35,9 +35,10 @@ class _Payload_Register : _Payload {
     string serverId;
     string apiKey;
     string localPort;
-    map<string, int> actions;
+    bool flagReauth;
+    array<ref GameLabsContextAction> availableActions;
 
-    void _Payload_Register(string serverId, string apiKey) {
+    void _Payload_Register(string serverId, string apiKey, bool flagReauth) {
         this.serverId = serverId;
         this.apiKey = apiKey;
         string tmp;
@@ -46,7 +47,8 @@ class _Payload_Register : _Payload {
         } else {
             this.localPort = "0";
         }
-        this.actions = GetGameLabsActions().GetMap();
+        this.flagReauth = flagReauth;
+        this.availableActions = GetGameLabs().GetGameLabsActions();
     }
     string ToJson() { return JsonFileLoader<_Payload_Register>.JsonMakeData(this); }
 };

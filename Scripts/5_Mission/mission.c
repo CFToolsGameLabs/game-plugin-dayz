@@ -64,8 +64,26 @@ modded class MissionServer {
         super.PlayerDisconnected(player, identity, uid);
     }
 
-    // Override to register your actions
-    void GLActionRegisterHook() {}
+    void GLActionRegisterHook() {
+        // Internal GameLabs actions
+
+        // Player
+        CFCloud_TeleportPlayer().Register();
+        CFCloud_HealPlayer().Register();
+        CFCloud_KillPlayer().Register();
+        CFCloud_SpawnPlayerItem().Register();
+        CFCloud_ExplodePlayer().Register();
+        CFCloud_StripPlayer().Register();
+
+        // Vehicle
+        CFCloud_DeleteVehicle().Register();
+
+        // Other
+        string tmp;
+        if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
+            GameLabsInternal_DummyAction().Register();
+        }
+    }
 
     void MissionServer() {
         if(this.gameLabs != NULL) {

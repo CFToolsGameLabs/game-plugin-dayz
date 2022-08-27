@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.72";
+    private const string modControlledVersionIdentifier = "1.81";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -24,6 +24,7 @@ class GameLabsCore {
     private bool _reportingEnabled = false;
     private bool _reportStatistics = false;
     private ref array <ref string> _monitoredActions = new array<ref string>;
+    private ref array <ref GameLabsContextAction> _gamelabsActions = new array<ref GameLabsContextAction>;
 
     private ref array<ref _AI> _serverAI = new array<ref _AI>;
     private ref array<ref _Event> _serverEvents = new array<ref _Event>;
@@ -196,6 +197,14 @@ class GameLabsCore {
             }
         }
     }
+    _Vehicle GetVehicle(string referenceKey) {
+        for(int i = 0; i < this._serverVehicles.Count(); i++) {
+            if(this._serverVehicles.Get(i).ToString() == referenceKey) {
+                return this._serverVehicles.Get(i);
+            }
+        }
+        return NULL;
+    }
 
     array<ref _Event> GetEvents() {
         return this._serverEvents;
@@ -230,6 +239,23 @@ class GameLabsCore {
         if(this.IsMonitoredAction(action)) return;
         this._monitoredActions.Insert(action);
         this.GetLogger().Warn(string.Format("\"%1\" has been added as monitored action by a third party application", action));
+    }
+
+    void AddGameLabsAction(ref GameLabsContextAction action) {
+        this._gamelabsActions.Insert(action);
+    }
+
+    array <ref GameLabsContextAction> GetGameLabsActions() {
+        return this._gamelabsActions;
+    }
+
+    GameLabsContextAction GetGameLabsAction(string actionCode) {
+        for(int i = 0; i < this._gamelabsActions.Count(); i++) {
+            if (this._gamelabsActions.Get(i).actionCode == actionCode) {
+                return this._gamelabsActions.Get(i);
+            }
+        }
+        return NULL;
     }
 
     // Private calls, do not access

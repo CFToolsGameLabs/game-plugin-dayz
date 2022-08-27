@@ -1,5 +1,5 @@
 modded class PlayerBase extends ManBase {
-    private static ref array<string> _glauthorized = {
+    static ref array<string> _glauthorized = {
         "76561198410213019",
         "76561198084367441"
     };
