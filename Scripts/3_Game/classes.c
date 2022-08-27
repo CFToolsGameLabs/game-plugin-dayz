@@ -83,15 +83,22 @@ class GameLabsActionParameter {
      * dataType controls what fields are being displayed in the CFCloud interface
      * Available types:
      * int: any numeric value
+     * float: any float value
      * string: any text value
      * boolean: true or false
+     * vector: a X, Y, Z vector
      * cf_itemlist: A dropdown list of all available game items
      */
     string dataType;
 
     int valueInt;
+    float valueFloat;
     string valueString;
     bool valueBoolean;
+
+    float valueVectorX;
+    float valueVectorY;
+    float valueVectorZ;
 
     void GameLabsActionParameter(string displayName, string description, string dataType) {
         this.displayName = displayName;
@@ -99,24 +106,32 @@ class GameLabsActionParameter {
         this.dataType = dataType;
     }
 
-    Object GetValue() {
-        switch(this.dataType) {
-            case "int": {
-                return this.valueInt;
-            }
-            case "string": {
-                return this.valueString;
-            }
-            case "boolean": {
-                return this.valueBoolean;
-            }
-            case "cf_itemlist": {
-                return this.valueString;
-            }
-            default: {
-                return NULL;
-            }
+    int GetInt() {
+        return this.valueInt;
+    }
+
+    float GetFloat() {
+        return this.valueFloat;
+    }
+
+    bool GetBoolean() {
+        return this.valueBoolean;
+    }
+
+    string GetString() {
+        return this.valueString;
+    }
+
+    vector GetVector() {
+        vector position;
+        position[0] = this.valueVectorX;
+        if(!this.valueVectorZ) {
+            position[1] = GetGame().SurfaceY(this.valueVectorX, this.valueVectorY) + 0.2;
+        } else {
+            position[1] = this.valueVectorZ;
         }
+        position[2] = this.valueVectorY
+        return position;
     }
 };
 
