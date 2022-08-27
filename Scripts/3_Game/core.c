@@ -199,7 +199,7 @@ class GameLabsCore {
     }
     _Vehicle GetVehicle(string referenceKey) {
         for(int i = 0; i < this._serverVehicles.Count(); i++) {
-            if(this._serverVehicles.Get(i).GetID() == referenceKey) {
+            if(this._serverVehicles.Get(i).ToString() == referenceKey) {
                 return this._serverVehicles.Get(i);
             }
         }

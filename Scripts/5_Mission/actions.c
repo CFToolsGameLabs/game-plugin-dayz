@@ -155,11 +155,14 @@ class CFCloud_DeleteVehicle extends GameLabsContextAction {
         }
 
         bool Execute(GameLabsActionContext context) {
-            Car vehicle;
-            Car.CastTo(vehicle, context.GetReferencedObject());
+            _Vehicle vehicle;
+            _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", vehicle));
-            vehicle.Delete();
+            Car vehicleEntity;
+            Car.CastTo(vehicleEntity, vehicle.Ref());
+
+            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", vehicleEntity));
+            vehicleEntity.Delete();
             return true;
         }
 };
