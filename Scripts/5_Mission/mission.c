@@ -78,6 +78,13 @@ modded class MissionServer {
         // Vehicle
         CFCloud_DeleteVehicle().Register();
 
+        // World
+        CFCloud_WorldTime().Register();
+        CFCloud_WorldWeather().Register();
+        CFCloud_WorldWeatherSunny().Register();
+
+        CFCloud_WorldWipeAI().Register();
+
         // Other
         string tmp;
         if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {

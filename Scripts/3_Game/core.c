@@ -179,6 +179,13 @@ class GameLabsCore {
             }
         }
     }
+    void ClearAI() {
+        if(!GetGame().IsServer()) return;
+        for(int i = 0; i < this._serverAI.Count(); i++) {
+            this._serverAI.Get(i).Ref().Delete();
+        }
+    }
+
 
     array<ref _Vehicle> GetVehicles() {
         return this._serverVehicles;
