@@ -85,6 +85,7 @@ modded class MissionServer {
 
         CFCloud_WorldWipeAI().Register();
         CFCloud_WorldWipeVehicles().Register();
+        CFCloud_SpawnItemWorld().Register();
 
         // Other
         string tmp;
