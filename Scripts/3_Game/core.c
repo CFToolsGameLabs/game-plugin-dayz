@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.81";
+    private const string modControlledVersionIdentifier = "1.812";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -179,6 +179,13 @@ class GameLabsCore {
             }
         }
     }
+    void ClearAI() {
+        if(!GetGame().IsServer()) return;
+        for(int i = 0; i < this._serverAI.Count(); i++) {
+            this._serverAI.Get(i).Ref().Delete();
+        }
+    }
+
 
     array<ref _Vehicle> GetVehicles() {
         return this._serverVehicles;
@@ -204,6 +211,12 @@ class GameLabsCore {
             }
         }
         return NULL;
+    }
+    void ClearVehicles() {
+        if(!GetGame().IsServer()) return;
+        for(int i = 0; i < this._serverVehicles.Count(); i++) {
+            this._serverVehicles.Get(i).Ref().Delete();
+        }
     }
 
     array<ref _Event> GetEvents() {

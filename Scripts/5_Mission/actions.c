@@ -1,3 +1,4 @@
+/* Player actions */
 class CFCloud_TeleportPlayer extends GameLabsContextAction {
         void CFCloud_TeleportPlayer() {
             this.actionCode = "CFCloud_TeleportPlayer";
@@ -144,6 +145,7 @@ class CFCloud_StripPlayer extends GameLabsContextAction {
         }
 };
 
+/* Vehicle Actions */
 
 class CFCloud_DeleteVehicle extends GameLabsContextAction {
         void CFCloud_DeleteVehicle() {
@@ -167,6 +169,127 @@ class CFCloud_DeleteVehicle extends GameLabsContextAction {
         }
 };
 
+/* World Actions */
+
+class CFCloud_WorldTime extends GameLabsContextAction {
+        void CFCloud_WorldTime() {
+            this.actionCode = "CFCloud_WorldTime";
+            this.actionName = "Update world time";
+            this.actionIcon = "clock";
+            this.actionColour = "default";
+            this.actionContext = "world";
+
+            // Set default value for parameter
+            GameLabsActionParameter hour = new GameLabsActionParameter("Hour", "", "int");
+            hour.valueInt = 12;
+            this.parameters.Insert("hour", hour);
+
+            this.parameters.Insert("minute", GameLabsActionParameter("Minute", "", "int"));
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Warn(string.Format("[Time] Updating game time hour=%1, minute=%2", context.parameters.Get("hour").GetInt(), context.parameters.Get("minute").GetInt()));
+
+            int year, month, day, hour, minute;
+            GetGame().GetWorld().GetDate(year, month, day, hour, minute);
+            GetGame().GetWorld().SetDate(year, month, day, context.parameters.Get("hour").GetInt(), context.parameters.Get("minute").GetInt());
+            return true;
+        }
+};
+
+class CFCloud_WorldWeather extends GameLabsContextAction {
+        void CFCloud_WorldWeather() {
+            this.actionCode = "CFCloud_WorldWeather";
+            this.actionName = "Update weather";
+            this.actionIcon = "clouds-sun";
+            this.actionColour = "default";
+            this.actionContext = "world";
+
+            this.parameters.Insert("overcast", GameLabsActionParameter("Overcast", "Number between 0 and 1", "float"));
+            this.parameters.Insert("fog", GameLabsActionParameter("Overcast", "Number between 0 and 1", "float"));
+            this.parameters.Insert("rain", GameLabsActionParameter("Overcast", "Number between 0 and 1", "float"));
+            this.parameters.Insert("wind", GameLabsActionParameter("Wind speed", "Wind speed in km/h", "int"));
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Warn(string.Format("[Weather] Updating weather overcast=%1, fog=%2, rain=%3, wind=%4",context.parameters.Get("overcast").GetFloat(),context.parameters.Get("fog").GetFloat(),context.parameters.Get("rain").GetFloat(),context.parameters.Get("wind").GetInt()));
+
+            Weather weather = GetGame().GetWeather();
+            if(!weather) return false;
+
+            if(weather.GetOvercast()) weather.GetOvercast().Set(context.parameters.Get("overcast").GetFloat(), context.parameters.Get("overcast").GetFloat(), context.parameters.Get("overcast").GetFloat());
+            if(weather.GetFog()) weather.GetFog().Set(context.parameters.Get("fog").GetFloat(), context.parameters.Get("fog").GetFloat(), context.parameters.Get("fog").GetFloat());
+            if(weather.GetRain()) weather.GetRain().Set(context.parameters.Get("rain").GetFloat(), context.parameters.Get("rain").GetFloat(), context.parameters.Get("rain").GetFloat());
+            weather.SetWindSpeed(context.parameters.Get("wind").GetInt());
+
+            return true;
+        }
+};
+
+class CFCloud_WorldWeatherSunny extends GameLabsContextAction {
+        void CFCloud_WorldWeatherSunny() {
+            this.actionCode = "CFCloud_WorldWeatherSunny";
+            this.actionName = "Set clear weather";
+            this.actionIcon = "sun";
+            this.actionColour = "success";
+            this.actionContext = "world";
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Warn(string.Format("[Weather] Updating weather (sunny/clear)"));
+
+            Weather weather = GetGame().GetWeather();
+            if(!weather) return false;
+
+            if(weather.GetOvercast()) weather.GetOvercast().Set(0.0, 0.0, 0.0);
+            if(weather.GetFog()) weather.GetFog().Set(0.0, 0.0, 0.0);
+            if(weather.GetRain()) weather.GetRain().Set(0.0, 0.0, 0.0);
+            weather.SetWindSpeed(0);
+
+            return true;
+        }
+};
+
+class CFCloud_WorldWipeAI extends GameLabsContextAction {
+        void CFCloud_WorldWipeAI() {
+            this.actionCode = "CFCloud_WorldWipeAI";
+            this.actionName = "Clear all world AI";
+            this.actionIcon = "redo";
+            this.actionColour = "danger";
+            this.actionContext = "world";
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Warn(string.Format("[World (AI)] Clearing all world ai..."));
+
+            GetGameLabs().ClearAI();
+
+            GetGameLabs().GetLogger().Warn(string.Format("[World (AI)] AI cleared"));
+            return true;
+        }
+};
+
+class CFCloud_WorldWipeVehicles extends GameLabsContextAction {
+        void CFCloud_WorldWipeVehicles() {
+            this.actionCode = "CFCloud_WorldWipeVehicles";
+            this.actionName = "Clear all world vehicles";
+            this.actionIcon = "redo";
+            this.actionColour = "danger";
+            this.actionContext = "world";
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Warn(string.Format("[World (AI)] Clearing all world vehicles..."));
+
+            GetGameLabs().ClearVehicles();
+
+            GetGameLabs().GetLogger().Warn(string.Format("[World (AI)] Vehicles cleared"));
+            return true;
+        }
+};
+
+/* Other Actions */
+
 // This is an example action for internal use, and it's not transmitted unless testing mode is locally enabled
 class GameLabsInternal_DummyAction extends GameLabsContextAction {
         void GameLabsInternal_DummyAction() {
@@ -186,6 +309,8 @@ class GameLabsInternal_DummyAction extends GameLabsContextAction {
             return true;
         }
 };
+
+
 
 /*
  * TODO: Implement with new action system
