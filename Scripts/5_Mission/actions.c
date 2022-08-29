@@ -309,31 +309,3 @@ class GameLabsInternal_DummyAction extends GameLabsContextAction {
             return true;
         }
 };
-
-
-
-/*
- * TODO: Implement with new action system
- * bool _ProcessWeatherServer(PlayerBase player, vector position, _SP2OrderParams params) {
-    GetGameLabs().GetLogger().Warn(string.Format("[Weather] Updating weather overcast=%1, fog=%2, rain=%3, wind=%4", params.overcast, params.fog, params.rain, params.wind));
-    Weather weather = GetGame().GetWeather();
-    if(!weather) return false;
-
-    if(params.overcast && weather.GetOvercast()) weather.GetOvercast().Set(params.overcast[0], params.overcast[1], params.overcast[2]);
-    if(params.fog && weather.GetFog()) weather.GetFog().Set(params.fog[0], params.fog[1], params.fog[2]);
-    if(params.rain && weather.GetRain()) weather.GetRain().Set(params.rain[0], params.rain[1], params.rain[2]);
-    if(params.wind) weather.SetWindSpeed(params.wind);
-
-    return true;
-};
-
-bool _ProcessTimeServer(PlayerBase player, vector position, _SP2OrderParams params) {
-    GetGameLabs().GetLogger().Warn(string.Format("[Time] Updating game time hour=%1, minute=%2", params.hour, params.minute));
-
-    int year, month, day, hour, minute;
-    GetGame().GetWorld().GetDate(year, month, day, hour, minute);
-    GetGame().GetWorld().SetDate(year, month, day, params.hour, params.minute);
-
-    return true;
-};
- */
