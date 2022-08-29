@@ -206,8 +206,8 @@ class CFCloud_WorldWeather extends GameLabsContextAction {
             this.actionContext = "world";
 
             this.parameters.Insert("overcast", GameLabsActionParameter("Overcast", "Number between 0 and 1", "float"));
-            this.parameters.Insert("fog", GameLabsActionParameter("Overcast", "Number between 0 and 1", "float"));
-            this.parameters.Insert("rain", GameLabsActionParameter("Overcast", "Number between 0 and 1", "float"));
+            this.parameters.Insert("fog", GameLabsActionParameter("Fog", "Number between 0 and 1", "float"));
+            this.parameters.Insert("rain", GameLabsActionParameter("Rain", "Number between 0 and 1", "float"));
             this.parameters.Insert("wind", GameLabsActionParameter("Wind speed", "Wind speed in km/h", "int"));
         }
 
