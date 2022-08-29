@@ -84,6 +84,7 @@ modded class MissionServer {
         CFCloud_WorldWeatherSunny().Register();
 
         CFCloud_WorldWipeAI().Register();
+        CFCloud_WorldWipeVehicles().Register();
 
         // Other
         string tmp;
