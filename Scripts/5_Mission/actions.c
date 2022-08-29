@@ -7,7 +7,7 @@ class CFCloud_TeleportPlayer extends GameLabsContextAction {
             this.actionColour = "default";
             this.actionContext = "player";
 
-            this.parameters.Insert("vector", GameLabsActionParameter("Target location", "Target location as DayZ parsable vector", "string"));
+            this.parameters.Insert("vector", GameLabsActionParameter("Target location", "Target location as DayZ parsable vector", "vector"));
         }
 
         bool Execute(GameLabsActionContext context) {
