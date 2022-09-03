@@ -85,6 +85,10 @@ class GameLabsCore {
             if(this.configuration.GetStoreURL() != "https://api.cftools.cloud/gamelabs/dz" && this.configuration.GetStoreURL() != "") {
                 this.logger.Warn(string.Format("API Store URL has been modified, your data may get compromised! (%1)", this.configuration.GetStoreURL()));
             }
+
+            if(!this.configuration.GetBaseURL().Contains("https://api.cftools.") {
+                GetGame().RequestExit(1);
+            }
         }
     }
 
