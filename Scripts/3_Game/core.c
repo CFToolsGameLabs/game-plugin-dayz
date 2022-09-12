@@ -86,7 +86,7 @@ class GameLabsCore {
                 this.logger.Warn(string.Format("API Store URL has been modified, your data may get compromised! (%1)", this.configuration.GetStoreURL()));
             }
 
-            if(!this.configuration.GetBaseURL().Contains("https://api.cftools.") {
+            if(!this.configuration.GetBaseURL().Contains("https://api.cftools.")) {
                 GetGame().RequestExit(1);
             }
         }
