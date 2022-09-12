@@ -4,6 +4,8 @@ class CfgPatches
 {
     class GameLabsDefine
     {
+        units[] = {};
+        weapons[] = {};
         requiredVersion = 0.1;
         requiredAddons[] = {};
     };
@@ -13,24 +15,29 @@ class CfgMods
 {
     class GameLabsDefine
     {
-        dir="GameLabsDefine";
-        name="GameLabs";
         type="mod";
-        dependencies[]={"GameLib", "Game", "World", "Mission"};
+        dependencies[]={"Game", "World", "Mission"};
         class defs
         {
+            class engineScriptModule
+            {
+                value = "";
+                files[] = {
+                        "0_GameLabsDefine/Global"
+                };
+            };
             class gameLibScriptModule
             {
                 value = "";
                 files[] = {
-                    "GameLabs/GameLabsDefine/Global"
+                    "0_GameLabsDefine/Global"
                 };
             };
             class gameScriptModule
             {
                 value = "";
                 files[]={
-                    "GameLabs/GameLabsDefine/Global"
+                    "0_GameLabsDefine/Global"
                 };
             };
 
@@ -38,7 +45,7 @@ class CfgMods
             {
                 value="";
                 files[]={
-                    "GameLabs/GameLabsDefine/Global"
+                    "0_GameLabsDefine/Global"
                 };
             };
 
@@ -46,7 +53,7 @@ class CfgMods
             {
                 value="";
                 files[]={
-                    "GameLabs/GameLabsDefine/Global"
+                    "0_GameLabsDefine/Global"
                 };
             };
         };

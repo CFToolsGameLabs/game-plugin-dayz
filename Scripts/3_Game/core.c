@@ -49,6 +49,10 @@ class GameLabsCore {
         if(this.logger) this.logger.Debug("(Core) All ref holding buffers cleared");
     }
 
+    void OnStoreLoad() {
+        // hehe
+    }
+
     bool IsProcessingBlocked() {
         return this.blockProcessing;
     }
