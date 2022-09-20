@@ -87,6 +87,10 @@ modded class MissionServer {
         CFCloud_WorldWipeVehicles().Register();
         CFCloud_SpawnItemWorld().Register();
 
+        // Object
+        CFCloud_ObjectDelete().Register();
+        CFCloud_TerritoryFlagClear().Register();
+
         // Other
         string tmp;
         if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
