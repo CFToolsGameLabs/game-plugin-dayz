@@ -251,6 +251,8 @@ class _Callback_ServerPoll2 : _Callback {
                     referencedObject = GetGameLabs().GetEvent(order.referenceKey);
                     if(referencedObject == NULL) {
                         GetGameLabs().GetLogger().Warn(string.Format("Order requires OBJECT/EVENT reference, but nothing found by referenceKey=%1", order.referenceKey));
+                    } else {
+                        if(referencedObject.Ref().ClassName())
                     }
                     break;
                 }
@@ -262,7 +264,16 @@ class _Callback_ServerPoll2 : _Callback {
                 context = new GameLabsActionContext(order.actionContext, referencedObject, order.parameters);
 
                 orderAction = GetGameLabs().GetGameLabsAction(order.actionCode);
-                orderStatus = orderAction.Execute(context);
+
+                if(order.actionContext == "object") {
+                    if(order.actionContextFilter.Count() > 0) {
+                        if(order.actionContextFilter.Find(referencedObject.Ref().ClassName()) == -1) {
+                            GetGameLabs().GetLogger().Warn(string.Format("Order requires OBJECT/EVENT reference of specific types, but %1 is not supported", referencedObject.Ref().ClassName()));
+                            referencedObject = NULL;
+                        }
+                    }
+                    if(referencedObject != NULL) orderStatus = orderAction.Execute(context);
+                } else orderStatus = orderAction.Execute(context);
             } else {
                 orderStatus = false;
             }
