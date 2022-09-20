@@ -124,6 +124,7 @@ modded class MissionServer {
             if(this.gameLabs.errorFlag) { // Mod licensing error
                 shutdownTitle = string.Format("Server not authorized to use %1", this.gameLabs.modLicensingOffender);
                 shutdownContent = "Contact the mod author for details";
+                this.gameLabs.GetLogger().Error(shutdownTitle);
                 Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
                 PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
                 GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
@@ -136,7 +137,12 @@ modded class MissionServer {
                 this.gameLabs.GetLogger().Info(string.Format("Server up (GameLabs v%1)", this.gameLabs.GetVersionIdentifier()));
                 this._Setup();
             } else {
-                this.gameLabs.GetLogger().Debug(string.Format("apiStatus=%1", apiStatus));
+                shutdownTitle = string.Format("Failed to verify api registration (apiStatus=%1)", apiStatus);
+                shutdownContent = "A race condition caused a GameLabs error, verify your server is booting in time"
+                this.gameLabs.GetLogger().Error(shutdownTitle);
+                Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
+                PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
+                GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
                 GetGame().RequestExit(1); // This should never happen
             }
         } else { // Unreachable

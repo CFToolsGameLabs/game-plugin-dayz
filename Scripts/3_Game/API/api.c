@@ -71,9 +71,9 @@ class GameLabsAPI {
         GetGame().CommandlineGetParam("port", this.gamePort);
     }
 
-    void Enable() { this.active = true; }
-    void Disable() { this.active = false; }
-    bool IsEnabled() { return this.active; }
+    void Enable() { Print("[GameLabs] API was ENABLED through script"); this.active = true; }
+    void Disable() { Print("[GameLabs] API was DISABLED through script"); this.active = false; }
+    bool IsEnabled() { Print(string.Format("[GameLabs] API status was requested (active=%1)", this.active)); return this.active; }
 
     void SetAuthkey(string authKey) {
         this.authKey = authKey;
