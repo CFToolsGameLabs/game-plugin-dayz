@@ -152,8 +152,11 @@ class GameLabsContextAction {
     // Available codes: "success" (green), "danger" (red), "warning" (yellow)
     string actionColour = "default";
 
-    // world, player, vehicle
+    // world, player, vehicle, object
     string actionContext = "world";
+
+    // Filter to applicable object type (classname) if actionContext = object
+    ref array<string> actionContextFilter;
 
     ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 

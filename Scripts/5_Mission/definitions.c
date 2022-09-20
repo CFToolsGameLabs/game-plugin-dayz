@@ -247,6 +247,13 @@ class _Callback_ServerPoll2 : _Callback {
                     referencedObject = GetGame().GetWorld();
                     break;
                 }
+                case "object": {
+                    referencedObject = GetGameLabs().GetEvent(order.referenceKey);
+                    if(referencedObject == NULL) {
+                        GetGameLabs().GetLogger().Warn(string.Format("Order requires OBJECT/EVENT reference, but nothing found by referenceKey=%1", order.referenceKey));
+                    }
+                    break;
+                }
                 default: {
                     referencedObject = NULL;
                 }
