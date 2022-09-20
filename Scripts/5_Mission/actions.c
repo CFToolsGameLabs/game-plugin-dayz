@@ -359,7 +359,7 @@ class CFCloud_TerritoryFlagClear extends GameLabsContextAction {
         void CFCloud_TerritoryFlagClear() {
             this.actionCode = "CFCloud_TerritoryFlagClear";
             this.actionName = "Clear territory (Server restart required)";
-            this.actionIcon = "flag-pennant";
+            this.actionIcon = "pennant";
             this.actionColour = "warning";
             this.actionContext = "object";
             this.actionContextFilter = new array<string>;
