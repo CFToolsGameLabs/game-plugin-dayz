@@ -249,6 +249,14 @@ class GameLabsCore {
             }
         }
     }
+    _Event GetEvent(string referenceKey) {
+        for(int i = 0; i < this._serverEvents.Count(); i++) {
+            if(this._serverEvents.Get(i).ToString() == referenceKey) {
+                return this._serverEvents.Get(i);
+            }
+        }
+        return NULL;
+    }
 
     int GetMetricsInterval() { return this._metricsInterval; }
     int GetReportingInterval() { return this._reportingInterval; }
