@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.812";
+    private const string modControlledVersionIdentifier = "1.821";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;

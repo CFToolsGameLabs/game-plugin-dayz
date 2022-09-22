@@ -185,3 +185,13 @@ class GameLabsContextAction {
         return string.Format("GameLabsContextAction<%1, %2, %3, %4, %5>", this.actionCode, this.actionName, this.actionIcon, this.actionColour, this.actionContext);
     }
 };
+
+class GLClientHitInfo {
+    float tick_time;
+    string object;
+
+    void GLClientHitInfo(string object) {
+        this.object = object;
+        this.tick_time = GetGame().GetTickTime();
+    }
+};

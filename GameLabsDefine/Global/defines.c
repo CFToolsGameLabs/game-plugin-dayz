@@ -1,0 +1,4 @@
+#define CFTOOLS
+#define GAMELABS
+#define GAMELABS_POLL2
+#define GAMELABS_18
