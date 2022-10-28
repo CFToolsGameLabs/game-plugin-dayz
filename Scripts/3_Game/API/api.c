@@ -40,8 +40,8 @@ class _Callback_RegisterAsync : _Callback {
 };
 
 class GameLabsAPI {
-    private string baseUrl = "https://api.cftools.cloud/gamelabs/dz";
-    private string storeUrl = "https://api.cftools.cloud/gamelabs/dz";
+    private string baseUrl = "https://api.gamelabs.cloud/dz";
+    private string storeUrl = "https://api.gamelabs.cloud/dz";
 
     private RestApi restApi;
     private RestContext restContext;
@@ -56,7 +56,7 @@ class GameLabsAPI {
 
     private int pollProtocolVersion = 0;
 
-    void GameLabsAPI(string serverId, string apiKey, string baseUrl = "https://api.cftools.cloud/gamelabs/dz", string storeUrl = "https://api.cftools.cloud/gamelabs/dz") {
+    void GameLabsAPI(string serverId, string apiKey, string baseUrl = "https://api.gamelabs.cloud/dz", string storeUrl = "https://api.gamelabs.cloud/dz") {
         this.serverId = serverId;
         this.apiKey = apiKey;
 
