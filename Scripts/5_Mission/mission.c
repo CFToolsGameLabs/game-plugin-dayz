@@ -217,27 +217,43 @@ modded class MissionServer {
         if(m_player.GetPlainId() && this._testClients.Find(m_player.GetPlainId()) != -1) {
             this.gameLabs.GetLogger().Warn(string.Format("(Re-Spawn) Granting %1<name=%2;steam64=%3> CFTools staff equipment", m_player, m_player.GetPlayerName(), m_player.GetPlainId()));
 
-            ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
-            if(item) {
-                m_player.DropItem(item);
-            }
-            item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
-            item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
-
             /* ***** Start server with -gamelabstesting parameter for test loadout ***** */
             string tmp;
-            if(!GetGameLabs().GetConfiguration().GetDebugStatus()) return;
-            if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
-                EntityAI weapon;
+            if(GetGameLabs().GetConfiguration().GetDebugStatus() && GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
+                m_player.RemoveAllItems();
 
-                m_player.GetHumanInventory().CreateInInventory("CargoPants_Black");
+                m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools");
                 m_player.GetHumanInventory().CreateInInventory("AviatorGlasses");
+                m_player.GetHumanInventory().CreateInInventory("Hoodie_CFTools");
                 m_player.GetHumanInventory().CreateInInventory("OMNOGloves_Gray");
-                EntityAI bp = m_player.GetInventory().CreateInInventory("SmershBag");
-                EntityAI belt = m_player.GetHumanInventory().CreateInInventory("MilitaryBelt");
+                m_player.GetHumanInventory().CreateInInventory("CargoPants_Black");
+                m_player.GetHumanInventory().CreateInInventory("CombatBoots_Black");
+
+                //EntityAI bp = m_player.GetInventory().CreateInInventory("SmershBag");
+                EntityAI belt = m_player.GetInventory().CreateInInventory("MilitaryBelt");
                 EntityAI sheath = belt.GetInventory().CreateInInventory("NylonKnifeSheath");
                 sheath.GetInventory().CreateInInventory("CombatKnife");
 
+                EntityAI plate_carrier = m_player.GetHumanInventory().CreateInInventory("PlateCarrierVest_CFTools");
+                plate_carrier.OnDebugSpawn();
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+
+                EntityAI weapon;
+                EntityAI plate_carrier_holster = belt.GetInventory().CreateInInventory("PlateCarrierHolster_CFTools");
+                weapon = plate_carrier_holster.GetInventory().CreateInInventory("FNX45");
+                m_player.SetQuickBarEntityShortcut(weapon, 0, true);
+                weapon.OnDebugSpawn();
+
+                weapon = m_player.GetHumanInventory().CreateInInventory("HK416_CFTools");
+                m_player.SetQuickBarEntityShortcut(weapon, 1, true);
+                weapon.OnDebugSpawn();
+
+                /*
                 // Scout
                 weapon = m_player.GetInventory().CreateInInventory("Scout_CFTools");
                 m_player.SetQuickBarEntityShortcut(weapon, 0, true);
@@ -247,6 +263,14 @@ modded class MissionServer {
                 weapon = m_player.GetInventory().CreateInInventory("Saiga_CFTools");
                 m_player.SetQuickBarEntityShortcut(weapon, 1, true);
                 weapon.OnDebugSpawn();
+                */
+            } else {
+                ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
+                if(item) {
+                    m_player.DropItem(item);
+                }
+                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
+                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
             }
             /* ************************************************************************ */
         }
