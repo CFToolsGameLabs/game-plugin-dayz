@@ -81,16 +81,16 @@ class GameLabsCore {
 
             // TODO: Move this somewhere else in the future
             this.logger.Debug(string.Format("baseUrl=%1", this.configuration.GetBaseURL()));
-            if(this.configuration.GetBaseURL() != "https://api.cftools.cloud/gamelabs/dz" && this.configuration.GetBaseURL() != "") {
+            if(this.configuration.GetBaseURL() != "https://api.gamelabs.cloud/dz" && this.configuration.GetBaseURL() != "") {
                 this.logger.Warn(string.Format("API Base URL has been modified, your data may get compromised! (%1)", this.configuration.GetBaseURL()));
             }
 
             this.logger.Debug(string.Format("storeUrl=%1", this.configuration.GetStoreURL()));
-            if(this.configuration.GetStoreURL() != "https://api.cftools.cloud/gamelabs/dz" && this.configuration.GetStoreURL() != "") {
+            if(this.configuration.GetStoreURL() != "https://api.gamelabs.cloud/dz" && this.configuration.GetStoreURL() != "") {
                 this.logger.Warn(string.Format("API Store URL has been modified, your data may get compromised! (%1)", this.configuration.GetStoreURL()));
             }
 
-            if(!this.configuration.GetBaseURL().Contains("https://api.cftools.")) {
+            if(!this.configuration.GetBaseURL().Contains("https://api.gamelabs.cloud")) {
                 GetGame().RequestExit(1);
             }
         }
