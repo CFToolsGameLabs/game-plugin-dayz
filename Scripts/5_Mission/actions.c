@@ -294,7 +294,7 @@ class CFCloud_SpawnItemWorld extends GameLabsContextAction {
             this.actionName = "Spawn an item at coordinates";
             this.actionIcon = "gem";
             this.actionColour = "default";
-            this.actionContext = "world"
+            this.actionContext = "world";
 
             this.parameters.Insert("vector", GameLabsActionParameter("Coordinates", "World coordinates", "vector"));
             this.parameters.Insert("item", GameLabsActionParameter("Item class name", "Class name of item to be spawned", "cf_itemlist"));
@@ -331,6 +331,52 @@ class CFCloud_SpawnItemWorld extends GameLabsContextAction {
                     }
                 }
             }
+            return true;
+        }
+};
+
+class CFCloud_ObjectDelete extends GameLabsContextAction {
+        void CFCloud_ObjectDelete() {
+            this.actionCode = "CFCloud_ObjectDelete";
+            this.actionName = "Delete object";
+            this.actionIcon = "trash";
+            this.actionColour = "danger";
+            this.actionContext = "object";
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            _Event eventInstance;
+            _Event.CastTo(eventInstance, context.GetReferencedObject());
+
+            GetGameLabs().GetLogger().Warn(string.Format("[ObjectDelete] Deleting object %1", eventInstance.Ref()));
+
+            eventInstance.Ref().Delete();
+            return true;
+        }
+};
+
+class CFCloud_TerritoryFlagClear extends GameLabsContextAction {
+        void CFCloud_TerritoryFlagClear() {
+            this.actionCode = "CFCloud_TerritoryFlagClear";
+            this.actionName = "Clear territory (Server restart required)";
+            this.actionIcon = "pennant";
+            this.actionColour = "warning";
+            this.actionContext = "object";
+            this.actionContextFilter = new array<string>;
+            this.actionContextFilter.Insert("TerritoryFlag");
+        }
+
+        bool Execute(GameLabsActionContext context) {
+            _Event eventInstance;
+            _Event.CastTo(eventInstance, context.GetReferencedObject());
+            GetGameLabs().GetLogger().Warn(string.Format("[TerritoryFlagClear] Clearing flag and everything in radius for %1<%2>", eventInstance.Ref(), eventInstance));
+
+            TerritoryFlag totem;
+            TerritoryFlag.CastTo(totem, eventInstance.Ref());
+
+            GetCEApi().RadiusLifetimeDecrease(totem.GetPosition(), GameConstants.REFRESHER_RADIUS, totem.GetEconomyProfile().GetLifetime() + 1);
+            totem.Delete();
+            GetCEApi().OnUpdate();
             return true;
         }
 };

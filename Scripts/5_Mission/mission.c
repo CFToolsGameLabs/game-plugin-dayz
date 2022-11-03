@@ -87,6 +87,10 @@ modded class MissionServer {
         CFCloud_WorldWipeVehicles().Register();
         CFCloud_SpawnItemWorld().Register();
 
+        // Object
+        CFCloud_ObjectDelete().Register();
+        CFCloud_TerritoryFlagClear().Register();
+
         // Other
         string tmp;
         if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
@@ -124,6 +128,7 @@ modded class MissionServer {
             if(this.gameLabs.errorFlag) { // Mod licensing error
                 shutdownTitle = string.Format("Server not authorized to use %1", this.gameLabs.modLicensingOffender);
                 shutdownContent = "Contact the mod author for details";
+                this.gameLabs.GetLogger().Error(shutdownTitle);
                 Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
                 PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
                 GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
@@ -136,7 +141,12 @@ modded class MissionServer {
                 this.gameLabs.GetLogger().Info(string.Format("Server up (GameLabs v%1)", this.gameLabs.GetVersionIdentifier()));
                 this._Setup();
             } else {
-                this.gameLabs.GetLogger().Debug(string.Format("apiStatus=%1", apiStatus));
+                shutdownTitle = string.Format("Failed to verify api registration (apiStatus=%1)", apiStatus);
+                shutdownContent = "A race condition caused a GameLabs error, verify your server is booting in time"
+                this.gameLabs.GetLogger().Error(shutdownTitle);
+                Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
+                PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
+                GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
                 GetGame().RequestExit(1); // This should never happen
             }
         } else { // Unreachable
@@ -207,27 +217,43 @@ modded class MissionServer {
         if(m_player.GetPlainId() && this._testClients.Find(m_player.GetPlainId()) != -1) {
             this.gameLabs.GetLogger().Warn(string.Format("(Re-Spawn) Granting %1<name=%2;steam64=%3> CFTools staff equipment", m_player, m_player.GetPlayerName(), m_player.GetPlainId()));
 
-            ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
-            if(item) {
-                m_player.DropItem(item);
-            }
-            item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
-            item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
-
             /* ***** Start server with -gamelabstesting parameter for test loadout ***** */
             string tmp;
-            if(!GetGameLabs().GetConfiguration().GetDebugStatus()) return;
-            if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
-                EntityAI weapon;
+            if(GetGameLabs().GetConfiguration().GetDebugStatus() && GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
+                m_player.RemoveAllItems();
 
-                m_player.GetHumanInventory().CreateInInventory("CargoPants_Black");
+                m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools");
                 m_player.GetHumanInventory().CreateInInventory("AviatorGlasses");
+                m_player.GetHumanInventory().CreateInInventory("Hoodie_CFTools");
                 m_player.GetHumanInventory().CreateInInventory("OMNOGloves_Gray");
-                EntityAI bp = m_player.GetInventory().CreateInInventory("SmershBag");
-                EntityAI belt = m_player.GetHumanInventory().CreateInInventory("MilitaryBelt");
+                m_player.GetHumanInventory().CreateInInventory("CargoPants_Black");
+                m_player.GetHumanInventory().CreateInInventory("CombatBoots_Black");
+
+                //EntityAI bp = m_player.GetInventory().CreateInInventory("SmershBag");
+                EntityAI belt = m_player.GetInventory().CreateInInventory("MilitaryBelt");
                 EntityAI sheath = belt.GetInventory().CreateInInventory("NylonKnifeSheath");
                 sheath.GetInventory().CreateInInventory("CombatKnife");
 
+                EntityAI plate_carrier = m_player.GetHumanInventory().CreateInInventory("PlateCarrierVest_CFTools");
+                plate_carrier.OnDebugSpawn();
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+                plate_carrier.GetInventory().CreateInInventory("Mag_FNX45_15Rnd");
+
+                EntityAI weapon;
+                EntityAI plate_carrier_holster = belt.GetInventory().CreateInInventory("PlateCarrierHolster_CFTools");
+                weapon = plate_carrier_holster.GetInventory().CreateInInventory("FNX45");
+                m_player.SetQuickBarEntityShortcut(weapon, 0, true);
+                weapon.OnDebugSpawn();
+
+                weapon = m_player.GetHumanInventory().CreateInInventory("HK416_CFTools");
+                m_player.SetQuickBarEntityShortcut(weapon, 1, true);
+                weapon.OnDebugSpawn();
+
+                /*
                 // Scout
                 weapon = m_player.GetInventory().CreateInInventory("Scout_CFTools");
                 m_player.SetQuickBarEntityShortcut(weapon, 0, true);
@@ -237,6 +263,14 @@ modded class MissionServer {
                 weapon = m_player.GetInventory().CreateInInventory("Saiga_CFTools");
                 m_player.SetQuickBarEntityShortcut(weapon, 1, true);
                 weapon.OnDebugSpawn();
+                */
+            } else {
+                ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
+                if(item) {
+                    m_player.DropItem(item);
+                }
+                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
+                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
             }
             /* ************************************************************************ */
         }

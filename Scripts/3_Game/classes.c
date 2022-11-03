@@ -152,8 +152,11 @@ class GameLabsContextAction {
     // Available codes: "success" (green), "danger" (red), "warning" (yellow)
     string actionColour = "default";
 
-    // world, player, vehicle
+    // world, player, vehicle, object
     string actionContext = "world";
+
+    // Filter to applicable object type (classname) if actionContext = object
+    ref array<string> actionContextFilter;
 
     ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
@@ -180,5 +183,15 @@ class GameLabsContextAction {
 
     string InfoString() {
         return string.Format("GameLabsContextAction<%1, %2, %3, %4, %5>", this.actionCode, this.actionName, this.actionIcon, this.actionColour, this.actionContext);
+    }
+};
+
+class GLClientHitInfo {
+    float tick_time;
+    string object;
+
+    void GLClientHitInfo(string object) {
+        this.object = object;
+        this.tick_time = GetGame().GetTickTime();
     }
 };

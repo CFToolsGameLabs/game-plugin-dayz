@@ -122,6 +122,19 @@ class GameLabsRPC {
                 return;
             }
             #endif
+            /*
+            case GameLabsRPCS.RP_HITINFO: {
+                player = GetPlayerByIdentity(sender);
+                if(!player) return;
+
+                Param1<string> hitref = new Param1<string>("");
+                ctx.Read(hitref);
+                if(hitref.param1) {
+                    GLClientHitInfo hitInfo = new GLClientHitInfo(hitref.param1);
+                    player.AddHitToCache(hitInfo);
+                }
+            }
+            */
         }
     }
 };

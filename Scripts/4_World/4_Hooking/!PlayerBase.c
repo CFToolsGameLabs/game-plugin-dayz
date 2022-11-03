@@ -18,6 +18,35 @@ modded class PlayerBase extends ManBase {
     private float gl_ticktime = 0.0;
     private vector gl_position;
 
+    /*
+    private ref array<GLClientHitInfo> _hitCache = new array<GLClientHitInfo>;
+
+    void AddHitToCache(GLClientHitInfo hitInfo) {
+        Print("AddHitToCache");
+        Print(this);
+        Print(Object.GetDebugName(this));
+        this._hitCache.Insert(hitInfo);
+    }
+
+    bool HasValidHitInCache(string className) {
+        GLClientHitInfo hitInfo;
+
+        float currentTime = GetGame().GetTickTime();
+        float allowedTimeSkew = 1.0;
+
+        bool hitFound = false;
+
+        for(int i = 0; i < this._hitCache.Count(); i++) {
+            hitInfo = this._hitCache.Get(i);
+            if(hitInfo.tick_time >= (currentTime - allowedTimeSkew) && hitInfo.tick_time <= (currentTime + allowedTimeSkew)) {
+                hitFound = true;
+                break;
+            }
+        }
+        return hitFound;
+    }
+    */
+
     bool HasAnyIdentitySet() {
         return (this.GetPlainId() || this.GetIdentity().GetPlainId());
     }
@@ -257,5 +286,8 @@ modded class PlayerBase extends ManBase {
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);
+
+        if(!GetGameLabs().GetDebugStatus()) return;
+        //if(!murderer.HasValidHitInCache()
     }
 };

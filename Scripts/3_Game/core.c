@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.812";
+    private const string modControlledVersionIdentifier = "1.821";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -49,6 +49,10 @@ class GameLabsCore {
         if(this.logger) this.logger.Debug("(Core) All ref holding buffers cleared");
     }
 
+    void OnStoreLoad() {
+        // hehe
+    }
+
     bool IsProcessingBlocked() {
         return this.blockProcessing;
     }
@@ -77,13 +81,17 @@ class GameLabsCore {
 
             // TODO: Move this somewhere else in the future
             this.logger.Debug(string.Format("baseUrl=%1", this.configuration.GetBaseURL()));
-            if(this.configuration.GetBaseURL() != "https://api.cftools.cloud/gamelabs/dz" && this.configuration.GetBaseURL() != "") {
+            if(this.configuration.GetBaseURL() != "https://api.gamelabs.cloud/dz" && this.configuration.GetBaseURL() != "") {
                 this.logger.Warn(string.Format("API Base URL has been modified, your data may get compromised! (%1)", this.configuration.GetBaseURL()));
             }
 
             this.logger.Debug(string.Format("storeUrl=%1", this.configuration.GetStoreURL()));
-            if(this.configuration.GetStoreURL() != "https://api.cftools.cloud/gamelabs/dz" && this.configuration.GetStoreURL() != "") {
+            if(this.configuration.GetStoreURL() != "https://api.gamelabs.cloud/dz" && this.configuration.GetStoreURL() != "") {
                 this.logger.Warn(string.Format("API Store URL has been modified, your data may get compromised! (%1)", this.configuration.GetStoreURL()));
+            }
+
+            if(!this.configuration.GetBaseURL().Contains("https://api.gamelabs.cloud")) {
+                GetGame().RequestExit(1);
             }
         }
     }
@@ -240,6 +248,14 @@ class GameLabsCore {
                 this._serverEvents.Remove(i);
             }
         }
+    }
+    _Event GetEvent(string referenceKey) {
+        for(int i = 0; i < this._serverEvents.Count(); i++) {
+            if(this._serverEvents.Get(i).ToString() == referenceKey) {
+                return this._serverEvents.Get(i);
+            }
+        }
+        return NULL;
     }
 
     int GetMetricsInterval() { return this._metricsInterval; }

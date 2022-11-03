@@ -1,0 +1,1 @@
+class Mag_STANAGDrum_60Rnd_CFTools: MagazineStorage {};

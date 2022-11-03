@@ -5,8 +5,8 @@ class GameLabsConfiguration {
     private string serverId = "";
     private string apiKey = "";
 
-    private string baseUrl = "https://api.cftools.cloud/gamelabs/dz";
-    private string storeUrl = "https://api.cftools.cloud/gamelabs/dz";
+    private string baseUrl = "https://api.gamelabs.cloud/dz";
+    private string storeUrl = "https://api.gamelabs.cloud/dz";
 
     private bool speedCheckDisabled = false;
     private float speedCheckThresholdFoot = 8.0;

@@ -1,6 +1,7 @@
 modded class Weapon_Base {
     float m_TargetDistance;
 
+    /*
     void EEFired(int muzzleType, int mode, string ammoType) {
         super.EEFired(muzzleType, mode, ammoType);
         if(GetGameLabs().IsServer()) return;
@@ -31,8 +32,12 @@ modded class Weapon_Base {
             for(int j = 0; j < results.Count(); ++j) {
                 Object contact_obj = results.Get(j);
 
-                GetGameLabs().GetLogger().Info(string.Format("EEFired.HIT %1", contact_obj));
+                GetGameLabs().GetLogger().Info(string.Format("EEFired.HIT %1, %2", contact_obj, Object.GetDebugName(contact_obj)));
+
+                Param1<string> hitref = new Param1<string>( Object.GetDebugName(contact_obj) );
+                GetGame().RPCSingleParam(NULL, GameLabsRPCS.RP_HITINFO, hitref, true);
             }
         }
     }
+    */
 };
