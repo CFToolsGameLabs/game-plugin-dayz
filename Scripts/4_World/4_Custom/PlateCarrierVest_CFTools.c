@@ -1,4 +1,5 @@
 class PlateCarrierVest_CFTools extends PlateCarrierVest {
+    private bool _isTestingEnvironment = false;
 
     void PlateCarrierVest_CFTools() {
         string tmp;

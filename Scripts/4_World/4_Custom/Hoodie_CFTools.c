@@ -1,4 +1,5 @@
 class Hoodie_CFTools extends Hoodie_ColorBase {
+    private bool _isTestingEnvironment = false;
 
     void Hoodie_CFTools() {
         string tmp;

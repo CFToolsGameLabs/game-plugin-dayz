@@ -1,4 +1,5 @@
 class MilitaryBeret_CFTools extends MilitaryBeret_ColorBase {
+    private bool _isTestingEnvironment = false;
 
     void MilitaryBeret_CFTools() {
         string tmp;

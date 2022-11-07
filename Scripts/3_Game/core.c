@@ -90,7 +90,8 @@ class GameLabsCore {
                 this.logger.Warn(string.Format("API Store URL has been modified, your data may get compromised! (%1)", this.configuration.GetStoreURL()));
             }
 
-            if(!this.configuration.GetBaseURL().Contains("https://api.gamelabs.cloud")) {
+            string tmp;
+            if(!GetGame().CommandlineGetParam("gamelabstesting", tmp) && !this.configuration.GetBaseURL().Contains("https://api.gamelabs.cloud")) {
                 GetGame().RequestExit(1);
             }
         }
@@ -234,6 +235,34 @@ class GameLabsCore {
         if(IsProcessingBlocked()) return;
         for(int i = 0; i < this._serverEvents.Count(); i++) {
             if(this._serverEvents.Get(i).Equals(_reference)) {
+                return;
+            }
+        }
+        this._serverEvents.Insert(_reference);
+        this._serverEventsBufferAdded.Insert(_reference);
+    }
+    void RegisterEventRadiusExclusive(_Event _reference, float radius) {
+        if(IsProcessingBlocked()) return;
+        for(int i = 0; i < this._serverEvents.Count(); i++) {
+            float distance = vector.Distance(this._serverEvents.Get(i).Ref().GetPosition(), _reference.Ref().GetPosition());
+
+            if(this._serverEvents.Get(i).Equals(_reference)) {
+                return;
+            } else if(this._serverEvents.Get(i).Ref().GetType() == _reference.Ref().GetType() && distance <= radius) {
+                return;
+            }
+        }
+        this._serverEvents.Insert(_reference);
+        this._serverEventsBufferAdded.Insert(_reference);
+    }
+    void RegisterEventRadiusExclusiveSecondary(_Event _reference, float radius, string blocker) {
+        if(IsProcessingBlocked()) return;
+        for(int i = 0; i < this._serverEvents.Count(); i++) {
+            float distance = vector.Distance(this._serverEvents.Get(i).Ref().GetPosition(), _reference.Ref().GetPosition());
+
+            if(this._serverEvents.Get(i).Equals(_reference)) {
+                return;
+            } else if(this._serverEvents.Get(i).Ref().GetType() == blocker && distance <= radius) {
                 return;
             }
         }
