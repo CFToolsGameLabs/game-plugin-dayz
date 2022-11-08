@@ -95,6 +95,10 @@ class GameLabsCore {
                 GetGame().RequestExit(1);
             }
         }
+
+        #ifdef GAMELABS
+        this.logger.Debug(string.Format("(Defines) GameLabs define found"));
+        #endif
     }
 
     string GetVersionIdentifier() { return this.modControlledVersionIdentifier; }
@@ -243,13 +247,18 @@ class GameLabsCore {
     }
     void RegisterEventRadiusExclusive(_Event _reference, float radius) {
         if(IsProcessingBlocked()) return;
-        for(int i = 0; i < this._serverEvents.Count(); i++) {
-            float distance = vector.Distance(this._serverEvents.Get(i).Ref().GetPosition(), _reference.Ref().GetPosition());
 
+        float distance;
+        for(int i = 0; i < this._serverEvents.Count(); i++) {
             if(this._serverEvents.Get(i).Equals(_reference)) {
                 return;
-            } else if(this._serverEvents.Get(i).Ref().GetType() == _reference.Ref().GetType() && distance <= radius) {
-                return;
+            } else {
+                if(this._serverEvents.Get(i).Ref() && _reference.Ref()) {
+                    distance = vector.Distance(this._serverEvents.Get(i).Ref().GetPosition(), _reference.Ref().GetPosition());
+                    if(this._serverEvents.Get(i).Ref().GetType() == _reference.Ref().GetType() && distance <= radius) {
+                        return;
+                    }
+                }
             }
         }
         this._serverEvents.Insert(_reference);
@@ -257,13 +266,19 @@ class GameLabsCore {
     }
     void RegisterEventRadiusExclusiveSecondary(_Event _reference, float radius, string blocker) {
         if(IsProcessingBlocked()) return;
+        float distance;
         for(int i = 0; i < this._serverEvents.Count(); i++) {
-            float distance = vector.Distance(this._serverEvents.Get(i).Ref().GetPosition(), _reference.Ref().GetPosition());
+
 
             if(this._serverEvents.Get(i).Equals(_reference)) {
                 return;
-            } else if(this._serverEvents.Get(i).Ref().GetType() == blocker && distance <= radius) {
-                return;
+            } else {
+                if(this._serverEvents.Get(i).Ref() && _reference.Ref()) {
+                    distance = vector.Distance(this._serverEvents.Get(i).Ref().GetPosition(), _reference.Ref().GetPosition());
+                    if(this._serverEvents.Get(i).Ref().GetType() == blocker && distance <= radius) {
+                        return;
+                    }
+                }
             }
         }
         this._serverEvents.Insert(_reference);
