@@ -30,7 +30,7 @@ class CFCloud_HealPlayer extends GameLabsContextAction {
             this.actionName = "Replenish player vitals";
             this.actionIcon = "heartbeat";
             this.actionColour = "default";
-            this.actionContext = "player"
+            this.actionContext = "player";
         }
 
         bool Execute(GameLabsActionContext context) {
@@ -50,7 +50,7 @@ class CFCloud_KillPlayer extends GameLabsContextAction {
             this.actionName = "Kill player character";
             this.actionIcon = "skull";
             this.actionColour = "warning";
-            this.actionContext = "player"
+            this.actionContext = "player";
         }
 
         bool Execute(GameLabsActionContext context) {
@@ -70,7 +70,7 @@ class CFCloud_SpawnPlayerItem extends GameLabsContextAction {
             this.actionName = "Spawn an item at player position";
             this.actionIcon = "gem";
             this.actionColour = "default";
-            this.actionContext = "player"
+            this.actionContext = "player";
 
             this.parameters.Insert("item", GameLabsActionParameter("Item class name", "Class name of item to be spawned", "cf_itemlist"));
             this.parameters.Insert("quantity", GameLabsActionParameter("Quantity", "Amount if items to be spawned", "int"));

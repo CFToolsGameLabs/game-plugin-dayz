@@ -7,7 +7,7 @@ class Land_Wreck_hb01_aban1_police extends House {
         if(!GetGameLabs().IsServer()) return;
         vector position = GetPosition();
         if(position[0] <= 0 && position[1] <= 0 && position[2] <= 0) return;
-        GetGameLabs().RegisterEvent(this._registeredInstance);
+        GetGameLabs().RegisterEventRadiusExclusiveSecondary(this._registeredInstance, 50.0, "StaticObj_Wreck_Decal_Small1");
     }
     override void EEDelete(EntityAI parent) {
         super.EEDelete(parent);
@@ -26,7 +26,7 @@ class Land_Wreck_hb01_aban2_police extends House {
         if(!GetGameLabs().IsServer()) return;
         vector position = GetPosition();
         if(position[0] <= 0 && position[1] <= 0 && position[2] <= 0) return;
-        GetGameLabs().RegisterEvent(this._registeredInstance);
+        GetGameLabs().RegisterEventRadiusExclusiveSecondary(this._registeredInstance, 50.0, "StaticObj_Wreck_Decal_Small1");
     }
     override void EEDelete(EntityAI parent) {
         super.EEDelete(parent);
@@ -45,7 +45,7 @@ class Land_Wreck_sed01_aban1_police extends House {
         if(!GetGameLabs().IsServer()) return;
         vector position = GetPosition();
         if(position[0] <= 0 && position[1] <= 0 && position[2] <= 0) return;
-        GetGameLabs().RegisterEvent(this._registeredInstance);
+        GetGameLabs().RegisterEventRadiusExclusiveSecondary(this._registeredInstance, 50.0, "StaticObj_Wreck_Decal_Small1");
     }
     override void EEDelete(EntityAI parent) {
         super.EEDelete(parent);
@@ -64,7 +64,7 @@ class Land_Wreck_sed01_aban2_police extends House {
         if(!GetGameLabs().IsServer()) return;
         vector position = GetPosition();
         if(position[0] <= 0 && position[1] <= 0 && position[2] <= 0) return;
-        GetGameLabs().RegisterEvent(this._registeredInstance);
+        GetGameLabs().RegisterEventRadiusExclusiveSecondary(this._registeredInstance, 50.0, "StaticObj_Wreck_Decal_Small1");
     }
     override void EEDelete(EntityAI parent) {
         super.EEDelete(parent);
@@ -83,7 +83,7 @@ class Land_Wreck_Volha_Police extends House {
         if(!GetGameLabs()) return;
         vector position = GetPosition();
         if(position[0] <= 0 && position[1] <= 0 && position[2] <= 0) return;
-        GetGameLabs().RegisterEvent(this._registeredInstance);
+        GetGameLabs().RegisterEventRadiusExclusiveSecondary(this._registeredInstance, 50.0, "StaticObj_Wreck_Decal_Small1");
     }
     override void EEDelete(EntityAI parent) {
         super.EEDelete(parent);

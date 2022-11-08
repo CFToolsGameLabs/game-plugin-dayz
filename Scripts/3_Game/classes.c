@@ -131,7 +131,7 @@ class GameLabsActionParameter {
         } else {
             position[1] = this.valueVectorZ;
         }
-        position[2] = this.valueVectorY
+        position[2] = this.valueVectorY;
         return position;
     }
 };
@@ -194,4 +194,8 @@ class GLClientHitInfo {
         this.object = object;
         this.tick_time = GetGame().GetTickTime();
     }
+};
+
+class GLPlayerStatistics {
+    int shotsFired = 0;
 };

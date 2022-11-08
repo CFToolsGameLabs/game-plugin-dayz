@@ -142,7 +142,7 @@ modded class MissionServer {
                 this._Setup();
             } else {
                 shutdownTitle = string.Format("Failed to verify api registration (apiStatus=%1)", apiStatus);
-                shutdownContent = "A race condition caused a GameLabs error, verify your server is booting in time"
+                shutdownContent = "A race condition caused a GameLabs error, verify your server is booting in time";
                 this.gameLabs.GetLogger().Error(shutdownTitle);
                 Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
                 PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
