@@ -23,21 +23,21 @@ class CfgMods
             {
                 value = "";
                 files[] = {
-                        "0_GameLabsDefine/Global"
+                        "GameLabs/0_GameLabsDefine/Global"
                 };
             };
             class gameLibScriptModule
             {
                 value = "";
                 files[] = {
-                    "0_GameLabsDefine/Global"
+                    "GameLabs/0_GameLabsDefine/Global"
                 };
             };
             class gameScriptModule
             {
                 value = "";
                 files[]={
-                    "0_GameLabsDefine/Global"
+                    "GameLabs/0_GameLabsDefine/Global"
                 };
             };
 
@@ -45,7 +45,7 @@ class CfgMods
             {
                 value="";
                 files[]={
-                    "0_GameLabsDefine/Global"
+                    "GameLabs/0_GameLabsDefine/Global"
                 };
             };
 
@@ -53,7 +53,7 @@ class CfgMods
             {
                 value="";
                 files[]={
-                    "0_GameLabsDefine/Global"
+                    "GameLabs/0_GameLabsDefine/Global"
                 };
             };
         };
