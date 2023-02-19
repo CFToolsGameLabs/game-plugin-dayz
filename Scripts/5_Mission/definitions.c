@@ -64,7 +64,7 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
 
         this.statistics = new PlayerDisconnectStatistics(player);
     }
-    string ToJson() { return JsonFileLoader<_Payload_PlayerDisconnectEx>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerDisconnectEx>.JsonMakeData(this); }
 };
 // ************************
 
