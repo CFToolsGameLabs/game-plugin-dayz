@@ -38,7 +38,7 @@ modded class DayZGame extends CGame {
             return
         }
     }
-    #ENDIF
+    #endif
 
     void OnCallBackEULA(int option) {
         switch(option) {
