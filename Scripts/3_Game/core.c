@@ -59,11 +59,11 @@ class GameLabsCore {
 
     void GameLabsCore() {
         // TODO: Complete bootstrapping
-        this.isServer = GetGame().IsServer();
+        this.isServer = GetGame().IsDedicatedServer();
         this.configuration = GameLabsConfiguration();
         if(!this.configuration.CheckDiskPresence()) {
             // Shut down when no config is present on server
-            if(GetGame().IsServer()) {
+            if(GetGame().IsDedicatedServer()) {
                 this.errorFlag = true;
             } else {
                 // Instance logger with logging disabled
@@ -94,6 +94,10 @@ class GameLabsCore {
 
         #ifdef GAMELABS
         this.logger.Debug(string.Format("(Defines) GameLabs define found"));
+        #endif
+
+        #ifdef GAMELABSCLIENTCONSENT
+        this.logger.Info(string.Format("(Defines) Client Consent Enabled - Players will be shown a banner"));
         #endif
     }
 
