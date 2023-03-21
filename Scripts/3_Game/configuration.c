@@ -16,6 +16,11 @@ class GameLabsConfiguration {
 
     private bool preventDynamicItemPopulation = false;
 
+    private bool chatSanitizeBattlEyeJoinLeave = false;
+    private bool chatSanitizeBattlEyePrefix = false;
+    private bool chatBlockEventProcessing = false;
+    private bool advancedChatInterface = false;
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -37,6 +42,11 @@ class GameLabsConfiguration {
     bool GetSpeedCheckStatus() { return !this.speedCheckDisabled; }
     float GetSpeedCheckThresholdFoot() { return this.speedCheckThresholdFoot; }
     float GetSpeedCheckThresholdVehicle() { return this.speedCheckThresholdVehicle; }
+
+    bool GetChatSanitizeBattlEyeJoinLeave() { return this.chatSanitizeBattlEyeJoinLeave; }
+    bool GetChatSanitizeBattlEyePrefix() { return this.chatSanitizeBattlEyePrefix; }
+    bool GetChatEventBlock() { return this.chatBlockEventProcessing; }
+    bool GetChatInterfaceProcessing() { return this.advancedChatInterface; }
 
     string GetServerId() { return this.serverId; }
     string GetApiKey() { return this.apiKey; }

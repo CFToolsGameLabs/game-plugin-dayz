@@ -10,7 +10,7 @@ class CFCloud_TeleportPlayer extends GameLabsContextAction {
             this.parameters.Insert("vector", GameLabsActionParameter("Target location", "Target location as DayZ parsable vector", "vector"));
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             PlayerBase player;
             PlayerBase.CastTo(player, context.GetReferencedObject());
 
@@ -33,7 +33,7 @@ class CFCloud_HealPlayer extends GameLabsContextAction {
             this.actionContext = "player";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             PlayerBase player;
             PlayerBase.CastTo(player, context.GetReferencedObject());
 
@@ -53,7 +53,7 @@ class CFCloud_KillPlayer extends GameLabsContextAction {
             this.actionContext = "player";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             PlayerBase player;
             PlayerBase.CastTo(player, context.GetReferencedObject());
 
@@ -78,7 +78,7 @@ class CFCloud_SpawnPlayerItem extends GameLabsContextAction {
             this.parameters.Insert("stacked", GameLabsActionParameter("Stacked", "Spawn items as a stack (only works if item supports to be stacked)", "boolean"));
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             PlayerBase player;
             PlayerBase.CastTo(player, context.GetReferencedObject());
 
@@ -115,7 +115,7 @@ class CFCloud_ExplodePlayer extends GameLabsContextAction {
             this.actionContext = "player";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             PlayerBase player;
             PlayerBase.CastTo(player, context.GetReferencedObject());
 
@@ -135,7 +135,7 @@ class CFCloud_StripPlayer extends GameLabsContextAction {
             this.actionContext = "player";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             PlayerBase player;
             PlayerBase.CastTo(player, context.GetReferencedObject());
 
@@ -156,7 +156,7 @@ class CFCloud_DeleteVehicle extends GameLabsContextAction {
             this.actionContext = "vehicle";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
@@ -187,7 +187,7 @@ class CFCloud_WorldTime extends GameLabsContextAction {
             this.parameters.Insert("minute", GameLabsActionParameter("Minute", "", "int"));
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Warn(string.Format("[Time] Updating game time hour=%1, minute=%2", context.parameters.Get("hour").GetInt(), context.parameters.Get("minute").GetInt()));
 
             int year, month, day, hour, minute;
@@ -211,7 +211,7 @@ class CFCloud_WorldWeather extends GameLabsContextAction {
             this.parameters.Insert("wind", GameLabsActionParameter("Wind speed", "Wind speed in km/h", "int"));
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Warn(string.Format("[Weather] Updating weather overcast=%1, fog=%2, rain=%3, wind=%4",context.parameters.Get("overcast").GetFloat(),context.parameters.Get("fog").GetFloat(),context.parameters.Get("rain").GetFloat(),context.parameters.Get("wind").GetInt()));
 
             Weather weather = GetGame().GetWeather();
@@ -235,7 +235,7 @@ class CFCloud_WorldWeatherSunny extends GameLabsContextAction {
             this.actionContext = "world";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Warn(string.Format("[Weather] Updating weather (sunny/clear)"));
 
             Weather weather = GetGame().GetWeather();
@@ -259,7 +259,7 @@ class CFCloud_WorldWipeAI extends GameLabsContextAction {
             this.actionContext = "world";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Warn(string.Format("[World (AI)] Clearing all world ai..."));
 
             GetGameLabs().ClearAI();
@@ -278,7 +278,7 @@ class CFCloud_WorldWipeVehicles extends GameLabsContextAction {
             this.actionContext = "world";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Warn(string.Format("[World (AI)] Clearing all world vehicles..."));
 
             GetGameLabs().ClearVehicles();
@@ -303,7 +303,7 @@ class CFCloud_SpawnItemWorld extends GameLabsContextAction {
             this.parameters.Insert("stacked", GameLabsActionParameter("Stacked", "Spawn items as a stack (only works if item supports to be stacked)", "boolean"));
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             string itemType = context.parameters.Get("item").GetString();
             GetGameLabs().GetLogger().Warn(string.Format("[Spawn] Spawning %1 (x%2) at %3", itemType, context.parameters.Get("quantity").GetInt(), context.parameters.Get("vector").GetVector()));
 
@@ -344,7 +344,7 @@ class CFCloud_ObjectDelete extends GameLabsContextAction {
             this.actionContext = "object";
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             _Event eventInstance;
             _Event.CastTo(eventInstance, context.GetReferencedObject());
 
@@ -366,7 +366,7 @@ class CFCloud_TerritoryFlagClear extends GameLabsContextAction {
             this.actionContextFilter.Insert("TerritoryFlag");
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             _Event eventInstance;
             _Event.CastTo(eventInstance, context.GetReferencedObject());
             GetGameLabs().GetLogger().Warn(string.Format("[TerritoryFlagClear] Clearing flag and everything in radius for %1<%2>", eventInstance.Ref(), eventInstance));
@@ -397,8 +397,28 @@ class GameLabsInternal_DummyAction extends GameLabsContextAction {
             this.parameters.Insert("testBool", GameLabsActionParameter("Boolean", "Description goes here", "boolean"));
         }
 
-        bool Execute(GameLabsActionContext context) {
+        override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Debug(string.Format("Dummy action called testInt=%1, testString=%2, testBool=%3", context.parameters.Get("testInt").GetInt(), context.parameters.Get("testString").GetString(), context.parameters.Get("testBool").GetBoolean()));
+            return true;
+        }
+};
+
+class GameLabsInternal_DummyActionWithWebHook extends GameLabsContextAction {
+        void GameLabsInternal_DummyActionWithWebHook() {
+            this.actionCode = "GameLabsInternal_DummyActionWithWebHook";
+            this.actionName = "Dummy action (WebHook)";
+            this.actionIcon = "accessible-icon";
+            this.actionColour = "danger";
+            this.actionContext = "world";
+
+            this.responseSuccess = new GameLabsActionResponse("webhook");
+            this.responseFailed = new GameLabsActionResponse("webhook");
+
+            this.parameters.Insert("webhookUrl", GameLabsActionParameter("WebHook URL", "Any valid WebHook URL", "webhook_url"));
+        }
+
+        override bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Debug(string.Format("Dummy action called webhookUrl=%1", context.parameters.Get("webhookUrl").GetString()));
             return true;
         }
 };
