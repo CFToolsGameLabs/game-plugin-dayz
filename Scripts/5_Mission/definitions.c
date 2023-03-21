@@ -19,6 +19,17 @@ class _Callback_PlayerConnect : _Callback {
         player.OnUpstreamIdentityReceived();
 
         GetGameLabs().GetLogger().Debug(string.Format("Player<%1> received CFTools Id from API cftools_id=%2, gamesession_id=%3", player, response.cftools_id, response.gamesession_id));
+
+        GameLabsClientSync clientSync = new GameLabsClientSync;
+        clientSync.cftoolsId = response.cftools_id;
+        clientSync.gameSessionId = response.gamesession_id;
+        clientSync.chatSanitizeBattlEyeJoinLeave = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyeJoinLeave();
+        clientSync.chatSanitizeBattlEyePrefix = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyePrefix();
+        clientSync.chatBlockEventProcessing = GetGameLabs().GetConfiguration().GetChatEventBlock();
+        clientSync.advancedChatInterface = GetGameLabs().GetConfiguration().GetChatInterfaceProcessing();
+
+        Param2 <bool, ref GameLabsClientSync> payloadSync = new Param2<bool, ref GameLabsClientSync>(GetGameLabs().GetDebugStatus(), clientSync);
+        GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, player.GetIdentity());
     };
 };
 // ************************
@@ -208,7 +219,6 @@ class _Callback_ServerPoll2 : _Callback {
     };
 
     override void OnSuccess(string data, int dataSize) {
-        //GetGameLabs().GetLogger().Debug(string.Format("ServerPoll2.OnSuccess()\ndataSize=%1\ndata=%2", dataSize, data));
         _Response_ServerPoll2 response = new _Response_ServerPoll2(data);
 
         Man man;
@@ -274,13 +284,36 @@ class _Callback_ServerPoll2 : _Callback {
                     }
                     if(referencedObject != NULL) orderStatus = orderAction.Execute(context);
                 } else orderStatus = orderAction.Execute(context);
+
             } else {
                 orderStatus = false;
             }
 
             GetGameLabs().GetLogger().Debug(string.Format("Order %1/%2 [action=%3] status=%4", i+1, response.orders.Count(), order.actionCode, orderStatus));
-            if(!orderStatus) {
+
+            string webhookUrl;
+            foreach(string parameterName, ref GameLabsActionParameter parameterRef : order.parameters) {
+                if(!webhookUrl) {
+                    if(parameterRef.dataType == "webhook_url") {
+                        if(parameterRef.GetString() && parameterRef.GetString().Length()) {
+                            webhookUrl = parameterRef.GetString();
+                        }
+                    }
+                }
+            }
+
+            if(orderStatus) {
+                if(orderAction && orderAction.GetResponseSuccess()) {
+                    if(webhookUrl) orderAction.GetResponseSuccess().SetWebHookURL(webhookUrl);
+                    orderAction.GetResponseSuccess().Execute(orderStatus, context);
+                }
+            } else {
                 GetGameLabs().GetLogger().Warn(string.Format("Order %1/%2 [action=%3] failed", i+1, response.orders.Count(), order.actionCode));
+
+                if(orderAction && orderAction.GetResponseFailed()) {
+                    if(webhookUrl) orderAction.GetResponseFailed().SetWebHookURL(webhookUrl);
+                    orderAction.GetResponseFailed().Execute(orderStatus, context);
+                }
             }
         }
     };
