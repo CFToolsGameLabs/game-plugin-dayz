@@ -34,10 +34,17 @@ modded class MissionServer {
                 player.SetUpstreamIdentity(cftoolsId);
                 player.SetGamesessionId(GetGameLabs().GetPlayerGamesessionId(player.GetPlainId()));
                 player.OnUpstreamIdentityReceived();
-            }
 
-            Param2 <bool, string> payloadSync = new Param2<bool, string>(GetGameLabs().GetDebugStatus(), player.GetUpstreamIdentity());
-            GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, identity);
+                GameLabsClientSync clientSync = new GameLabsClientSync;
+                clientSync.cftoolsId = cftoolsId;
+                clientSync.gameSessionId = GetGameLabs().GetPlayerGamesessionId(player.GetPlainId());
+                clientSync.chatSanitizeBattlEyeJoinLeave = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyeJoinLeave();
+                clientSync.chatSanitizeBattlEyePrefix = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyePrefix();
+                clientSync.chatBlockEventProcessing = GetGameLabs().GetConfiguration().GetChatEventBlock();
+
+                Param2 <bool, ref GameLabsClientSync> payloadSync = new Param2<bool, ref GameLabsClientSync>(GetGameLabs().GetDebugStatus(), clientSync);
+                GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, identity);
+            }
         }
 
         super.InvokeOnConnect(player, identity);
@@ -95,6 +102,7 @@ modded class MissionServer {
         string tmp;
         if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
             GameLabsInternal_DummyAction().Register();
+            GameLabsInternal_DummyActionWithWebHook().Register();
         }
     }
 
@@ -289,6 +297,11 @@ modded class MissionGameplay extends MissionBase {
 
     private ref GameLabsRPC gameLabsRPC;
 
+    bool chatSanitizeBattlEyeJoinLeave = false;
+    bool chatSanitizeBattlEyePrefix = false;
+    bool chatBlockEventProcessing = false;
+    bool advancedChatInterface = false;
+
     void MissionGameplay() {
         if(this.gameLabs != NULL) {
             this.gameLabs.GetLogger().Error("MissionServer attempted to initiate twice! Review mod list for faulty mod.");
@@ -315,10 +328,62 @@ modded class MissionGameplay extends MissionBase {
     }
 
     override void OnEvent(EventType eventTypeId, Param params) {
+        ChatMessageEventParams chatParams;
+
+        if(this.gameLabs == NULL || (this.gameLabs != NULL && this.gameLabs.GetConfiguration() == NULL)) {
+            super.OnEvent(eventTypeId, params);
+            return;
+        }
+
+        if(eventTypeId == ChatMessageEventTypeID) {
+            chatParams = ChatMessageEventParams.Cast(params);
+
+            if(m_LifeState == EPlayerStates.ALIVE) {
+                int channel = chatParams.param1;
+                string message = chatParams.param3;
+
+                if(this.chatSanitizeBattlEyeJoinLeave) {
+                    if(message.Contains("BattlEye: Admin Kick")) return;
+                }
+
+                if(this.chatSanitizeBattlEyePrefix) {
+                    if(message.Contains("(Global) Admin:") || message.Contains("(Private) Admin:")) {
+                        message.Replace("(Global) Admin:", "(Global)");
+                        message.Replace("(Private) Admin:", "(Private)");
+                        chatParams.param3 = message;
+                    }
+                }
+
+                if(this.advancedChatInterface) {
+                    if(channel & CCBattlEye) {
+                        int prefix_position = message.IndexOf(m_Chat.MESSAGE_HANDLER_PREFIX);
+                        if (prefix_position != -1) {
+                            string messageType = message.Get(prefix_position + m_Chat.MESSAGE_HANDLER_PREFIX.Length());
+                            if (messageType == "N") { // Notification
+                                message = message.Substring(prefix_position + m_Chat.MESSAGE_HANDLER_PREFIX.Length() + 1, message.Length() - (prefix_position + m_Chat.MESSAGE_HANDLER_PREFIX.Length() + 1));
+                                NotificationSystem.AddNotificationExtended(5.0, "Server", message);
+                                return;
+                            } else if (messageType == "C") { // Coloured
+                                m_Chat.AddGameLabs(chatParams);
+                                return;
+                            }
+                        }
+                    }
+                }
+                
+                if(this.chatBlockEventProcessing) {
+                    m_Chat.Add(chatParams);
+                } else {
+                    super.OnEvent(ChatMessageEventTypeID, chatParams);
+                }
+                return;
+            }
+        }
+
         super.OnEvent(eventTypeId, params);
 
         if(eventTypeId == ChatMessageEventTypeID) {
-            ChatMessageEventParams chatParams = ChatMessageEventParams.Cast(params);
+            if(chatParams == NULL) chatParams = ChatMessageEventParams.Cast(params);
             #ifdef EXPANSIONMODCORE
             if(chatParams.param1 <= CCBattlEye) return;
             #else
