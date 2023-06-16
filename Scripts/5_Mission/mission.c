@@ -338,6 +338,20 @@ modded class MissionGameplay extends MissionBase {
         if(eventTypeId == ChatMessageEventTypeID) {
             chatParams = ChatMessageEventParams.Cast(params);
 
+            #ifdef EXPANSIONMODCORE
+            if(chatParams.param1 > CCBattlEye) {
+                if(this.name == chatParams.param2) {
+                    this.gameLabsClient.SyncExpansionChat(chatParams);
+                }
+            }
+            #else
+            if(chatParams.param1 > 64) {
+                if(this.name == chatParams.param2) {
+                    this.gameLabsClient.SyncExpansionChat(chatParams);
+                }
+            }
+            #endif                
+
             if(m_LifeState == EPlayerStates.ALIVE) {
                 int channel = chatParams.param1;
                 string message = chatParams.param3;
@@ -381,16 +395,5 @@ modded class MissionGameplay extends MissionBase {
         }
 
         super.OnEvent(eventTypeId, params);
-
-        if(eventTypeId == ChatMessageEventTypeID) {
-            if(chatParams == NULL) chatParams = ChatMessageEventParams.Cast(params);
-            #ifdef EXPANSIONMODCORE
-            if(chatParams.param1 <= CCBattlEye) return;
-            #else
-            if(chatParams.param1 < 64) return;
-            #endif
-            if(this.name != chatParams.param2) return;
-            this.gameLabsClient.SyncExpansionChat(chatParams);
-        }
     }
 };
