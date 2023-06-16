@@ -1,5 +1,3 @@
-#define GAMELABS
-
 class CfgPatches
 {
     class GameLabsDefine

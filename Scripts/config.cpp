@@ -7,7 +7,6 @@ class CfgPatches
         requiredVersion=0.1;
         requiredAddons[]=
         {
-            "GameLabsDefine",
             "DZ_Data",
             "DZ_Characters",
             "DZ_Characters_Tops",
@@ -44,6 +43,13 @@ class CfgMods
 		type = "mod";
 		
 		dependencies[] = { "Core", "Game", "World", "Mission" };
+
+        defines[] = {
+            "CFTOOLS",
+            "GAMELABS",
+            "GAMELABS_POLL2",
+            "GAMELABS_18"
+        };
 		
 		class defs
 		{
