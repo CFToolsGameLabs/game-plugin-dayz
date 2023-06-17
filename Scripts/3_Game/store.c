@@ -17,7 +17,7 @@ class _Payload_KVSet : _Payload {
         this.key = key;
         this.value = value;
     }
-    string ToJson() { return JsonFileLoader<_Payload_KVSet>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_KVSet>.JsonMakeData(this); }
 };
 class _Response_KVSet : _Response {};
 
@@ -30,7 +30,7 @@ class _Payload_KVGet : _Payload {
         this.modId = modId;
         this.key = key;
     }
-    string ToJson() { return JsonFileLoader<_Payload_KVGet>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_KVGet>.JsonMakeData(this); }
 };
 class _Response_KVGet : _Response {
     string value;
@@ -48,7 +48,7 @@ class _Payload_KVIncr : _Payload {
         this.key = key;
         this.value = value;
     }
-    string ToJson() { return JsonFileLoader<_Payload_KVIncr>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_KVIncr>.JsonMakeData(this); }
 };
 class _Response_KVIncr : _Response {};
 
@@ -63,7 +63,7 @@ class _Payload_KVDecr : _Payload {
         this.key = key;
         this.value = value;
     }
-    string ToJson() { return JsonFileLoader<_Payload_KVDecr>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_KVDecr>.JsonMakeData(this); }
 };
 class _Response_KVDecr : _Response {};
 

@@ -66,8 +66,8 @@ class GameLabsReporter {
     void Disable() {
         this.processReporting = false;
         GetGameLabs().GetLogger().Info("(Reporter) Disabled");
-        this.timerPoll.Stop();
-        this.timerServer.Stop();
+        if(this.timerPoll) this.timerPoll.Stop();
+        if(this.timerServer) this.timerServer.Stop();
         GetGameLabs().GetLogger().Debug("(Reporter) Timers gracefully closed");
     }
 

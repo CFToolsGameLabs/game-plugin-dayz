@@ -89,6 +89,9 @@ class GameLabsActionParameter {
      * boolean: true or false
      * vector: a X, Y, Z vector
      * cf_itemlist: A dropdown list of all available game items
+     *
+     * Advanced types:
+     * webhook_url: Used in conjunction with a response of type WebHook, this will automatically populate the WebHook URL for your responses
      */
     string dataType;
 
@@ -160,6 +163,9 @@ class GameLabsContextAction {
 
     ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
+    protected ref GameLabsActionResponse responseSuccess;
+    protected ref GameLabsActionResponse responseFailed;
+
     // Internal
     string referenceKey;
 
@@ -181,11 +187,76 @@ class GameLabsContextAction {
     string GetActionColour() {return this.actionColour;}
     string ToJson() { return JsonFileLoader<GameLabsContextAction>.JsonMakeData(this); }
 
+    GameLabsActionResponse GetResponseSuccess() {
+        return this.responseSuccess;
+    }
+
+    GameLabsActionResponse GetResponseFailed() {
+        return this.responseFailed;
+    }
+
     string InfoString() {
         return string.Format("GameLabsContextAction<%1, %2, %3, %4, %5>", this.actionCode, this.actionName, this.actionIcon, this.actionColour, this.actionContext);
     }
 };
 
+class GameLabsResponsePayload extends _Payload {
+    bool status;
+    GameLabsActionContext action;
+
+    void GameLabsResponsePayload(bool status, GameLabsActionContext context) {
+        this.status = status;
+        this.action = context;
+    }
+
+    override string ToJson() { return JsonFileLoader<GameLabsResponsePayload>.JsonMakeData(this); }
+};
+
+class GameLabsActionResponse {
+    /*
+     * Response Types for Dynamic Actions
+     * Supported:
+     * [- output (Show a message in the CFCloud interface)] ONLY AVAILABLE FOR SPECIFIC SERVERS; DO NOT IMPLEMENT;
+     * - webhook (Send a webhook to a specific URL)
+     */
+    string responseType = "webhook";
+
+    private string webhookUrl;
+
+    void GameLabsActionResponse(string responseType, string webhookUrl = "") {
+        this.responseType = responseType;
+
+        if(webhookUrl && webhookUrl.Length()) {
+            this.webhookUrl = webhookUrl;
+        }
+    }
+
+    bool Execute(bool orderStatus, GameLabsActionContext context) {
+        if(this.responseType == "webhook") {
+            GetGameLabs().GetLogger().Warn(string.Format("orderStatus=%1; context=%2;", orderStatus, context));
+            RestContext curl = GetRestApi().GetRestContext(this.webhookUrl);
+            curl.SetHeader("application/json");
+            GameLabsResponsePayload payload = new GameLabsResponsePayload(orderStatus, context);
+            curl.POST(new _Callback(), "", payload.ToJson());
+            return true;
+        }
+        return false;
+    }
+
+    // Used for dynamically populating WebHook URL if none has been defined
+    // Server side actions may pre-populate a WebHook URL and thus will be hidden from end-users and not require user input
+    bool SetWebHookURL(string url) {
+        if(this.webhookUrl || this.responseType != "webhook") return false;
+        this.webhookUrl = url;
+        return true;
+    }
+
+    string InfoString() {
+        return string.Format("GameLabsActionResponse<%1, %2>", this.responseType, this.webhookUrl);
+    }
+};
+
+/* These are currently unused */
 class GLClientHitInfo {
     float tick_time;
     string object;

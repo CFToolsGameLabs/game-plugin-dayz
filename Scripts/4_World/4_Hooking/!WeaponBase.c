@@ -1,6 +1,10 @@
 modded class Weapon_Base {
     float m_TargetDistance;
 
+    override void EEFired(int muzzleType, int mode, string ammoType) {
+        super.EEFired(muzzleType, mode, ammoType);
+    }
+
     /*
     void EEFired(int muzzleType, int mode, string ammoType) {
         super.EEFired(muzzleType, mode, ammoType);

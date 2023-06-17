@@ -29,21 +29,29 @@ class GameLabsRPC {
                 player = PlayerBase.Cast(GetGame().GetPlayer());
                 if(!player) return;
 
-                Param2<bool, string> responseRESync = new Param2<bool, string>(false, "");
-                ctx.Read(responseRESync);
+                Param2<bool, ref GameLabsClientSync> responseRESync = new Param2<bool, ref GameLabsClientSync>(false, null);
+                if(ctx.Read(responseRESync)) {
+                    GetGameLabs().GetLogger().OverrideDebugStatus(responseRESync.param1);
+                    GetGameLabs().GetConfiguration().OverrideDebugStatus(responseRESync.param1);
 
-                GetGameLabs().GetLogger().OverrideDebugStatus(responseRESync.param1);
-                GetGameLabs().GetConfiguration().OverrideDebugStatus(responseRESync.param1);
+                    if(responseRESync.param2 == NULL) {
+                        GetGameLabs().GetLogger().Debug(string.Format("Sync response did not contain a valid sync object"));
+                    } else {
+                        GameLabsClientSync clientSync = responseRESync.param2;
+                        player.SetUpstreamIdentity(clientSync.cftoolsId);
+                        GetGameLabs().GetLogger().Debug(string.Format("Received upstream identity (cftoolsId=%1)", player.GetUpstreamIdentity()));
+                        player.OnUpstreamIdentityReceived();
 
-                if(responseRESync.param2 == "") {
-                    GetGameLabs().GetLogger().Debug(string.Format("Sync response did not contain an upstream identity"));
+                        MissionGameplay mission = MissionGameplay.Cast(GetGame().GetMission());
+                        mission.chatSanitizeBattlEyeJoinLeave = clientSync.chatSanitizeBattlEyeJoinLeave;
+                        mission.chatSanitizeBattlEyePrefix = clientSync.chatSanitizeBattlEyePrefix;
+                        mission.chatBlockEventProcessing = clientSync.chatBlockEventProcessing;
+                        mission.advancedChatInterface = clientSync.advancedChatInterface;
+                    }
+                    player.OnGameLabsSync();
                 } else {
-                    player.SetUpstreamIdentity(responseRESync.param2);
-                    GetGameLabs().GetLogger().Debug(string.Format("Received upstream identity (cftoolsId=%1)", player.GetUpstreamIdentity()));
-                    player.OnUpstreamIdentityReceived();
+                    GetGameLabs().GetLogger().Error(string.Format("Could not read from sync context"));
                 }
-
-                player.OnGameLabsSync();
                 return;
             }
         }

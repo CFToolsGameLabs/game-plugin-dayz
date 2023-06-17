@@ -52,9 +52,9 @@ modded class Wreck_Mi8_Crashed extends CrashBase {
     }
 };
 
-/*
- * TODO: Investigate crash issue
-class Wreck_SantasSleigh extends House {
+
+// TODO: Investigate crash issue
+modded class Wreck_SantasSleigh extends CrashBase {
     ref _Event _registeredInstance = new _Event(this.GetType(), "sleigh", this);
 
     override void EEInit() {
@@ -71,4 +71,3 @@ class Wreck_SantasSleigh extends House {
         if(this._registeredInstance) GetGameLabs().RemoveEvent(this._registeredInstance);
     }
 };
- */

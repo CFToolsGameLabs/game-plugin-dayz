@@ -5,25 +5,8 @@ modded class DayZGame extends CGame {
     private bool _passthroughConnect = false;
     private bool _isLaunchConnect = false;
 
+    #ifdef GAMELABSCLIENTCONSENT
     override void ConnectLaunch() {
-        /*
-        OnlineServices.Init();
-
-        BiosUserManager user_manager = GetGame().GetUserManager();
-        if(user_manager) {
-            if(user_manager.GetTitleInitiator()) {
-                user_manager.SelectUser(user_manager.GetTitleInitiator());
-            }
-        }
-
-        Print("user_manager: " + user_manager);
-        Print("GetSelectedUser: " + user_manager.GetSelectedUser());
-
-        if(user_manager && user_manager.GetSelectedUser()) {
-            Print("Name: " + user_manager.GetSelectedUser().GetName() + " SteamId: " + user_manager.GetSelectedUser().GetUid());
-        }
-        */
-
         this._isLaunchConnect = true;
         if(this._passthroughConnect) {
             Print("[GameLabs] Allowing client to pass through license check");
@@ -55,6 +38,7 @@ modded class DayZGame extends CGame {
             return
         }
     }
+    #endif
 
     void OnCallBackEULA(int option) {
         switch(option) {

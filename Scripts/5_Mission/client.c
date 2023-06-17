@@ -2,6 +2,10 @@ class GameLabsClient {
     private bool processReporting = true;
     ref Timer timerSync;
 
+    void GameLabsClient() {
+        GetGame().RPCSingleParam(NULL, GameLabsRPCS.RQ_SERVERCFG, NULL, true);
+    }
+
     void StartSynchronization() {
         this.timerSync = new Timer(CALL_CATEGORY_SYSTEM);
         this.timerSync.Run(5, this, "clientSync", NULL, true);

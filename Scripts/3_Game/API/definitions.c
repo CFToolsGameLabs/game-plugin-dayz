@@ -50,7 +50,7 @@ class _Payload_Register : _Payload {
         this.flagReauth = flagReauth;
         this.availableActions = GetGameLabs().GetGameLabsActions();
     }
-    string ToJson() { return JsonFileLoader<_Payload_Register>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_Register>.JsonMakeData(this); }
 };
 class _Response_Register_Features {
     int allowReporting = 2;
@@ -109,7 +109,7 @@ class _Payload_ServerPoll : _Payload {
             this.windspeed = weather.GetWindSpeed();
         }
     }
-    string ToJson() { return JsonFileLoader<_Payload_ServerPoll>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ServerPoll>.JsonMakeData(this); }
 };
 class ServerPollItem {
     string action;
@@ -158,7 +158,7 @@ class _Payload_ServerEvents : _Payload {
             this.removed.Insert(new _ServerEvent(removed.Get(y)));
         }
     }
-    string ToJson() { return JsonFileLoader<_Payload_ServerEvents>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ServerEvents>.JsonMakeData(this); }
 };
 class _Response_ServerEvents : _Response {
     void _Response_ServerEvents(string content) { JsonFileLoader<_Response_ServerEvents>.JsonLoadData(content, this); }
@@ -206,7 +206,7 @@ class _Payload_ServerVehicles : _Payload {
             this.removed.Insert(new _ServerVehicle(removed.Get(y)));
         }
     }
-    string ToJson() { return JsonFileLoader<_Payload_ServerVehicles>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ServerVehicles>.JsonMakeData(this); }
 };
 
 class _Response_ServerVehicles : _Response {
@@ -238,7 +238,7 @@ class _Payload_ServerPlayers : _Payload {
         this.interval = interval;
         this.updated = updated;
     }
-    string ToJson() { return JsonFileLoader<_Payload_ServerPlayers>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ServerPlayers>.JsonMakeData(this); }
 };
 
 class _Response_ServerPlayers : _Response {
@@ -265,7 +265,7 @@ class _Payload_PlayerDeath : _Payload {
             this.distance = vector.Distance(player.position, murderer.position);
         }
     }
-    string ToJson() { return JsonFileLoader<_Payload_PlayerDeath>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerDeath>.JsonMakeData(this); }
 };
 // ************************
 
@@ -290,7 +290,7 @@ class _Payload_PlayerDamage : _Payload {
             this.distance = vector.Distance(player.position, murderer.position);
         }
     }
-    string ToJson() { return JsonFileLoader<_Payload_PlayerDamage>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerDamage>.JsonMakeData(this); }
 };
 // ************************
 
@@ -310,7 +310,7 @@ class _Payload_ItemInteract : _Payload {
         this.target = target;
         this.action = action;
     }
-    string ToJson() { return JsonFileLoader<_Payload_ItemInteract>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ItemInteract>.JsonMakeData(this); }
 };
 // ************************
 
@@ -325,7 +325,7 @@ class _Payload_ItemPlace : _Payload {
 
         this.item = item;
     }
-    string ToJson() { return JsonFileLoader<_Payload_ItemPlace>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ItemPlace>.JsonMakeData(this); }
 };
 // ************************
 
@@ -342,7 +342,7 @@ class _Payload_PlayerChat : _Payload {
         this.channel = channel;
         this.message = message;
     }
-    string ToJson() { return JsonFileLoader<_Payload_PlayerChat>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerChat>.JsonMakeData(this); }
 };
 // ************************
 
@@ -356,7 +356,7 @@ class _Payload_PlayerConnect : _Payload {
         this.steam64 = steam64;
         this.position = position;
     }
-    string ToJson() { return JsonFileLoader<_Payload_PlayerConnect>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerConnect>.JsonMakeData(this); }
 };
 class _Response_PlayerConnect : _Response {
     string steam64;
@@ -391,7 +391,7 @@ class _Payload_ItemList : _Payload {
     void _Payload_ItemList(array<ref TrackedItem> items) {
         this.items = items;
     }
-    string ToJson() { return JsonFileLoader<_Payload_ItemList>.JsonMakeData(this); }
+    override string ToJson() { return JsonFileLoader<_Payload_ItemList>.JsonMakeData(this); }
 };
 class _Response_ItemList : _Response {
     void _Response_ItemList(string content) { JsonFileLoader<_Response_ItemList>.JsonLoadData(content, this); }

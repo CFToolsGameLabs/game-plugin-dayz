@@ -1,5 +1,5 @@
 class Land_Wreck_hb01_aban1_police extends House {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "car", this);
+    ref _Event _registeredInstance = new _Event("Police Wreck", "car", this);
 
     override void EEInit() {
         super.EEInit();
@@ -18,7 +18,7 @@ class Land_Wreck_hb01_aban1_police extends House {
 };
 
 class Land_Wreck_hb01_aban2_police extends House {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "car", this);
+    ref _Event _registeredInstance = new _Event("Police Wreck", "car", this);
 
     override void EEInit() {
         super.EEInit();
@@ -37,7 +37,7 @@ class Land_Wreck_hb01_aban2_police extends House {
 };
 
 class Land_Wreck_sed01_aban1_police extends House {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "car", this);
+    ref _Event _registeredInstance = new _Event("Police Wreck", "car", this);
 
     override void EEInit() {
         super.EEInit();
@@ -56,7 +56,7 @@ class Land_Wreck_sed01_aban1_police extends House {
 };
 
 class Land_Wreck_sed01_aban2_police extends House {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "car", this);
+    ref _Event _registeredInstance = new _Event("Police Wreck", "car", this);
 
     override void EEInit() {
         super.EEInit();
@@ -75,7 +75,7 @@ class Land_Wreck_sed01_aban2_police extends House {
 };
 
 class Land_Wreck_Volha_Police extends House {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "car", this);
+    ref _Event _registeredInstance = new _Event("Police Wreck", "car", this);
 
     override void EEInit() {
         super.EEInit();

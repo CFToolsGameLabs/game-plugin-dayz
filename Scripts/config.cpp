@@ -7,7 +7,6 @@ class CfgPatches
         requiredVersion=0.1;
         requiredAddons[]=
         {
-            "GameLabsDefine",
             "DZ_Data",
             "DZ_Characters",
             "DZ_Characters_Tops",
@@ -22,6 +21,13 @@ class CfgPatches
             "DZ_Weapons_Firearms_Scout",
             "DZ_Weapons_Firearms_SaigaK"
         };
+    };
+
+    class GameLabsDefine {
+        units[] = {};
+        weapons[] = {};
+        requiredVersion = 0.1;
+        requiredAddons[] = {};
     };
 };
 
@@ -44,6 +50,15 @@ class CfgMods
 		type = "mod";
 		
 		dependencies[] = { "Core", "Game", "World", "Mission" };
+
+        defines[] = {
+            "GameLabs",
+            "GameLabsDefine",
+            "CFTOOLS",
+            "GAMELABS",
+            "GAMELABS_POLL2",
+            "GAMELABS_18"
+        };
 		
 		class defs
 		{
