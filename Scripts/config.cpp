@@ -22,6 +22,13 @@ class CfgPatches
             "DZ_Weapons_Firearms_SaigaK"
         };
     };
+
+    class GameLabsDefine {
+        units[] = {};
+        weapons[] = {};
+        requiredVersion = 0.1;
+        requiredAddons[] = {};
+    };
 };
 
 class CfgMods
@@ -45,6 +52,8 @@ class CfgMods
 		dependencies[] = { "Core", "Game", "World", "Mission" };
 
         defines[] = {
+            "GameLabs",
+            "GameLabsDefine",
             "CFTOOLS",
             "GAMELABS",
             "GAMELABS_POLL2",
