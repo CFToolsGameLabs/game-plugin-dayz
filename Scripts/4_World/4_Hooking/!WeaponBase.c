@@ -3,6 +3,15 @@ modded class Weapon_Base {
 
     override void EEFired(int muzzleType, int mode, string ammoType) {
         super.EEFired(muzzleType, mode, ammoType);
+        if(!GetGameLabs().IsServer()) return;
+        PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
+        if(player) {
+            if(player.HasUpstreamIdentity()) {
+                string cftoolsId = player.GetUpstreamIdentity();
+                ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+                playerStatistics.shotsFired++;
+            }
+        }
     }
 
     /*

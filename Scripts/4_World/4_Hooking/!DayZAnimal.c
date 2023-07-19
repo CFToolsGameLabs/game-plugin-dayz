@@ -14,4 +14,23 @@ modded class AnimalBase  {
         GetGameLabs().DecrAnimalCount();
         if(this._registeredInstance) GetGameLabs().RemoveAI(this._registeredInstance);
     }
+
+    override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {
+        super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
+
+        if( !IsAlive() ) return;
+
+        PlayerBase player;
+        if(source) {
+            player = PlayerBase.Cast(source.GetHierarchyRootPlayer());
+        }
+        if(!player) return;
+
+        if(player.HasUpstreamIdentity()) {
+            string cftoolsId = player.GetUpstreamIdentity();
+            ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            playerStatistics.shotsHit++;
+            playerStatistics.shotsHitAnimals++;
+        }
+    }
 };

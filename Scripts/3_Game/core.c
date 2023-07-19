@@ -13,6 +13,7 @@ class GameLabsCore {
 
     private ref map<string, string> gamesessionIdMap = new map<string, string>;
     private ref map<string, string> upstreamIdentityMap = new map<string, string>;
+    private ref map<string, ref GLPlayerStatistics> playerStatisticsMap = new map<string, ref GLPlayerStatistics>;
 
     private int _computedServerFps = 0;
     private int _computedAI = 0;
@@ -121,9 +122,14 @@ class GameLabsCore {
     void SetPlayerUpstreamIdentity(string steam64, string cftoolsId) {
         if(!this.IsServer()) return;
         this.upstreamIdentityMap.Set(steam64, cftoolsId);
+        this.playerStatisticsMap.Set(cftoolsId, GLPlayerStatistics());
     }
     void ClearPlayerUpstreamIdentity(string steam64) {
         if(!this.IsServer()) return;
+        string cftoolsId = GetPlayerUpstreamIdentity(steam64);
+        if(cftoolsId) {
+            this.playerStatisticsMap.Remove(cftoolsId);
+        }
         this.upstreamIdentityMap.Remove(steam64);
     }
     string GetPlayerUpstreamIdentity(string steam64) {
@@ -142,6 +148,18 @@ class GameLabsCore {
     string GetPlayerGamesessionId(string steam64) {
         if(!this.IsServer()) return "";
         return this.gamesessionIdMap.Get(steam64);
+    }
+
+    ref GLPlayerStatistics GetPlayerStatisticsByCFToolsId(string cftoolsId) {
+        return this.playerStatisticsMap.Get(cftoolsId);
+    }
+
+    ref GLPlayerStatistics GetPlayerStatisticsBySteam64(string steam64) {
+        string cftoolsId = GetPlayerUpstreamIdentity(steam64);
+        if(cftoolsId) {
+            return this.playerStatisticsMap.Get(cftoolsId);
+        }
+        return NULL;
     }
 
     int GetServerFPS() { return this._computedServerFps; }

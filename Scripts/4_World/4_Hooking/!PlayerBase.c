@@ -48,7 +48,11 @@ modded class PlayerBase extends ManBase {
     */
 
     bool HasAnyIdentitySet() {
-        return (this.GetPlainId() || this.GetIdentity().GetPlainId());
+        if(this.GetPlainId()) return true;
+        if(this.GetIdentity()) {
+            if(this.GetIdentity().GetPlainId()) return true;
+        }
+        return false;
     }
 
     bool _GLSIA() {
@@ -70,19 +74,24 @@ modded class PlayerBase extends ManBase {
     }
 
     void SetUpstreamIdentity(string cftoolsId) {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.SetUpstreamIdentity(%1, %2)", this, cftoolsId));
         this.gl_cftoolsId = cftoolsId;
     }
     string GetUpstreamIdentity() {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.GetUpstreamIdentity(%1) => %2", this, this.gl_cftoolsId));
         return this.gl_cftoolsId;
     }
     bool HasUpstreamIdentity() {
-        return (this.gl_cftoolsId == "");
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.HasUpstreamIdentity(%1) [%2] ", this, this.gl_cftoolsId));
+        return (this.gl_cftoolsId != "");
     }
 
     void SetGamesessionId(string gamesessionId) {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.SetGamesessionId(%1, %2)", this, gamesessionId));
         this.gl_gamesessionId = gamesessionId;
     }
     string GetGamesessionId() {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.GetGamesessionId(%1) => %2", this, this.gl_gamesessionId));
         return this.gl_gamesessionId;
     }
 
@@ -281,6 +290,13 @@ modded class PlayerBase extends ManBase {
             murderer = PlayerBase.Cast(source.GetHierarchyParent());
         }
         if(!source || !murderer) return;
+
+        if(murderer.HasUpstreamIdentity()) {
+            string cftoolsId = murderer.GetUpstreamIdentity();
+            ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            playerStatistics.shotsHit++;
+            playerStatistics.shotsHitPlayers++;
+        }
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy(this=%1, murderer=%2, source=%3, component=%4, dmgZone=%5, ammo=%6, modelPos=%7, speedCoef=%8)", this, murderer, source, component, dmgZone, ammo, modelPos, speedCoef));
         logObjectMurderer = new _LogPlayerEx(murderer);
