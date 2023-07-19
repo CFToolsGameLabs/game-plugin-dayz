@@ -206,9 +206,9 @@ echo Building PBO: !pboName!.pbo
 echo START /w %pboProject% %pboProject% +W "+^!" -F +Stop -P +Z +O -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 echo ADD "+^!" +O to obfuscate
 If "%pboName%"=="Scripts" (
-	START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z "+^!" +O -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
+	START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 ) Else If "%pboName%"=="GUI" (
-       	START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z "+^!" +O -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
+       	START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 ) Else (
 	START /w %pboProject% %pboProject% +K +W -F +Stop -P -B -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 )
