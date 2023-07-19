@@ -1,19 +1,3 @@
-[WorkbenchPluginAttribute("-> Deploy Mod", "Deploys the active loaded mod", "alt+1", "", {"ResourceManager", "ScriptEditor"})]
-class DeployModTool: DayZTool
-{
-	string BatchFile;
-
-	void DeployModTool()
-	{
-		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\Deploy.bat";
-	}
-	
-	override void Run()
-	{
-		RunDayZBat(BatchFile, true);
-	}
-}
-
 [WorkbenchPluginAttribute("-> Kill it", "Kill Dayz Tasks", "ctrl+3", "", {"ResourceManager", "ScriptEditor"})]
 class KillModTool: DayZTool
 {
@@ -30,39 +14,6 @@ class KillModTool: DayZTool
 	}
 }
 
-
-[WorkbenchPluginAttribute("-> Update Version", "Updates the mod version", "alt+5", "", {"ResourceManager", "ScriptEditor"})]
-class UpdateVersionModTool: DayZTool
-{
-	string BatchFile;
-
-	void UpdateVersionModTool()
-	{
-		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\UpdateVersion.bat";
-	}		
-	override void Run()
-	{
-		RunDayZBat(BatchFile, true);
-	}
-}
-
-[WorkbenchPluginAttribute("-> Launch Offline", "Launches the game in offline mode", "F5", "", {"ResourceManager", "ScriptEditor"})]
-class LaunchOfflineModTool: DayZProjectManager
-{
-	string BatchFile;
-	string BatchFile1;
-	void LaunchOfflineModTool()
-	{
-		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\Exit.bat";
-		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\LaunchOffline.bat";
-	}		
-	override void Run()
-	{
-		RunDayZBat(BatchFile, true);
-		RunDayZBat(BatchFile1, true);
-	}	
-}
-
 [WorkbenchPluginAttribute("-> Open Log Files", "Opens logfiles in NPP", "F4", "", {"ResourceManager", "ScriptEditor"})]
 class OpenLogFiles: DayZProjectManager
 {
@@ -71,6 +22,26 @@ class OpenLogFiles: DayZProjectManager
 	{
 		RunDayZBat("P:\\openlogs.bat", true);
 	}
+}
+
+[WorkbenchPluginAttribute("-> Build Mod (RELEASE)", "Builds current mod (RELEASE)", "", "", {"ResourceManager", "ScriptEditor"})]
+class BuildModRelease: DayZProjectManager
+{
+	string BatchFile;
+	string BatchFile1;
+
+	void BuildModRelease()
+	{
+		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\Exit.bat";
+		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\ZBinarizeDeployRelease.bat";
+	}
+	
+	override void Run()
+	{
+		RunDayZBat(BatchFile, true);
+		RunDayZBat(BatchFile1, true);
+	}	
+
 }
 
 [WorkbenchPluginAttribute("-> Build Mod", "Builds current mod", "F8", "", {"ResourceManager", "ScriptEditor"})]
@@ -91,28 +62,6 @@ class BuildMod: DayZProjectManager
 		RunDayZBat(BatchFile1, true);
 	}	
 
-}
-
-[WorkbenchPluginAttribute("-> Build Mod + Offline", "Builds and launch current mod", "Ctrl+F8", "", {"ResourceManager", "ScriptEditor"})]
-class BuildModAndLaunch: DayZProjectManager
-{
-	string BatchFile;
-	string BatchFile1;
-	string BatchFile2;
-	
-	void BuildModAndLaunch()
-	{
-		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\Exit.bat";
-		BatchFile1 = GetWorkDriveDirectory() + "Batchfiles\\ZBinarizeDeploy.bat";
-		BatchFile2 = GetWorkDriveDirectory() + "Batchfiles\\LaunchOffline.bat";
-	}
-	
-	override void Run()
-	{
-		RunDayZBat(BatchFile, true);
-		RunDayZBat(BatchFile1, true);
-		RunDayZBat(BatchFile2, true);
-	}
 }
 
 [WorkbenchPluginAttribute("-> Launch Server+Client", "Launches Server+Client", "Ctrl+F6", "", {"ResourceManager", "ScriptEditor"})]
@@ -159,6 +108,31 @@ class LaunchServer: DayZProjectManager
 		RunDayZBat(BatchFile, true);
 		RunDayZBat(BatchFile1, true);
 		RunDayZBat(BatchFile2, true);	
+	}
+}
+
+[WorkbenchPluginAttribute("-> Launch Server+Client (Server Mod)", "Launches Server+Client (Server Mod)", "", "", {"ResourceManager", "ScriptEditor"})]
+class LaunchServerClientServerMod: DayZProjectManager
+{
+	string BatchFile;
+	string BatchFile1;
+	string BatchFile2;
+	string BatchFile3;
+
+	void LaunchServerClientServerMod()
+	{
+		BatchFile = GetWorkDriveDirectory() + "Batchfiles\\Exit.bat";
+		BatchFile1 = GetWorkDriveDirectory() + "Batchfiles\\ZBinarizeDeploy.bat";
+		BatchFile2 = GetWorkDriveDirectory() + "Batchfiles\\LaunchServerServerMod.bat";
+		BatchFile3 = GetWorkDriveDirectory() + "Batchfiles\\LaunchLocalServerMod.bat";
+	}
+	
+	override void Run()
+	{
+		RunDayZBat(BatchFile, true);
+		RunDayZBat(BatchFile1, true);
+		RunDayZBat(BatchFile2, true);
+		RunDayZBat(BatchFile3, true);		
 	}
 }
 
