@@ -73,6 +73,11 @@ class HK416_Base_CFTools : RifleBoltLock_Base {
             magazine = this.GetMagazine(this.GetCurrentMuzzle());
             if(magazine) magazine.LocalSetAmmoMax();
         }
+
+        ItemSuppressor suppressor = GetAttachedSuppressor();
+        if(suppressor) {
+            suppressor.AddHealth(100);
+        }
     }
 
 	override void EEItemAttached(EntityAI item, string slot_name) {
