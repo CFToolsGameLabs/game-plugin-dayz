@@ -68,12 +68,19 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
     vector position;
 
     ref PlayerDisconnectStatistics statistics;
+    ref GLPlayerStatistics playerStatistics;
 
     void _Payload_PlayerDisconnectEx(string gamesession_id, PlayerBase player) {
         this.gamesession_id = gamesession_id;
         this.position = player.GetPosition();
 
         this.statistics = new PlayerDisconnectStatistics(player);
+
+        if(player.HasUpstreamIdentity()) {
+            string cftoolsId = player.GetUpstreamIdentity();
+            ref GLPlayerStatistics pS = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            this.playerStatistics = pS;
+        }
     }
     override string ToJson() { return JsonFileLoader<_Payload_PlayerDisconnectEx>.JsonMakeData(this); }
 };
@@ -82,23 +89,25 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
 // Reporter internals
 
 class _ServerPlayerEx : _ServerPlayer {
-void _ServerPlayerEx(PlayerBase player) {
-    if(player != NULL) {
-        this.id = player.GetPlainId(); // Steam64
-        this.name = player.GetPlayerName();
+    void _ServerPlayerEx(PlayerBase player) {
+        if(player != NULL) {
+            this.id = player.GetPlainId(); // Steam64
+            this.name = player.GetPlayerName();
 
-        this.position = player.GetPosition();
-        this.health = player.GetHealth("GlobalHealth", "Health");
-        if(GetGame().GetMission().IsPlayerDisconnecting(player))
-            this.loggingOut = 1;
+            this.gamesessionId = player.GetUpstreamIdentity();
 
-        if(player.IsInVehicle())
-            this.insideVehicle = 1;
-    }
+            this.position = player.GetPosition();
+            this.health = player.GetHealth("GlobalHealth", "Health");
+            if(GetGame().GetMission().IsPlayerDisconnecting(player))
+                this.loggingOut = 1;
 
-    if(player.GetItemInHands())
-        this.item = player.GetItemInHands().GetType();
-};
+            if(player.IsInVehicle())
+                this.insideVehicle = 1;
+        }
+
+        if(player.GetItemInHands())
+            this.item = player.GetItemInHands().GetType();
+    };
 };
 
 class _Callback_ServerDummy : _Callback {};
