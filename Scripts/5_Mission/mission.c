@@ -55,11 +55,11 @@ modded class MissionServer {
             string gamesessionId;
             gamesessionId = GetGameLabs().GetPlayerGamesessionId(player.GetPlainId());
             if(gamesessionId) {
-                GetGameLabs().ClearPlayerGamesessionId(player.GetPlainId());
-                GetGameLabs().ClearPlayerUpstreamIdentity(player.GetPlainId());
-
                 _Payload_PlayerDisconnectEx payloadPlayerDisconnect = new _Payload_PlayerDisconnectEx(gamesessionId, player);
                 GetGameLabs().GetApi().PlayerDisconnect(new _Callback_PlayerDisconnect(), payloadPlayerDisconnect);
+
+                GetGameLabs().ClearPlayerGamesessionId(player.GetPlainId());
+                GetGameLabs().ClearPlayerUpstreamIdentity(player.GetPlainId());
 
                 GetGameLabs().GetLogger().Debug(string.Format("Player<%1> disconnected at %2", player, player.GetPosition()));
 
