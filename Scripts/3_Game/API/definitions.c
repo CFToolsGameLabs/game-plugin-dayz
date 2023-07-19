@@ -219,6 +219,9 @@ class _Response_ServerVehicles : _Response {
 class _ServerPlayer {
     string id;
     string name;
+
+    string gamesessionId;
+
     int loggingOut = 0;
     int insideVehicle = 0;
 
