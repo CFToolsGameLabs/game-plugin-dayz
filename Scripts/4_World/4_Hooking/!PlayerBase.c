@@ -302,8 +302,5 @@ modded class PlayerBase extends ManBase {
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);
-
-        if(!GetGameLabs().GetDebugStatus()) return;
-        //if(!murderer.HasValidHitInCache()
     }
 };

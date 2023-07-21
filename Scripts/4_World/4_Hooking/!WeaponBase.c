@@ -14,6 +14,8 @@ modded class Weapon_Base {
         }
     }
 
+
+
     /*
     void EEFired(int muzzleType, int mode, string ammoType) {
         super.EEFired(muzzleType, mode, ammoType);
