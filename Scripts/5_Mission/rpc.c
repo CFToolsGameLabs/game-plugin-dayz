@@ -20,6 +20,17 @@ class GameLabsRPC {
 
                 float serverFps = responseREServerFps.param1;
                 GetGameLabs().SetServerFPS(serverFps);
+
+                // TODO: Add client fps warning, memory warning and slow load warning
+                if(GetGameLabs().GetConfiguration().GetDebugStatus()) {
+                    if(serverFps > 100) {
+                        GetDayZGame().GLSetConnectivityStatState(EConnectivityStatType.SERVER_PERF, EConnectivityStatLevel.OFF);
+                    } else if(serverFps > 30) {
+                        GetDayZGame().GLSetConnectivityStatState(EConnectivityStatType.SERVER_PERF, EConnectivityStatLevel.LEVEL1);
+                    } else {
+                        GetDayZGame().GLSetConnectivityStatState(EConnectivityStatType.SERVER_PERF, EConnectivityStatLevel.LEVEL2);
+                    }
+                }
                 return;
             }
             case GameLabsRPCS.RE_SYNC: {
