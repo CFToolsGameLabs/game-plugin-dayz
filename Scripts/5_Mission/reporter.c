@@ -41,6 +41,20 @@ class GameLabsReporter {
                             displayName = "";
                     }
 
+                    displayName = displayName.Trim();
+                    displayName = displayName.SubstringUtf8(0, 64);
+
+                    bool nonAsciiCheck = false;
+                    for (int c = 0; c < displayName.Length(); ++c) {
+                        if(displayName.Get(c).ToAscii() < 0 || displayName.Get(c).ToAscii() > 127) {
+                            nonAsciiCheck = true;
+                        }
+                    }
+
+                    if(nonAsciiCheck) {
+                        displayName = strName;
+                    }
+
                     itemCount++;
                     items.Insert(new TrackedItem(strName, displayName));
                 }
