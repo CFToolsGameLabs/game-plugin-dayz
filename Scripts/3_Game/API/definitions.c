@@ -393,6 +393,9 @@ class _Payload_ItemList : _Payload {
 
     void _Payload_ItemList(array<ref TrackedItem> items) {
         this.items = items;
+        if(GetGameLabs().GetDebugStatus()) {
+            JsonFileLoader <_Payload_ItemList>.JsonSaveFile("$profile:@Logging/server_items.json", this);
+        }
     }
     override string ToJson() { return JsonFileLoader<_Payload_ItemList>.JsonMakeData(this); }
 };
