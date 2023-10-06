@@ -14,7 +14,7 @@ enum GameLabsRPCS {
     RE_SYNC,
     RP_HITINFO, // This is currently used in debug mode only
     RQ_SERVERCFG,
-    RE_SERVERCFG
+    RE_SERVERCFG,
 };
 
 class GameLabsClientSync {

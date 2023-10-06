@@ -3,16 +3,13 @@
 class GameLabsRPC {
     void GameLabsRPC() {
         GetDayZGame().Event_OnRPC.Insert( OnRPC );
+        GetGameLabs().GetLogger().Info(string.Format("RPC interface initiated and handler registered"));
     }
 
     void OnRPC(PlayerIdentity sender, Object target, int rpc_type, ParamsReadContext ctx) {
         if(GetGame().IsServer()) HandleServerRPC(sender, target, rpc_type, ctx);
         else HandleClientRPC(sender, target, rpc_type, ctx);
     }
-
-    /*
-     * TODO: PoC. This is inefficient beyond reasonable doubt, implement proper sync
-     */
 
     private void HandleClientRPC(PlayerIdentity sender, Object target, int rpc_type, ParamsReadContext ctx) {
         PlayerBase player;

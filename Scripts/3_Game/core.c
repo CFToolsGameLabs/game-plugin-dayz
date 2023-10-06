@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.910";
+    private const string modControlledVersionIdentifier = "1.918";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -74,9 +74,10 @@ class GameLabsCore {
             this.configuration.LoadFromDisk();
             this.logger = GameLabsLogger("GameLabsCore", this.GetDebugStatus());
 
+            this.logger.Info(string.Format("GameLabs v%1 start for server %2", this.GetVersionIdentifier(), this.configuration.GetServerId()));
+
             this.api = GameLabsAPI(this.configuration.GetServerId(),this.configuration.GetApiKey(),this.configuration.GetBaseURL(),this.configuration.GetStoreURL());
 
-            // TODO: Move this somewhere else in the future
             this.logger.Debug(string.Format("baseUrl=%1", this.configuration.GetBaseURL()));
             if(this.configuration.GetBaseURL() != "https://api.gamelabs.cloud/dz" && this.configuration.GetBaseURL() != "") {
                 this.logger.Warn(string.Format("API Base URL has been modified, your data may get compromised! (%1)", this.configuration.GetBaseURL()));

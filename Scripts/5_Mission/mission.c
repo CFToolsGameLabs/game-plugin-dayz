@@ -313,7 +313,8 @@ modded class MissionGameplay extends MissionBase {
         this.gameLabsClient = new GameLabsClient();
 
         this.gameLabsRPC = new GameLabsRPC();
-        this.gameLabs.GetLogger().Info("Loaded MissionGameplay");
+        this.gameLabs.GetLogger().Info("Loaded MissionGameplay (Client)");
+        this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.name));
     }
 
     void ~MissionGameplay() {
