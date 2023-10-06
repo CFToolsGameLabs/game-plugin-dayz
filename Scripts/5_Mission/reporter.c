@@ -41,18 +41,18 @@ class GameLabsReporter {
                             displayName = "";
                     }
 
-                    displayName = displayName.Trim();
-                    displayName = displayName.SubstringUtf8(0, 64);
-
-                    bool nonAsciiCheck = false;
-                    for (int c = 0; c < displayName.Length(); ++c) {
-                        if(displayName.Get(c).ToAscii() < 0 || displayName.Get(c).ToAscii() > 127) {
-                            nonAsciiCheck = true;
+                    if(displayName.Length()) {
+                        int nonAsciiCharacters = 0;
+                        for (int c = 0; c < displayName.Length(); c++) {
+                            if(displayName.Get(c).ToAscii() < 0 || displayName.Get(c).ToAscii() > 127) {
+                                nonAsciiCharacters++;
+                            }
                         }
-                    }
+                        float nonAsciiPortion = nonAsciiCharacters / displayName.Length();
 
-                    if(nonAsciiCheck) {
-                        displayName = strName;
+                        if(nonAsciiPortion >= 0.5) {
+                            displayName = strName;
+                        }
                     }
 
                     itemCount++;
