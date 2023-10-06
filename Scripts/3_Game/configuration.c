@@ -21,6 +21,9 @@ class GameLabsConfiguration {
     private bool chatBlockEventProcessing = false;
     private bool advancedChatInterface = false;
 
+    private bool requireASCIIItemNames = false;
+    private bool filterASCIIItemNames = true;
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -47,6 +50,9 @@ class GameLabsConfiguration {
     bool GetChatSanitizeBattlEyePrefix() { return this.chatSanitizeBattlEyePrefix; }
     bool GetChatEventBlock() { return this.chatBlockEventProcessing; }
     bool GetChatInterfaceProcessing() { return this.advancedChatInterface; }
+
+    bool GetItemNameASCIIRequired() { return this.requireASCIIItemNames; }
+    bool GetItemNameASCIIFilter() { return this.filterASCIIItemNames; }
 
     string GetServerId() { return this.serverId; }
     string GetApiKey() { return this.apiKey; }

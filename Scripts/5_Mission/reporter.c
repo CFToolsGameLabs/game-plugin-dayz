@@ -22,6 +22,11 @@ class GameLabsReporter {
             int itemCount = 0;
             ref array < ref TrackedItem > items = new array < ref TrackedItem > ();
 
+            float nonAsciiThreshold = 0.5;
+            if(GetGameLabs().GetConfiguration().GetItemNameASCIIRequired()) {
+                nonAsciiThreshold = 0.0;
+            }
+
             for (int i = 0; i < cfgPaths.Count(); ++i) {
                 string cfgPath = cfgPaths.Get(i);
                 int nClasses = g_Game.ConfigGetChildrenCount(cfgPath);
@@ -41,17 +46,19 @@ class GameLabsReporter {
                             displayName = "";
                     }
 
-                    if(displayName.Length()) {
-                        int nonAsciiCharacters = 0;
-                        for (int c = 0; c < displayName.Length(); c++) {
-                            if(displayName.Get(c).ToAscii() < 0 || displayName.Get(c).ToAscii() > 127) {
-                                nonAsciiCharacters++;
+                    if(GetGameLabs().GetConfiguration().GetItemNameASCIIFilter()) {
+                        if(displayName.Length()) {
+                            int nonAsciiCharacters = 0;
+                            for (int c = 0; c < displayName.Length(); c++) {
+                                if (displayName.Get(c).ToAscii() < 0 || displayName.Get(c).ToAscii() > 127) {
+                                    nonAsciiCharacters++;
+                                }
                             }
-                        }
-                        float nonAsciiPortion = nonAsciiCharacters / displayName.Length();
+                            float nonAsciiPortion = nonAsciiCharacters / displayName.Length();
 
-                        if(nonAsciiPortion >= 0.5) {
-                            displayName = strName;
+                            if(nonAsciiPortion >= nonAsciiThreshold) {
+                                displayName = strName;
+                            }
                         }
                     }
 
