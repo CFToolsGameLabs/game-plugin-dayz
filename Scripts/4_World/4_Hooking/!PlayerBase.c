@@ -138,6 +138,9 @@ modded class PlayerBase extends ManBase {
         vector currentPosition = this.GetPosition();
         currentPosition[1] = 0; // Work with 2D only
         float distance = vector.Distance(this.gl_position, currentPosition);
+        if(diff == 0) {
+            diff = 1;
+        }
         float unitsPerSecond = distance / diff;
         this.gl_position = currentPosition;
 
