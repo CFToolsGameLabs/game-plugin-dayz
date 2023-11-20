@@ -192,15 +192,12 @@ modded class PlayerBase extends ManBase {
         this.GetStatSpecialty().Set(this.GetStatSpecialty().GetMax());
         this.SetBleedingBits(0);
 
-        /*
-         * TODO: This crashes servers under weird conditions
-        if(this.m_BrokenLegState == 1) {
-            this.AddHealth("LeftLeg","Health",   this.GetMaxHealth("LeftLeg", "Health")  - this.GetHealth("LeftLeg", "Health"));
-            this.AddHealth("RightLeg","Health",  this.GetMaxHealth("RightLeg", "Health") - this.GetHealth("RightLeg", "Health"));
-            this.AddHealth("RightFoot","Health", this.GetMaxHealth("RightFoot", "Health") - this.GetHealth("RightFoot", "Health"));
-            this.AddHealth("LeftFoot","Health",  this.GetMaxHealth("LeftFoot", "Health") - this.GetHealth("LeftFoot", "Health"));
+        this.SetHealth("LeftLeg", "Health", this.GetMaxHealth("LeftLeg", "Health"));
+        this.SetHealth("RightLeg", "Health", this.GetMaxHealth("RightLeg", "Health"));
+
+        if(this.GetBleedingManagerServer()) {
+            this.GetBleedingManagerServer().RemoveAllSources();
         }
-        */
     }
 
     override void OnVehicleSwitchSeat(int seatIndex) {
