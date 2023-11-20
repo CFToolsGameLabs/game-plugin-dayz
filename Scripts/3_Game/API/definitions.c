@@ -59,7 +59,9 @@ class _Response_Register_Features {
     int metricsInterval = 5;
     int reportingInterval = 10;
 
-    int pollProtocolVersion = 1;
+    int pollProtocolVersion = 2;
+
+    bool kvEnabled = false;
 };
 class _Response_Register : _Response {
     string authKey;
@@ -401,5 +403,58 @@ class _Payload_ItemList : _Payload {
 };
 class _Response_ItemList : _Response {
     void _Response_ItemList(string content) { JsonFileLoader<_Response_ItemList>.JsonLoadData(content, this); }
+};
+// ************************
+
+// Register: /v1/kv/server
+class _Payload_KVOperation : _Payload {
+    string operation;
+
+    string key;
+    string value;
+
+    int expires;
+
+    void _Payload_KVOperation(string operation, string key, string value, int expires) {
+        this.operation = operation;
+
+        this.key = key;
+        this.value = value;
+
+        this.expires = expires;
+    }
+    override string ToJson() { return JsonFileLoader<_Payload_KVOperation>.JsonMakeData(this); }
+};
+class _Response_KVOperation : _Response {
+    string key;
+    string value;
+    void _Response_KVOperation(string content) { JsonFileLoader<_Response_KVOperation>.JsonLoadData(content, this); }
+};
+class _Callback_KVOperation : _Callback {
+    string operation;
+
+    string key;
+    string value;
+
+    int expires;
+
+    void _Callback_KVOperation(string operation, string key, string value, int expires) {
+        this.operation = operation;
+
+        this.key = key;
+        this.value = value;
+
+        this.expires = expires;
+    }
+
+    override void OnError(int errorCode) {
+        GetGameLabs().GetLogger().Error(string.Format("[KV] (%1) %2=%3 [expires=%4] => error: server; errorCode: %5", this.operation, this.key, this.value, this.expires, errorCode));
+    };
+    override void OnTimeout() {
+        GetGameLabs().GetLogger().Error(string.Format("[KV] (%1) %2=%3 [expires=%4] => error: timeout", this.operation, this.key, this.value, this.expires));
+    };
+    override void OnSuccess(string data, int dataSize) {
+        GetGameLabs().GetLogger().Info(string.Format("[KV] (%1) %2=%3 [expires=%4] => success: %5[%6]", this.operation, this.key, this.value, this.expires, data, dataSize));
+    };
 };
 // ************************
