@@ -54,10 +54,12 @@ class GameLabsReporter {
                                     nonAsciiCharacters++;
                                 }
                             }
+
+                            float nonAsciiPortion;
                             if(displayName.Length() == 0) {
-                                float nonAsciiPortion = 0;
+                                nonAsciiPortion = 0;
                             } else {
-                                float nonAsciiPortion = nonAsciiCharacters / displayName.Length();
+                                nonAsciiPortion = nonAsciiCharacters / displayName.Length();
                             }
 
                             if(nonAsciiPortion >= nonAsciiThreshold) {
