@@ -43,11 +43,12 @@ class GameLabsRPC {
                     GetGameLabs().GetConfiguration().OverrideDebugStatus(responseRESync.param1);
 
                     if(responseRESync.param2 == NULL) {
-                        GetGameLabs().GetLogger().Debug(string.Format("Sync response did not contain a valid sync object"));
+                        GetGameLabs().GetLogger().Info(string.Format("Sync response did not contain a valid sync object"));
                     } else {
                         GameLabsClientSync clientSync = responseRESync.param2;
+
                         player.SetUpstreamIdentity(clientSync.cftoolsId);
-                        GetGameLabs().GetLogger().Debug(string.Format("Received upstream identity (cftoolsId=%1)", player.GetUpstreamIdentity()));
+                        GetGameLabs().GetLogger().Info(string.Format("Received upstream identity (cftoolsId=%1)", clientSync.cftoolsId));
                         player.OnUpstreamIdentityReceived();
 
                         MissionGameplay mission = MissionGameplay.Cast(GetGame().GetMission());
@@ -55,6 +56,11 @@ class GameLabsRPC {
                         mission.chatSanitizeBattlEyePrefix = clientSync.chatSanitizeBattlEyePrefix;
                         mission.chatBlockEventProcessing = clientSync.chatBlockEventProcessing;
                         mission.advancedChatInterface = clientSync.advancedChatInterface;
+
+                        GetGameLabs().GetConfiguration().SetMagicBulletCheckEnabled(clientSync.enableMagicBulletCheck);
+                        GetGameLabs().GetConfiguration().SetMagicBulletInvalidateEnabled(clientSync.enableMagicBulletInvalidation);
+
+                        GetGameLabs().GetLogger().Info(string.Format("enableMagicBulletCheck=%1; enableMagicBulletInvalidation=%2", clientSync.enableMagicBulletCheck, clientSync.enableMagicBulletInvalidation));
                     }
                     player.OnGameLabsSync();
                 } else {
@@ -138,19 +144,17 @@ class GameLabsRPC {
                 return;
             }
             #endif
-            /*
-            case GameLabsRPCS.RP_HITINFO: {
-                player = GetPlayerByIdentity(sender);
-                if(!player) return;
-
-                Param1<string> hitref = new Param1<string>("");
-                ctx.Read(hitref);
-                if(hitref.param1) {
-                    GLClientHitInfo hitInfo = new GLClientHitInfo(hitref.param1);
-                    player.AddHitToCache(hitInfo);
+            case GameLabsRPCS.RQ_INVALIDBULLET: {
+                player = this.GetPlayerByIdentity(sender);
+                if(!player) {
+                    GetGameLabs().GetLogger().Error(string.Format("[RQ_INVALIDBULLET] Received without valid sender identity (%1)", sender));
+                } else {
+                    string playerName = player.GetPlayerName();
+                    string steam64 = player.GetPlainId();
+                    string cftoolsId = player.GetUpstreamIdentity();
+                    GetGameLabs().GetLogger().Warn(string.Format("[RQ_INVALIDBULLET] Player %1 [steam64=%2; cftools_id=%3] triggered magic bullet detection | This is an experimental system. !!!!!!!!!!!!!!!!! DO NOT ISSUE A BAN SOLELY BASED ON THIS MESSAGE !!!!!!!!!!!!!!!!!", playerName, steam64, cftoolsId));
                 }
             }
-            */
         }
     }
 };

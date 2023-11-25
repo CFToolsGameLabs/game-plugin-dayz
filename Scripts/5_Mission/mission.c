@@ -35,12 +35,19 @@ modded class MissionServer {
                 player.SetGamesessionId(GetGameLabs().GetPlayerGamesessionId(player.GetPlainId()));
                 player.OnUpstreamIdentityReceived();
 
+                ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+                playerStats.startingDistance = 0;
+
                 GameLabsClientSync clientSync = new GameLabsClientSync;
                 clientSync.cftoolsId = cftoolsId;
                 clientSync.gameSessionId = GetGameLabs().GetPlayerGamesessionId(player.GetPlainId());
+
                 clientSync.chatSanitizeBattlEyeJoinLeave = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyeJoinLeave();
                 clientSync.chatSanitizeBattlEyePrefix = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyePrefix();
                 clientSync.chatBlockEventProcessing = GetGameLabs().GetConfiguration().GetChatEventBlock();
+
+                clientSync.enableMagicBulletCheck = GetGameLabs().GetConfiguration().GetMagicBulletCheckEnabled();
+                clientSync.enableMagicBulletInvalidation = GetGameLabs().GetConfiguration().GetMagicBulletInvalidateEnabled();
 
                 Param2 <bool, ref GameLabsClientSync> payloadSync = new Param2<bool, ref GameLabsClientSync>(GetGameLabs().GetDebugStatus(), clientSync);
                 GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, identity);
@@ -259,6 +266,10 @@ modded class MissionServer {
 
                 weapon = m_player.GetHumanInventory().CreateInInventory("HK416_CFTools");
                 m_player.SetQuickBarEntityShortcut(weapon, 1, true);
+                weapon.OnDebugSpawn();
+
+                weapon = m_player.GetInventory().CreateInInventory("Scout_CFTools");
+                m_player.SetQuickBarEntityShortcut(weapon, 0, true);
                 weapon.OnDebugSpawn();
 
                 /*

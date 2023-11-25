@@ -24,6 +24,9 @@ class GameLabsConfiguration {
     private bool requireASCIIItemNames = false;
     private bool filterASCIIItemNames = true;
 
+    private bool enableMagicBulletCheck = false;
+    private bool enableMagicBulletInvalidation = false;
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -45,6 +48,11 @@ class GameLabsConfiguration {
     bool GetSpeedCheckStatus() { return !this.speedCheckDisabled; }
     float GetSpeedCheckThresholdFoot() { return this.speedCheckThresholdFoot; }
     float GetSpeedCheckThresholdVehicle() { return this.speedCheckThresholdVehicle; }
+
+    bool GetMagicBulletCheckEnabled() { return this.enableMagicBulletCheck; }
+    void SetMagicBulletCheckEnabled(bool value) { this.enableMagicBulletCheck = value; }
+    bool GetMagicBulletInvalidateEnabled() { return this.enableMagicBulletInvalidation; }
+    void SetMagicBulletInvalidateEnabled(bool value) { this.enableMagicBulletInvalidation = value; }
 
     bool GetChatSanitizeBattlEyeJoinLeave() { return this.chatSanitizeBattlEyeJoinLeave; }
     bool GetChatSanitizeBattlEyePrefix() { return this.chatSanitizeBattlEyePrefix; }
