@@ -402,3 +402,21 @@ static ref GameLabsCore GetGameLabs() {
     }
     return g_GameLabsCore;
 };
+
+string GameLabs_GetPlayerSteam64() {
+    if(GetGame().IsDedicatedServer()) return "";
+    BiosUserManager user_manager = GetGame().GetUserManager();
+    if(user_manager) {
+        if(user_manager.GetTitleInitiator()) {
+            user_manager.SelectUser(user_manager.GetTitleInitiator());
+        }
+    }
+
+    string uid;
+    if(user_manager && user_manager.GetSelectedUser()) {
+        uid = user_manager.GetSelectedUser().GetUid();
+    } else {
+        uid = "";
+    }
+    return uid;
+};
