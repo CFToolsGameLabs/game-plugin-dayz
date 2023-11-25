@@ -277,4 +277,7 @@ class GLPlayerStatistics {
 
     int killsInfected       = 0;
     int killsAnimals        = 0;
+
+    float startingDistance  = 0;
+    float distance          = 0;
 };

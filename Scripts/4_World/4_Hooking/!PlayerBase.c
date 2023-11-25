@@ -210,6 +210,14 @@ modded class PlayerBase extends ManBase {
         if(!GetGame().IsServer()) return;
         if(!GetGameLabs().IsStatReportingEnabled()) return;
 
+        string cftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(this.GetPlainId());
+        if(cftoolsId) {
+            ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            if (this.StatGet("dist") >= playerStats.startingDistance) {
+                playerStats.distance += (this.StatGet("dist") - playerStats.startingDistance);
+            }
+        }
+
         _Payload_PlayerDeath payload;
         _LogPlayerEx logObjectMurderer;
         _LogPlayerEx logObjectPlayer = new _LogPlayerEx(this);
