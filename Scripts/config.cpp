@@ -99,11 +99,12 @@ class CfgVehicles
     class PlateCarrierPouches;
     class PlateCarrierPouches_CFTools: PlateCarrierPouches
     {
-        displayName="Plate Carrier Puches (CFTools edition)";
+        displayName="Plate Carrier Pouches (CFTools edition)";
         descriptionShort="Schnitzel and some beer to-go";
         hiddenSelections[] = {"zbytek"};
         hiddenSelectionsTextures[] = {"GameLabs\Scripts\Assets\ballisticvest_CF_co.paa"};
         hiddenSelectionsMaterials[] = {"GameLabs\Scripts\Assets\ballisticvest_CF.rvmat"};
+        itemCargoSize[] = {30, 30};
         class DamageSystem: DamageSystem
         {
             class GlobalHealth: GlobalHealth
@@ -170,6 +171,7 @@ class CfgVehicles
 			"GameLabs\Scripts\Assets\shirtcftools.paa",
 			"GameLabs\Scripts\Assets\shirtcftools.paa"
 		};
+        itemCargoSize[] = {30, 30};
 	};
 
     class Hoodie_ColorBase;
@@ -188,6 +190,7 @@ class CfgVehicles
         quickBarBonus = 5;
         varWetMax = 0.249;
         heatIsolation = 1.0;
+        itemCargoSize[] = {30, 30};
     };
 
     class MilitaryBeret_ColorBase;
@@ -373,8 +376,8 @@ class CfgWeapons
         chamberableFrom[] = {"Ammo_556x45","Ammo_556x45Tracer"};
         magazines[] = {"Mag_STANAGDrum_60Rnd_CFTools"};
         ejectType = 1;
-        recoilModifier[] = {0.7,0.7,0.7};
-        swayModifier[] = {1.8,1.8,0.99};
+        recoilModifier[] = {0.0,0.0,0.0};
+        swayModifier[] = {0.0,0.0,0.0};
         simpleHiddenSelections[] = {"hide_barrel","folding_lowered","folding_raised"};
         hiddenSelections[] = {"color"};
         modes[] = {"SemiAuto","FullAuto"};
@@ -484,7 +487,7 @@ class CfgWeapons
             {
                 class Health
                 {
-                    hitpoints = 220;
+                    hitpoints = 10000;
                     healthLevels[] = {{1.0,{"GameLabs\Scripts\Assets\hk416.rvmat"}},{0.7,{"GameLabs\Scripts\Assets\hk416.rvmat"}},{0.5,{"GameLabs\Scripts\Assets\hk416_damage.rvmat"}},{0.3,{"GameLabs\Scripts\Assets\hk416_damage.rvmat"}},{0.0,{"GameLabs\Scripts\Assets\hk416_destruct.rvmat"}}};
                 };
             };
