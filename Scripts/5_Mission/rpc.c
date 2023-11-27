@@ -148,11 +148,29 @@ class GameLabsRPC {
                 player = this.GetPlayerByIdentity(sender);
                 if(!player) {
                     GetGameLabs().GetLogger().Error(string.Format("[RQ_INVALIDBULLET] Received without valid sender identity (%1)", sender));
+
                 } else {
                     string playerName = player.GetPlayerName();
                     string steam64 = player.GetPlainId();
                     string cftoolsId = player.GetUpstreamIdentity();
                     GetGameLabs().GetLogger().Warn(string.Format("[RQ_INVALIDBULLET] Player %1 [steam64=%2; cftools_id=%3] triggered magic bullet detection | This is an experimental system. !!!!!!!!!!!!!!!!! DO NOT ISSUE A BAN SOLELY BASED ON THIS MESSAGE !!!!!!!!!!!!!!!!!", playerName, steam64, cftoolsId));
+
+                    if(GetGameLabs().GetConfiguration().GetReportingEndpointMagicBullet()) {
+                        _Payload_DiscordWebHook webhook = new _Payload_DiscordWebHook();
+                        _Payload_DiscordWebHookEmbed embed = new _Payload_DiscordWebHookEmbed();
+                        embed.SetTitle("Magic Bullet Detection Triggered");
+                        embed.SetColor(16711741);
+                        embed.SetDescription(string.Format("%1 Triggered Magic Bullet Detection", playerName));
+                        embed.AddField("Player Name", playerName, false);
+                        embed.AddField("CFTools Id", cftoolsId, true);
+                        embed.AddField("Steam64", steam64, true);
+                        webhook.AddEmbed(embed);
+
+                        RestContext webhookContext = GetRestApi().GetRestContext(GetGameLabs().GetConfiguration().GetReportingEndpointMagicBullet());
+                        webhookContext.SetHeader("application/json");
+                        webhookContext.POST(new _Callback(), "", webhook.ToJson());
+                    }
+
                 }
             }
         }

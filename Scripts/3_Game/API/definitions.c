@@ -83,6 +83,7 @@ class _Payload_ServerPoll : _Payload {
     int aiCount;
     int animalCount;
     int vehicleCount;
+    int entityCount;
 
     int aiActive;
 
@@ -97,6 +98,7 @@ class _Payload_ServerPoll : _Payload {
         this.aiCount = GetGameLabs().GetAICount();
         this.animalCount = GetGameLabs().GetAnimalCount();
         this.vehicleCount = GetGameLabs().GetVehicleCount();
+        this.entityCount = GetGameLabs().GetEntityCount();
 
         if(!isFirst) this.aiActive = GetGameLabs().GetAIActiveCount();
         else this.aiActive = 0;
@@ -458,3 +460,61 @@ class _Callback_KVOperation : _Callback {
     };
 };
 // ************************
+
+// Discord
+
+class _Payload_DiscordWebHookEmbedField {
+    string name;
+    string value;
+    bool inline;
+
+    void _Payload_DiscordWebHookEmbedField(string _name, string _value, bool _inlineField) {
+        this.name = _name;
+        this.value = _value;
+        this.inline = _inlineField;
+    }
+};
+
+class _Payload_DiscordWebHookEmbed {
+    string title;
+    string description;
+    int color;
+
+    ref array<ref _Payload_DiscordWebHookEmbedField> fields = new array<ref _Payload_DiscordWebHookEmbedField>();
+
+    void SetTitle(string _title) {
+        this.title = _title;
+    }
+
+    void SetDescription(string _description) {
+        this.description = _description;
+    }
+
+    void SetColor(int _color) {
+        this.color = _color;
+    }
+
+    void AddField(string name, string value, bool inlineField) {
+        ref _Payload_DiscordWebHookEmbedField field = new _Payload_DiscordWebHookEmbedField(name, value, inlineField);
+        this.fields.Insert(field);
+    }
+};
+
+class _Payload_DiscordWebHook : _Payload {
+    string username = "GameLabs";
+    string avatar_url = "https://cdn.cftools.de/brand/cloud/avatar-blue.png";
+
+    string content;
+    ref array<_Payload_DiscordWebHookEmbed> embeds = new array<_Payload_DiscordWebHookEmbed>();
+
+    void _Payload_DiscordWebHook() {}
+
+    void SetContent(string content) {
+        this.content = content;
+    }
+
+    void AddEmbed(_Payload_DiscordWebHookEmbed embed) {
+        this.embeds.Insert(embed);
+    }
+    override string ToJson() { return JsonFileLoader<_Payload_DiscordWebHook>.JsonMakeData(this); }
+};

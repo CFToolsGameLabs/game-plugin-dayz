@@ -19,6 +19,7 @@ class GameLabsCore {
     private int _computedAI = 0;
     private int _computedAnimals = 0;
     private int _computedVehicles = 0;
+    private int _computedEntities = 0;
 
     private int _metricsInterval = 5;
     private int _reportingInterval = 10;
@@ -165,6 +166,10 @@ class GameLabsCore {
 
     int GetServerFPS() { return this._computedServerFps; }
     void SetServerFPS(int fpsValue) { this._computedServerFps = fpsValue; }
+
+    int GetEntityCount() { return this._computedEntities; }
+    void IncrEntityCount() { this._computedEntities++; }
+    void DecrEntityCount() { this._computedEntities--; }
 
     int GetAICount() { return this._computedAI; }
     void IncrAICount() { this._computedAI++; }

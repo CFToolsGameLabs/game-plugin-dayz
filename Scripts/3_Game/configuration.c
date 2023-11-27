@@ -27,6 +27,8 @@ class GameLabsConfiguration {
     private bool enableMagicBulletCheck = false;
     private bool enableMagicBulletInvalidation = false;
 
+    private string reportingEndpointMagicBullet = "";
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -53,6 +55,7 @@ class GameLabsConfiguration {
     void SetMagicBulletCheckEnabled(bool value) { this.enableMagicBulletCheck = value; }
     bool GetMagicBulletInvalidateEnabled() { return this.enableMagicBulletInvalidation; }
     void SetMagicBulletInvalidateEnabled(bool value) { this.enableMagicBulletInvalidation = value; }
+    string GetReportingEndpointMagicBullet() { return this.reportingEndpointMagicBullet; }
 
     bool GetChatSanitizeBattlEyeJoinLeave() { return this.chatSanitizeBattlEyeJoinLeave; }
     bool GetChatSanitizeBattlEyePrefix() { return this.chatSanitizeBattlEyePrefix; }
