@@ -14,7 +14,9 @@ modded class MissionServer {
     override void OnEvent(EventType eventTypeId, Param params) {
         super.OnEvent(eventTypeId, params);
         if(eventTypeId == ClientNewEventTypeID) {
-            m_player.GameLabs_MakeReady(m_player.GetIdentity().GetPlainId(), m_player.GetIdentity().GetName());
+            string steam64 = m_player.GetIdentity().GetPlainId();
+            string name = m_player.GetIdentity().GetName();
+            m_player.GameLabs_MakeReady(steam64, name);
             this.PrivilegedEquip();
         }
     };
