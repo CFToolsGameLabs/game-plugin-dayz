@@ -88,11 +88,17 @@ modded class MissionServer {
         CFCloud_HealPlayer().Register();
         CFCloud_KillPlayer().Register();
         CFCloud_SpawnPlayerItem().Register();
-        CFCloud_ExplodePlayer().Register();
         CFCloud_StripPlayer().Register();
+        CFCloud_ExplodePlayer().Register();
+        //CFCloud_PlayerDropItem().Register(); // TODO: not working
 
         // Vehicle
         CFCloud_DeleteVehicle().Register();
+        CFCloud_KillVehicleEngine().Register();
+        CFCloud_RefuelVehicle().Register();
+        CFCloud_RepairVehicle().Register();
+        //CFCloud_VehicleEjectDriver().Register(); // TODO: sync
+        CFCloud_VehicleExplode().Register();
 
         // World
         CFCloud_WorldTime().Register();
@@ -286,12 +292,14 @@ modded class MissionServer {
                 weapon.OnDebugSpawn();
                 */
             } else {
-                ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
-                if(item) {
-                    m_player.DropItem(item);
+                if(GetGame().CommandlineGetParam("glequip", tmp)) {
+                    ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
+                    if (item) {
+                        m_player.DropItem(item);
+                    }
+                    item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
+                    item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
                 }
-                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
-                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
             }
             /* ************************************************************************ */
         }
