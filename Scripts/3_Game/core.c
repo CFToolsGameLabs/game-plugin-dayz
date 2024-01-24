@@ -38,6 +38,8 @@ class GameLabsCore {
     ref array<ref _Vehicle> _serverVehiclesBufferAdded = new array<ref _Vehicle>;
     ref array<ref _Vehicle> _serverVehiclesBufferRemoved = new array<ref _Vehicle>;
 
+    static ref map<string, ref array<string>> _vehicleSlotMap = new map <string, ref array<string>>;
+
     void Exit() {
         this.blockProcessing = true;
         if(this.logger) this.logger.Info("(Core) Attempting graceful exit");

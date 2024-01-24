@@ -33,12 +33,44 @@ class GameLabsReporter {
 
                 for (int nClass = 0; nClass < nClasses; ++nClass) {
                     string strName;
-                    GetGame().ConfigGetChildName(cfgPath, nClass, strName);
+                    if(!GetGame().ConfigGetChildName(cfgPath, nClass, strName))
+                        continue;
 
                     int scope = GetGame().ConfigGetInt(cfgPath + " " + strName + " scope");
 
                     if (scope <= 0)
                         continue;
+
+                    if(cfgPath == "CfgVehicles") {
+                        int cfgType = GetGame().ConfigGetType(CFG_VEHICLESPATH + " " + strName + " inventorySlot");
+                        if(cfgType == CT_ARRAY) {
+                            array<string> attachments = {};
+                            GetGame().ConfigGetTextArray(CFG_VEHICLESPATH + " " + strName + " inventorySlot", attachments);
+                            foreach(string attachment : attachments) {
+                                if (attachment == string.Empty)
+                                    break;
+
+                                attachment.ToLower();
+                                if (GetGameLabs()._vehicleSlotMap[attachment] == NULL) {
+                                    GetGameLabs()._vehicleSlotMap[attachment] = new array<string>;
+                                }
+
+                                if (GetGameLabs()._vehicleSlotMap[attachment].Find(strName) == -1)
+                                    GetGameLabs()._vehicleSlotMap[attachment].Insert(strName);
+                            }
+                        } else if (cfgType == CT_STRING) {
+                            string slot = string.Empty;
+                            if (GetGame().ConfigGetText("CfgVehicles " + strName + " inventorySlot", slot) && slot != string.Empty) {
+                                slot.ToLower();
+                                if (GetGameLabs()._vehicleSlotMap[slot] == NULL){
+                                    GetGameLabs()._vehicleSlotMap[slot] = new array<string>;
+                                }
+
+                                if (GetGameLabs()._vehicleSlotMap[slot].Find(strName) == -1)
+                                    GetGameLabs()._vehicleSlotMap[slot].Insert(strName);
+                            }
+                        }
+                    }
 
                     string displayName = "";
                     if (scope == 2) {
