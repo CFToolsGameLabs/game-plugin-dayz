@@ -199,7 +199,50 @@ modded class PlayerBase extends ManBase {
             this.GetBleedingManagerServer().RemoveAllSources();
         }
 
-        this.m_AgentPool.RemoveAllAgents();
+        this.RemoveAllAgents();
+        ModifiersManager modifiers_manager = this.GetModifiersManager();
+
+        // Consumption based
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CHOLERA))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CHOLERA);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_INFLUENZA))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_INFLUENZA);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_SALMONELLA))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_SALMONELLA);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_POISONING))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_POISONING);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_HEMOLYTIC_REACTION))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_VOMITSTUFFED))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_VOMITSTUFFED);
+
+        // Someone's naughty
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_BRAIN))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_BRAIN);
+
+        // Infections
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION1))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION1);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION2))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION2);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_FEVER))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_FEVER);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_COMMON_COLD))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_COMMON_COLD);
+
+        // Gas
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_TOXICITY))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_TOXICITY);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CONTAMINATION1))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CONTAMINATION1);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CONTAMINATION2))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CONTAMINATION2);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CONTAMINATION3))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CONTAMINATION3);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_AREAEXPOSURE))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_AREAEXPOSURE);
     }
 
     override void OnVehicleSwitchSeat(int seatIndex) {
@@ -309,6 +352,7 @@ modded class PlayerBase extends ManBase {
         }
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy(this=%1, murderer=%2, source=%3, component=%4, dmgZone=%5, ammo=%6, modelPos=%7, speedCoef=%8)", this, murderer, source, component, dmgZone, ammo, modelPos, speedCoef));
+        GetGameLabs().GetLogger().Debug(string.Format("^EEHitBy(GetDamage(%1), GetHighestDamage(%2))", damageResult.GetDamage(dmgZone, "Health"), damageResult.GetHighestDamage("Health")));
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);
