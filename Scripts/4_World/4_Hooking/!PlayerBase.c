@@ -198,6 +198,8 @@ modded class PlayerBase extends ManBase {
         if(this.GetBleedingManagerServer()) {
             this.GetBleedingManagerServer().RemoveAllSources();
         }
+
+        this.m_AgentPool.RemoveAllAgents();
     }
 
     override void OnVehicleSwitchSeat(int seatIndex) {
