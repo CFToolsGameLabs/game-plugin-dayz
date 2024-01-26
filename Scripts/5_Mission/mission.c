@@ -99,6 +99,7 @@ modded class MissionServer {
         CFCloud_RepairVehicle().Register();
         //CFCloud_VehicleEjectDriver().Register(); // TODO: sync
         CFCloud_VehicleExplode().Register();
+        CFCloud_UnstuckVehicle().Register();
 
         // World
         CFCloud_WorldTime().Register();
