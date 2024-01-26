@@ -406,6 +406,31 @@ class CFCloud_RepairVehicle extends GameLabsContextAction {
         }
 };
 
+class CFCloud_UnstuckVehicle extends GameLabsContextAction {
+        void CFCloud_UnstuckVehicle() {
+            this.actionCode = "CFCloud_UnstuckVehicle";
+            this.actionName = "Unstuck vehicle from below the map";
+            this.actionIcon = "caret-square-up";
+            this.actionColour = "default";
+            this.actionContext = "vehicle";
+        }
+
+        override bool Execute(GameLabsActionContext context) {
+            _Vehicle vehicle;
+            _Vehicle.CastTo(vehicle, context.GetReferencedObject());
+
+            Car vehicleEntity;
+            Car.CastTo(vehicleEntity, vehicle.Ref());
+
+            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1", vehicleEntity));
+
+            vector position = vehicleEntity.GetPosition();
+            position[1] = GetGame().SurfaceY(position[0], position[2]) + 1;
+            vehicleEntity.SetPosition(position);
+            return true;
+        }
+};
+
 /* World Actions */
 
 class CFCloud_WorldTime extends GameLabsContextAction {
