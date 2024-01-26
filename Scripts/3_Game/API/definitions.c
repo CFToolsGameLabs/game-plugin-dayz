@@ -233,6 +233,8 @@ class _ServerPlayer {
     string item;
     vector position;
 
+    int unconscious = 0;
+
     // Constructor is in reporter.c to circumvent layer limitations
 };
 class _Payload_ServerPlayers : _Payload {

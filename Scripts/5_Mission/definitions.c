@@ -114,6 +114,9 @@ class _ServerPlayerEx : _ServerPlayer {
 
             if(player.IsInVehicle())
                 this.insideVehicle = 1;
+
+            if(player.IsUnconscious())
+                this.unconscious = 1;
         }
 
         if(player.GetItemInHands())
