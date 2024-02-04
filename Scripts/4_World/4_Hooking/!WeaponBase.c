@@ -258,7 +258,7 @@ modded class Weapon_Base {
                     // Handle no Bullets found
                 } else {
                     GameLabsBulletPostprocessor bulletHandler = new GameLabsBulletPostprocessor(bullets);
-                    GetGame().GameScript.Call(bulletHandler, "TraceBullets", NULL)
+                    GetGame().GameScript.Call(bulletHandler, "TraceBullets", NULL);
                 }
             }
         } else {
@@ -267,7 +267,11 @@ modded class Weapon_Base {
                 if(player.HasUpstreamIdentity()) {
                     string cftoolsId = player.GetUpstreamIdentity();
                     ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
-                    playerStatistics.shotsFired++;
+                    if(ammoType == "Bullet_12GaugePellets") {
+                        playerStatistics.shotsFired += 8; // One "shot" per pellet. Without killing performance, there is no better way. Sorry shotgun users.
+                    } else {
+                        playerStatistics.shotsFired++;
+                    }
                 }
             }
         }
