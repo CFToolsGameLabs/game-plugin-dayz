@@ -73,10 +73,11 @@ class GameLabsReporter {
                     }
 
                     string displayName = "";
-                    if (scope == 2) {
-                        if (!GetGame().ConfigGetText(cfgPath + " " + strName + " displayName", displayName))
-                            displayName = "";
-                    }
+                    if(scope != 2)
+                        continue;
+
+                    if (!GetGame().ConfigGetText(cfgPath + " " + strName + " displayName", displayName))
+                        displayName = "";
 
                     if(GetGameLabs().GetConfiguration().GetItemNameASCIIFilter()) {
                         if(displayName.Length()) {
