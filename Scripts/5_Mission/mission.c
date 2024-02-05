@@ -14,7 +14,9 @@ modded class MissionServer {
     override void OnEvent(EventType eventTypeId, Param params) {
         super.OnEvent(eventTypeId, params);
         if(eventTypeId == ClientNewEventTypeID) {
-            m_player.GameLabs_MakeReady(m_player.GetIdentity().GetPlainId(), m_player.GetIdentity().GetName());
+            string steam64 = m_player.GetIdentity().GetPlainId();
+            string name = m_player.GetIdentity().GetName();
+            m_player.GameLabs_MakeReady(steam64, name);
             this.PrivilegedEquip();
         }
     };
@@ -35,12 +37,19 @@ modded class MissionServer {
                 player.SetGamesessionId(GetGameLabs().GetPlayerGamesessionId(player.GetPlainId()));
                 player.OnUpstreamIdentityReceived();
 
+                ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+                playerStats.startingDistance = 0;
+
                 GameLabsClientSync clientSync = new GameLabsClientSync;
                 clientSync.cftoolsId = cftoolsId;
                 clientSync.gameSessionId = GetGameLabs().GetPlayerGamesessionId(player.GetPlainId());
+
                 clientSync.chatSanitizeBattlEyeJoinLeave = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyeJoinLeave();
                 clientSync.chatSanitizeBattlEyePrefix = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyePrefix();
                 clientSync.chatBlockEventProcessing = GetGameLabs().GetConfiguration().GetChatEventBlock();
+
+                clientSync.enableMagicBulletCheck = GetGameLabs().GetConfiguration().GetMagicBulletCheckEnabled();
+                clientSync.enableMagicBulletInvalidation = GetGameLabs().GetConfiguration().GetMagicBulletInvalidateEnabled();
 
                 Param2 <bool, ref GameLabsClientSync> payloadSync = new Param2<bool, ref GameLabsClientSync>(GetGameLabs().GetDebugStatus(), clientSync);
                 GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, identity);
@@ -55,11 +64,11 @@ modded class MissionServer {
             string gamesessionId;
             gamesessionId = GetGameLabs().GetPlayerGamesessionId(player.GetPlainId());
             if(gamesessionId) {
-                GetGameLabs().ClearPlayerGamesessionId(player.GetPlainId());
-                GetGameLabs().ClearPlayerUpstreamIdentity(player.GetPlainId());
-
                 _Payload_PlayerDisconnectEx payloadPlayerDisconnect = new _Payload_PlayerDisconnectEx(gamesessionId, player);
                 GetGameLabs().GetApi().PlayerDisconnect(new _Callback_PlayerDisconnect(), payloadPlayerDisconnect);
+
+                GetGameLabs().ClearPlayerGamesessionId(player.GetPlainId());
+                GetGameLabs().ClearPlayerUpstreamIdentity(player.GetPlainId());
 
                 GetGameLabs().GetLogger().Debug(string.Format("Player<%1> disconnected at %2", player, player.GetPosition()));
 
@@ -79,11 +88,18 @@ modded class MissionServer {
         CFCloud_HealPlayer().Register();
         CFCloud_KillPlayer().Register();
         CFCloud_SpawnPlayerItem().Register();
-        CFCloud_ExplodePlayer().Register();
         CFCloud_StripPlayer().Register();
+        CFCloud_ExplodePlayer().Register();
+        //CFCloud_PlayerDropItem().Register(); // TODO: not working
 
         // Vehicle
         CFCloud_DeleteVehicle().Register();
+        CFCloud_KillVehicleEngine().Register();
+        CFCloud_RefuelVehicle().Register();
+        CFCloud_RepairVehicle().Register();
+        //CFCloud_VehicleEjectDriver().Register(); // TODO: sync
+        CFCloud_VehicleExplode().Register();
+        CFCloud_UnstuckVehicle().Register();
 
         // World
         CFCloud_WorldTime().Register();
@@ -261,6 +277,10 @@ modded class MissionServer {
                 m_player.SetQuickBarEntityShortcut(weapon, 1, true);
                 weapon.OnDebugSpawn();
 
+                weapon = m_player.GetInventory().CreateInInventory("Scout_CFTools");
+                m_player.SetQuickBarEntityShortcut(weapon, 0, true);
+                weapon.OnDebugSpawn();
+
                 /*
                 // Scout
                 weapon = m_player.GetInventory().CreateInInventory("Scout_CFTools");
@@ -273,12 +293,14 @@ modded class MissionServer {
                 weapon.OnDebugSpawn();
                 */
             } else {
-                ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
-                if(item) {
-                    m_player.DropItem(item);
+                if(GetGame().CommandlineGetParam("glequip", tmp)) {
+                    ItemBase item = ItemBase.Cast(m_player.GetItemInHands());
+                    if (item) {
+                        m_player.DropItem(item);
+                    }
+                    item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
+                    item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
                 }
-                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInHands("Hoodie_CFTools"));
-                item = ItemBase.Cast(m_player.GetHumanInventory().CreateInInventory("MilitaryBeret_CFTools"));
             }
             /* ************************************************************************ */
         }
@@ -313,7 +335,8 @@ modded class MissionGameplay extends MissionBase {
         this.gameLabsClient = new GameLabsClient();
 
         this.gameLabsRPC = new GameLabsRPC();
-        this.gameLabs.GetLogger().Info("Loaded MissionGameplay");
+        this.gameLabs.GetLogger().Info("Loaded MissionGameplay (Client)");
+        this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.name));
     }
 
     void ~MissionGameplay() {

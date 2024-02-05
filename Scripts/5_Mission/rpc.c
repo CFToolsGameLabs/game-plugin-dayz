@@ -3,16 +3,13 @@
 class GameLabsRPC {
     void GameLabsRPC() {
         GetDayZGame().Event_OnRPC.Insert( OnRPC );
+        GetGameLabs().GetLogger().Info(string.Format("RPC interface initiated and handler registered"));
     }
 
     void OnRPC(PlayerIdentity sender, Object target, int rpc_type, ParamsReadContext ctx) {
         if(GetGame().IsServer()) HandleServerRPC(sender, target, rpc_type, ctx);
         else HandleClientRPC(sender, target, rpc_type, ctx);
     }
-
-    /*
-     * TODO: PoC. This is inefficient beyond reasonable doubt, implement proper sync
-     */
 
     private void HandleClientRPC(PlayerIdentity sender, Object target, int rpc_type, ParamsReadContext ctx) {
         PlayerBase player;
@@ -23,6 +20,17 @@ class GameLabsRPC {
 
                 float serverFps = responseREServerFps.param1;
                 GetGameLabs().SetServerFPS(serverFps);
+
+                // TODO: Add client fps warning, memory warning and slow load warning
+                if(GetGameLabs().GetConfiguration().GetDebugStatus()) {
+                    if(serverFps > 100) {
+                        GetDayZGame().GLSetConnectivityStatState(EConnectivityStatType.SERVER_PERF, EConnectivityStatLevel.OFF);
+                    } else if(serverFps > 30) {
+                        GetDayZGame().GLSetConnectivityStatState(EConnectivityStatType.SERVER_PERF, EConnectivityStatLevel.LEVEL1);
+                    } else {
+                        GetDayZGame().GLSetConnectivityStatState(EConnectivityStatType.SERVER_PERF, EConnectivityStatLevel.LEVEL2);
+                    }
+                }
                 return;
             }
             case GameLabsRPCS.RE_SYNC: {
@@ -35,11 +43,12 @@ class GameLabsRPC {
                     GetGameLabs().GetConfiguration().OverrideDebugStatus(responseRESync.param1);
 
                     if(responseRESync.param2 == NULL) {
-                        GetGameLabs().GetLogger().Debug(string.Format("Sync response did not contain a valid sync object"));
+                        GetGameLabs().GetLogger().Info(string.Format("Sync response did not contain a valid sync object"));
                     } else {
                         GameLabsClientSync clientSync = responseRESync.param2;
+
                         player.SetUpstreamIdentity(clientSync.cftoolsId);
-                        GetGameLabs().GetLogger().Debug(string.Format("Received upstream identity (cftoolsId=%1)", player.GetUpstreamIdentity()));
+                        GetGameLabs().GetLogger().Info(string.Format("Received upstream identity (cftoolsId=%1)", clientSync.cftoolsId));
                         player.OnUpstreamIdentityReceived();
 
                         MissionGameplay mission = MissionGameplay.Cast(GetGame().GetMission());
@@ -47,6 +56,11 @@ class GameLabsRPC {
                         mission.chatSanitizeBattlEyePrefix = clientSync.chatSanitizeBattlEyePrefix;
                         mission.chatBlockEventProcessing = clientSync.chatBlockEventProcessing;
                         mission.advancedChatInterface = clientSync.advancedChatInterface;
+
+                        GetGameLabs().GetConfiguration().SetMagicBulletCheckEnabled(clientSync.enableMagicBulletCheck);
+                        GetGameLabs().GetConfiguration().SetMagicBulletInvalidateEnabled(clientSync.enableMagicBulletInvalidation);
+
+                        GetGameLabs().GetLogger().Info(string.Format("enableMagicBulletCheck=%1; enableMagicBulletInvalidation=%2", clientSync.enableMagicBulletCheck, clientSync.enableMagicBulletInvalidation));
                     }
                     player.OnGameLabsSync();
                 } else {
@@ -130,19 +144,35 @@ class GameLabsRPC {
                 return;
             }
             #endif
-            /*
-            case GameLabsRPCS.RP_HITINFO: {
-                player = GetPlayerByIdentity(sender);
-                if(!player) return;
+            case GameLabsRPCS.RQ_INVALIDBULLET: {
+                player = this.GetPlayerByIdentity(sender);
+                if(!player) {
+                    GetGameLabs().GetLogger().Error(string.Format("[RQ_INVALIDBULLET] Received without valid sender identity (%1)", sender));
 
-                Param1<string> hitref = new Param1<string>("");
-                ctx.Read(hitref);
-                if(hitref.param1) {
-                    GLClientHitInfo hitInfo = new GLClientHitInfo(hitref.param1);
-                    player.AddHitToCache(hitInfo);
+                } else {
+                    string playerName = player.GetPlayerName();
+                    string steam64 = player.GetPlainId();
+                    string cftoolsId = player.GetUpstreamIdentity();
+                    GetGameLabs().GetLogger().Warn(string.Format("[RQ_INVALIDBULLET] Player %1 [steam64=%2; cftools_id=%3] triggered magic bullet detection | This is an experimental system. !!!!!!!!!!!!!!!!! DO NOT ISSUE A BAN SOLELY BASED ON THIS MESSAGE !!!!!!!!!!!!!!!!!", playerName, steam64, cftoolsId));
+
+                    if(GetGameLabs().GetConfiguration().GetReportingEndpointMagicBullet()) {
+                        _Payload_DiscordWebHook webhook = new _Payload_DiscordWebHook();
+                        _Payload_DiscordWebHookEmbed embed = new _Payload_DiscordWebHookEmbed();
+                        embed.SetTitle("Magic Bullet Detection Triggered");
+                        embed.SetColor(16711741);
+                        embed.SetDescription(string.Format("%1 Triggered Magic Bullet Detection", playerName));
+                        embed.AddField("Player Name", playerName, false);
+                        embed.AddField("CFTools Id", cftoolsId, true);
+                        embed.AddField("Steam64", steam64, true);
+                        webhook.AddEmbed(embed);
+
+                        RestContext webhookContext = GetRestApi().GetRestContext(GetGameLabs().GetConfiguration().GetReportingEndpointMagicBullet());
+                        webhookContext.SetHeader("application/json");
+                        webhookContext.POST(new _Callback(), "", webhook.ToJson());
+                    }
+
                 }
             }
-            */
         }
     }
 };

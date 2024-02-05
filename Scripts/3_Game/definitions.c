@@ -14,7 +14,8 @@ enum GameLabsRPCS {
     RE_SYNC,
     RP_HITINFO, // This is currently used in debug mode only
     RQ_SERVERCFG,
-    RE_SERVERCFG
+    RE_SERVERCFG,
+    RQ_INVALIDBULLET
 };
 
 class GameLabsClientSync {
@@ -26,4 +27,7 @@ class GameLabsClientSync {
     bool chatSanitizeBattlEyePrefix;
     bool chatBlockEventProcessing;
     bool advancedChatInterface;
+
+    bool enableMagicBulletCheck;
+    bool enableMagicBulletInvalidation;
 };

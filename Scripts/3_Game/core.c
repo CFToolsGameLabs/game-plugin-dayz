@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.902";
+    private const string modControlledVersionIdentifier = "1.932";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -13,11 +13,13 @@ class GameLabsCore {
 
     private ref map<string, string> gamesessionIdMap = new map<string, string>;
     private ref map<string, string> upstreamIdentityMap = new map<string, string>;
+    private ref map<string, ref GLPlayerStatistics> playerStatisticsMap = new map<string, ref GLPlayerStatistics>;
 
     private int _computedServerFps = 0;
     private int _computedAI = 0;
     private int _computedAnimals = 0;
     private int _computedVehicles = 0;
+    private int _computedEntities = 0;
 
     private int _metricsInterval = 5;
     private int _reportingInterval = 10;
@@ -35,6 +37,8 @@ class GameLabsCore {
 
     ref array<ref _Vehicle> _serverVehiclesBufferAdded = new array<ref _Vehicle>;
     ref array<ref _Vehicle> _serverVehiclesBufferRemoved = new array<ref _Vehicle>;
+
+    static ref map<string, ref array<string>> _vehicleSlotMap = new map <string, ref array<string>>;
 
     void Exit() {
         this.blockProcessing = true;
@@ -73,9 +77,10 @@ class GameLabsCore {
             this.configuration.LoadFromDisk();
             this.logger = GameLabsLogger("GameLabsCore", this.GetDebugStatus());
 
+            this.logger.Info(string.Format("GameLabs v%1 start for server %2", this.GetVersionIdentifier(), this.configuration.GetServerId()));
+
             this.api = GameLabsAPI(this.configuration.GetServerId(),this.configuration.GetApiKey(),this.configuration.GetBaseURL(),this.configuration.GetStoreURL());
 
-            // TODO: Move this somewhere else in the future
             this.logger.Debug(string.Format("baseUrl=%1", this.configuration.GetBaseURL()));
             if(this.configuration.GetBaseURL() != "https://api.gamelabs.cloud/dz" && this.configuration.GetBaseURL() != "") {
                 this.logger.Warn(string.Format("API Base URL has been modified, your data may get compromised! (%1)", this.configuration.GetBaseURL()));
@@ -121,9 +126,14 @@ class GameLabsCore {
     void SetPlayerUpstreamIdentity(string steam64, string cftoolsId) {
         if(!this.IsServer()) return;
         this.upstreamIdentityMap.Set(steam64, cftoolsId);
+        this.playerStatisticsMap.Set(cftoolsId, GLPlayerStatistics());
     }
     void ClearPlayerUpstreamIdentity(string steam64) {
         if(!this.IsServer()) return;
+        string cftoolsId = GetPlayerUpstreamIdentity(steam64);
+        if(cftoolsId) {
+            this.playerStatisticsMap.Remove(cftoolsId);
+        }
         this.upstreamIdentityMap.Remove(steam64);
     }
     string GetPlayerUpstreamIdentity(string steam64) {
@@ -144,8 +154,24 @@ class GameLabsCore {
         return this.gamesessionIdMap.Get(steam64);
     }
 
+    ref GLPlayerStatistics GetPlayerStatisticsByCFToolsId(string cftoolsId) {
+        return this.playerStatisticsMap.Get(cftoolsId);
+    }
+
+    ref GLPlayerStatistics GetPlayerStatisticsBySteam64(string steam64) {
+        string cftoolsId = GetPlayerUpstreamIdentity(steam64);
+        if(cftoolsId) {
+            return this.playerStatisticsMap.Get(cftoolsId);
+        }
+        return NULL;
+    }
+
     int GetServerFPS() { return this._computedServerFps; }
     void SetServerFPS(int fpsValue) { this._computedServerFps = fpsValue; }
+
+    int GetEntityCount() { return this._computedEntities; }
+    void IncrEntityCount() { this._computedEntities++; }
+    void DecrEntityCount() { this._computedEntities--; }
 
     int GetAICount() { return this._computedAI; }
     void IncrAICount() { this._computedAI++; }
@@ -382,4 +408,22 @@ static ref GameLabsCore GetGameLabs() {
         g_GameLabsCore = GameLabsCore();
     }
     return g_GameLabsCore;
+};
+
+string GameLabs_GetPlayerSteam64() {
+    if(GetGame().IsDedicatedServer()) return "";
+    BiosUserManager user_manager = GetGame().GetUserManager();
+    if(user_manager) {
+        if(user_manager.GetTitleInitiator()) {
+            user_manager.SelectUser(user_manager.GetTitleInitiator());
+        }
+    }
+
+    string uid;
+    if(user_manager && user_manager.GetSelectedUser()) {
+        uid = user_manager.GetSelectedUser().GetUid();
+    } else {
+        uid = "";
+    }
+    return uid;
 };

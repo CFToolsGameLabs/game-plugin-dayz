@@ -21,6 +21,14 @@ class GameLabsConfiguration {
     private bool chatBlockEventProcessing = false;
     private bool advancedChatInterface = false;
 
+    private bool requireASCIIItemNames = false;
+    private bool filterASCIIItemNames = true;
+
+    private bool enableMagicBulletCheck = false;
+    private bool enableMagicBulletInvalidation = false;
+
+    private string reportingEndpointMagicBullet = "";
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -43,10 +51,19 @@ class GameLabsConfiguration {
     float GetSpeedCheckThresholdFoot() { return this.speedCheckThresholdFoot; }
     float GetSpeedCheckThresholdVehicle() { return this.speedCheckThresholdVehicle; }
 
+    bool GetMagicBulletCheckEnabled() { return this.enableMagicBulletCheck; }
+    void SetMagicBulletCheckEnabled(bool value) { this.enableMagicBulletCheck = value; }
+    bool GetMagicBulletInvalidateEnabled() { return this.enableMagicBulletInvalidation; }
+    void SetMagicBulletInvalidateEnabled(bool value) { this.enableMagicBulletInvalidation = value; }
+    string GetReportingEndpointMagicBullet() { return this.reportingEndpointMagicBullet; }
+
     bool GetChatSanitizeBattlEyeJoinLeave() { return this.chatSanitizeBattlEyeJoinLeave; }
     bool GetChatSanitizeBattlEyePrefix() { return this.chatSanitizeBattlEyePrefix; }
     bool GetChatEventBlock() { return this.chatBlockEventProcessing; }
     bool GetChatInterfaceProcessing() { return this.advancedChatInterface; }
+
+    bool GetItemNameASCIIRequired() { return this.requireASCIIItemNames; }
+    bool GetItemNameASCIIFilter() { return this.filterASCIIItemNames; }
 
     string GetServerId() { return this.serverId; }
     string GetApiKey() { return this.apiKey; }

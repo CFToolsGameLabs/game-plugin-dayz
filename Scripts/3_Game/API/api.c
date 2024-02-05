@@ -56,6 +56,9 @@ class GameLabsAPI {
 
     private int pollProtocolVersion = 0;
 
+    /* KV */
+    private bool kvEnabled = false;
+
     void GameLabsAPI(string serverId, string apiKey, string baseUrl = "https://api.gamelabs.cloud/dz", string storeUrl = "https://api.gamelabs.cloud/dz") {
         this.serverId = serverId;
         this.apiKey = apiKey;
@@ -90,6 +93,14 @@ class GameLabsAPI {
         return this.pollProtocolVersion;
     }
 
+    bool GetKVEnabled() {
+        return this.kvEnabled;
+    }
+
+    private void SetKVEnabled(bool enabled) {
+        this.kvEnabled = enabled;
+    }
+
     RegisterResult Register() {
         this.restContext.SetHeader("application/json"); // Expected for auth request
 
@@ -98,6 +109,7 @@ class GameLabsAPI {
         if(response.status == 2) {
             GetGameLabs()._PropagateFeatures(response); // Access features outside of API class
             this.SetPollProtocolVersion(response.features.pollProtocolVersion);
+            this.SetKVEnabled(response.features.kvEnabled);
             this.SetAuthkey(response.authKey);
         }
         return new RegisterResult(response.status, response.error);
@@ -181,4 +193,76 @@ class GameLabsAPI {
         if(!this.IsEnabled()) return;
         this.restContext.POST(RestCallback.Cast(cb), "/v1/item/list", payload.ToJson());
     }
+
+    bool KV_GET(string key, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        _Payload_KVOperation payload =  new _Payload_KVOperation("GET", key, "", 0);
+        if(cb == NULL) cb = new _Callback_KVOperation("GET", key, "", 0);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
+    bool KV_DELETE(string key, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        _Payload_KVOperation payload =  new _Payload_KVOperation("DEL", key, "", 0);
+        if(cb == NULL) cb = new _Callback_KVOperation("DEL", key, "", 0);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
+    bool KV_SET(string key, string value, int expires = 0, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        _Payload_KVOperation payload =  new _Payload_KVOperation("SET", key, value, expires);
+        if(cb == NULL) cb = new _Callback_KVOperation("SET", key, value, expires);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
+    bool KV_INCR(string key, int value, int expires = 0, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        _Payload_KVOperation payload =  new _Payload_KVOperation("INCR", key, value.ToString(), expires);
+        if(cb == NULL) cb = new _Callback_KVOperation("INCR", key, value.ToString(), expires);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
+    bool KV_DECR(string key, int value, int expires = 0, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        _Payload_KVOperation payload =  new _Payload_KVOperation("DECR", key, value.ToString(), expires);
+        if(cb == NULL) cb = new _Callback_KVOperation("DECR", key, value.ToString(), expires);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
+    bool KV_INCRBYFLOAT(string key, float value, int expires = 0, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        _Payload_KVOperation payload =  new _Payload_KVOperation("INCRFLOAT", key, value.ToString(), expires);
+        if(cb == NULL) cb = new _Callback_KVOperation("INCRFLOAT", key, value.ToString(), expires);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
+    bool KV_DECRBYFLOAT(string key, int value, int expires = 0, ref Managed cb = NULL) {
+        if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
+
+        value = value*-1;
+        _Payload_KVOperation payload =  new _Payload_KVOperation("INCRFLOAT", key, value.ToString(), expires);
+        if(cb == NULL) cb = new _Callback_KVOperation("INCRFLOAT", key, value.ToString(), expires);
+
+        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        return true;
+    }
+
 };

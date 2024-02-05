@@ -73,6 +73,11 @@ class AKM_CFTools extends AKM_Base {
             magazine = this.GetMagazine(this.GetCurrentMuzzle());
             if(magazine) magazine.LocalSetAmmoMax();
         }
+
+        ItemSuppressor suppressor = GetAttachedSuppressor();
+        if(suppressor) {
+            suppressor.AddHealth(100);
+        }
     }
 
     override void OnDebugSpawn() {

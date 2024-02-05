@@ -59,7 +59,9 @@ class _Response_Register_Features {
     int metricsInterval = 5;
     int reportingInterval = 10;
 
-    int pollProtocolVersion = 1;
+    int pollProtocolVersion = 2;
+
+    bool kvEnabled = false;
 };
 class _Response_Register : _Response {
     string authKey;
@@ -81,6 +83,7 @@ class _Payload_ServerPoll : _Payload {
     int aiCount;
     int animalCount;
     int vehicleCount;
+    int entityCount;
 
     int aiActive;
 
@@ -95,6 +98,7 @@ class _Payload_ServerPoll : _Payload {
         this.aiCount = GetGameLabs().GetAICount();
         this.animalCount = GetGameLabs().GetAnimalCount();
         this.vehicleCount = GetGameLabs().GetVehicleCount();
+        this.entityCount = GetGameLabs().GetEntityCount();
 
         if(!isFirst) this.aiActive = GetGameLabs().GetAIActiveCount();
         else this.aiActive = 0;
@@ -219,12 +223,17 @@ class _Response_ServerVehicles : _Response {
 class _ServerPlayer {
     string id;
     string name;
+
+    string gamesessionId;
+
     int loggingOut = 0;
     int insideVehicle = 0;
 
     int health;
     string item;
     vector position;
+
+    int unconscious = 0;
 
     // Constructor is in reporter.c to circumvent layer limitations
 };
@@ -390,6 +399,9 @@ class _Payload_ItemList : _Payload {
 
     void _Payload_ItemList(array<ref TrackedItem> items) {
         this.items = items;
+        if(GetGameLabs().GetDebugStatus()) {
+            JsonFileLoader <_Payload_ItemList>.JsonSaveFile("$profile:@Logging/server_items.json", this);
+        }
     }
     override string ToJson() { return JsonFileLoader<_Payload_ItemList>.JsonMakeData(this); }
 };
@@ -397,3 +409,114 @@ class _Response_ItemList : _Response {
     void _Response_ItemList(string content) { JsonFileLoader<_Response_ItemList>.JsonLoadData(content, this); }
 };
 // ************************
+
+// Register: /v1/kv/server
+class _Payload_KVOperation : _Payload {
+    string operation;
+
+    string key;
+    string value;
+
+    int expires;
+
+    void _Payload_KVOperation(string operation, string key, string value, int expires) {
+        this.operation = operation;
+
+        this.key = key;
+        this.value = value;
+
+        this.expires = expires;
+    }
+    override string ToJson() { return JsonFileLoader<_Payload_KVOperation>.JsonMakeData(this); }
+};
+class _Response_KVOperation : _Response {
+    string key;
+    string value;
+    void _Response_KVOperation(string content) { JsonFileLoader<_Response_KVOperation>.JsonLoadData(content, this); }
+};
+class _Callback_KVOperation : _Callback {
+    string operation;
+
+    string key;
+    string value;
+
+    int expires;
+
+    void _Callback_KVOperation(string operation, string key, string value, int expires) {
+        this.operation = operation;
+
+        this.key = key;
+        this.value = value;
+
+        this.expires = expires;
+    }
+
+    override void OnError(int errorCode) {
+        GetGameLabs().GetLogger().Error(string.Format("[KV] (%1) %2=%3 [expires=%4] => error: server; errorCode: %5", this.operation, this.key, this.value, this.expires, errorCode));
+    };
+    override void OnTimeout() {
+        GetGameLabs().GetLogger().Error(string.Format("[KV] (%1) %2=%3 [expires=%4] => error: timeout", this.operation, this.key, this.value, this.expires));
+    };
+    override void OnSuccess(string data, int dataSize) {
+        GetGameLabs().GetLogger().Info(string.Format("[KV] (%1) %2=%3 [expires=%4] => success: %5[%6]", this.operation, this.key, this.value, this.expires, data, dataSize));
+    };
+};
+// ************************
+
+// Discord
+
+class _Payload_DiscordWebHookEmbedField {
+    string name;
+    string value;
+    bool inline;
+
+    void _Payload_DiscordWebHookEmbedField(string _name, string _value, bool _inlineField) {
+        this.name = _name;
+        this.value = _value;
+        this.inline = _inlineField;
+    }
+};
+
+class _Payload_DiscordWebHookEmbed {
+    string title;
+    string description;
+    int color;
+
+    ref array<ref _Payload_DiscordWebHookEmbedField> fields = new array<ref _Payload_DiscordWebHookEmbedField>();
+
+    void SetTitle(string _title) {
+        this.title = _title;
+    }
+
+    void SetDescription(string _description) {
+        this.description = _description;
+    }
+
+    void SetColor(int _color) {
+        this.color = _color;
+    }
+
+    void AddField(string name, string value, bool inlineField) {
+        ref _Payload_DiscordWebHookEmbedField field = new _Payload_DiscordWebHookEmbedField(name, value, inlineField);
+        this.fields.Insert(field);
+    }
+};
+
+class _Payload_DiscordWebHook : _Payload {
+    string username = "GameLabs";
+    string avatar_url = "https://cdn.cftools.de/brand/cloud/avatar-blue.png";
+
+    string content;
+    ref array<_Payload_DiscordWebHookEmbed> embeds = new array<_Payload_DiscordWebHookEmbed>();
+
+    void _Payload_DiscordWebHook() {}
+
+    void SetContent(string content) {
+        this.content = content;
+    }
+
+    void AddEmbed(_Payload_DiscordWebHookEmbed embed) {
+        this.embeds.Insert(embed);
+    }
+    override string ToJson() { return JsonFileLoader<_Payload_DiscordWebHook>.JsonMakeData(this); }
+};

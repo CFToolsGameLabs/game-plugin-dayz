@@ -1,17 +1,32 @@
-modded class AnimalBase  {
-    private ref _AI _registeredInstance = new _AI(this, false);
-
-    void AnimalBase () {
+modded class ItemBase {
+    void ItemBase() {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        GetGameLabs().IncrAnimalCount();
+        GetGameLabs().IncrEntityCount();
+    }
+
+    void ~ItemBase() {
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+        GetGameLabs().DecrEntityCount();
+    }
+};
+
+
+modded class ZombieBase  {
+    private ref _AI _registeredInstance = new _AI(this, true);
+
+    void ZombieBase () {
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+        GetGameLabs().IncrAICount();
         GetGameLabs().RegisterAI(this._registeredInstance);
     }
 
-    void ~AnimalBase () {
+    void ~ZombieBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        GetGameLabs().DecrAnimalCount();
+        GetGameLabs().DecrAICount();
         if(this._registeredInstance) GetGameLabs().RemoveAI(this._registeredInstance);
     }
 
@@ -32,7 +47,7 @@ modded class AnimalBase  {
             string cftoolsId = player.GetUpstreamIdentity();
             ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
             playerStatistics.shotsHit++;
-            playerStatistics.shotsHitAnimals++;
+            playerStatistics.shotsHitInfected++;
         }
     }
 };

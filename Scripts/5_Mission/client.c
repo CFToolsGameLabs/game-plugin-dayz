@@ -7,6 +7,7 @@ class GameLabsClient {
     }
 
     void StartSynchronization() {
+        GetGameLabs().GetLogger().Info("(Client) Started GameLabs background sync");
         this.timerSync = new Timer(CALL_CATEGORY_SYSTEM);
         this.timerSync.Run(5, this, "clientSync", NULL, true);
     }

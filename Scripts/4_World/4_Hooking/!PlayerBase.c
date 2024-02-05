@@ -48,7 +48,11 @@ modded class PlayerBase extends ManBase {
     */
 
     bool HasAnyIdentitySet() {
-        return (this.GetPlainId() || this.GetIdentity().GetPlainId());
+        if(this.GetPlainId()) return true;
+        if(this.GetIdentity()) {
+            if(this.GetIdentity().GetPlainId()) return true;
+        }
+        return false;
     }
 
     bool _GLSIA() {
@@ -70,19 +74,24 @@ modded class PlayerBase extends ManBase {
     }
 
     void SetUpstreamIdentity(string cftoolsId) {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.SetUpstreamIdentity(%1, %2)", this, cftoolsId));
         this.gl_cftoolsId = cftoolsId;
     }
     string GetUpstreamIdentity() {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.GetUpstreamIdentity(%1) => %2", this, this.gl_cftoolsId));
         return this.gl_cftoolsId;
     }
     bool HasUpstreamIdentity() {
-        return (this.gl_cftoolsId == "");
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.HasUpstreamIdentity(%1) [%2] ", this, this.gl_cftoolsId));
+        return (this.gl_cftoolsId != "");
     }
 
     void SetGamesessionId(string gamesessionId) {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.SetGamesessionId(%1, %2)", this, gamesessionId));
         this.gl_gamesessionId = gamesessionId;
     }
     string GetGamesessionId() {
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.GetGamesessionId(%1) => %2", this, this.gl_gamesessionId));
         return this.gl_gamesessionId;
     }
 
@@ -129,6 +138,9 @@ modded class PlayerBase extends ManBase {
         vector currentPosition = this.GetPosition();
         currentPosition[1] = 0; // Work with 2D only
         float distance = vector.Distance(this.gl_position, currentPosition);
+        if(diff == 0) {
+            diff = 1;
+        }
         float unitsPerSecond = distance / diff;
         this.gl_position = currentPosition;
 
@@ -180,15 +192,57 @@ modded class PlayerBase extends ManBase {
         this.GetStatSpecialty().Set(this.GetStatSpecialty().GetMax());
         this.SetBleedingBits(0);
 
-        /*
-         * TODO: This crashes servers under weird conditions
-        if(this.m_BrokenLegState == 1) {
-            this.AddHealth("LeftLeg","Health",   this.GetMaxHealth("LeftLeg", "Health")  - this.GetHealth("LeftLeg", "Health"));
-            this.AddHealth("RightLeg","Health",  this.GetMaxHealth("RightLeg", "Health") - this.GetHealth("RightLeg", "Health"));
-            this.AddHealth("RightFoot","Health", this.GetMaxHealth("RightFoot", "Health") - this.GetHealth("RightFoot", "Health"));
-            this.AddHealth("LeftFoot","Health",  this.GetMaxHealth("LeftFoot", "Health") - this.GetHealth("LeftFoot", "Health"));
+        this.SetHealth("LeftLeg", "Health", this.GetMaxHealth("LeftLeg", "Health"));
+        this.SetHealth("RightLeg", "Health", this.GetMaxHealth("RightLeg", "Health"));
+
+        if(this.GetBleedingManagerServer()) {
+            this.GetBleedingManagerServer().RemoveAllSources();
         }
-        */
+
+        this.RemoveAllAgents();
+        ModifiersManager modifiers_manager = this.GetModifiersManager();
+
+        // Consumption based
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CHOLERA))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CHOLERA);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_INFLUENZA))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_INFLUENZA);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_SALMONELLA))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_SALMONELLA);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_POISONING))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_POISONING);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_HEMOLYTIC_REACTION))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_VOMITSTUFFED))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_VOMITSTUFFED);
+
+        // Someone's naughty
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_BRAIN))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_BRAIN);
+
+        // Infections
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION1))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION1);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION2))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION2);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_FEVER))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_FEVER);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_COMMON_COLD))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_COMMON_COLD);
+
+        // Gas
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_TOXICITY))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_TOXICITY);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CONTAMINATION1))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CONTAMINATION1);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CONTAMINATION2))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CONTAMINATION2);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_CONTAMINATION3))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_CONTAMINATION3);
+        if(modifiers_manager.IsModifierActive(eModifiers.MDF_AREAEXPOSURE))
+            modifiers_manager.DeactivateModifier(eModifiers.MDF_AREAEXPOSURE);
     }
 
     override void OnVehicleSwitchSeat(int seatIndex) {
@@ -200,6 +254,14 @@ modded class PlayerBase extends ManBase {
         super.EEKilled(killer);
         if(!GetGame().IsServer()) return;
         if(!GetGameLabs().IsStatReportingEnabled()) return;
+
+        string cftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(this.GetPlainId());
+        if(cftoolsId) {
+            ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            if (this.StatGet("dist") >= playerStats.startingDistance) {
+                playerStats.distance += (this.StatGet("dist") - playerStats.startingDistance);
+            }
+        }
 
         _Payload_PlayerDeath payload;
         _LogPlayerEx logObjectMurderer;
@@ -282,12 +344,17 @@ modded class PlayerBase extends ManBase {
         }
         if(!source || !murderer) return;
 
+        if(murderer.HasUpstreamIdentity()) {
+            string cftoolsId = murderer.GetUpstreamIdentity();
+            ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            playerStatistics.shotsHit++;
+            playerStatistics.shotsHitPlayers++;
+        }
+
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy(this=%1, murderer=%2, source=%3, component=%4, dmgZone=%5, ammo=%6, modelPos=%7, speedCoef=%8)", this, murderer, source, component, dmgZone, ammo, modelPos, speedCoef));
+        GetGameLabs().GetLogger().Debug(string.Format("^EEHitBy(GetDamage(%1), GetHighestDamage(%2))", damageResult.GetDamage(dmgZone, "Health"), damageResult.GetHighestDamage("Health")));
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);
-
-        if(!GetGameLabs().GetDebugStatus()) return;
-        //if(!murderer.HasValidHitInCache()
     }
 };

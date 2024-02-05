@@ -18,15 +18,22 @@ class _Callback_PlayerConnect : _Callback {
         player.SetGamesessionId(response.gamesession_id);
         player.OnUpstreamIdentityReceived();
 
+        ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(response.cftools_id);
+        playerStats.startingDistance = player.StatGet("dist");
+
         GetGameLabs().GetLogger().Debug(string.Format("Player<%1> received CFTools Id from API cftools_id=%2, gamesession_id=%3", player, response.cftools_id, response.gamesession_id));
 
         GameLabsClientSync clientSync = new GameLabsClientSync;
         clientSync.cftoolsId = response.cftools_id;
         clientSync.gameSessionId = response.gamesession_id;
+
         clientSync.chatSanitizeBattlEyeJoinLeave = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyeJoinLeave();
         clientSync.chatSanitizeBattlEyePrefix = GetGameLabs().GetConfiguration().GetChatSanitizeBattlEyePrefix();
         clientSync.chatBlockEventProcessing = GetGameLabs().GetConfiguration().GetChatEventBlock();
         clientSync.advancedChatInterface = GetGameLabs().GetConfiguration().GetChatInterfaceProcessing();
+
+        clientSync.enableMagicBulletCheck = GetGameLabs().GetConfiguration().GetMagicBulletCheckEnabled();
+        clientSync.enableMagicBulletInvalidation = GetGameLabs().GetConfiguration().GetMagicBulletInvalidateEnabled();
 
         Param2 <bool, ref GameLabsClientSync> payloadSync = new Param2<bool, ref GameLabsClientSync>(GetGameLabs().GetDebugStatus(), clientSync);
         GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, player.GetIdentity());
@@ -68,12 +75,23 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
     vector position;
 
     ref PlayerDisconnectStatistics statistics;
+    ref GLPlayerStatistics playerStatistics;
 
     void _Payload_PlayerDisconnectEx(string gamesession_id, PlayerBase player) {
         this.gamesession_id = gamesession_id;
         this.position = player.GetPosition();
 
         this.statistics = new PlayerDisconnectStatistics(player);
+
+        if(player.HasUpstreamIdentity()) {
+            string cftoolsId = player.GetUpstreamIdentity();
+            ref GLPlayerStatistics pS = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            this.playerStatistics = pS;
+            if(this.playerStatistics.startingDistance != 0 && player.StatGet("dist")) {
+                this.playerStatistics.distance += (player.StatGet("dist") - this.playerStatistics.startingDistance);
+            }
+
+        }
     }
     override string ToJson() { return JsonFileLoader<_Payload_PlayerDisconnectEx>.JsonMakeData(this); }
 };
@@ -82,23 +100,28 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
 // Reporter internals
 
 class _ServerPlayerEx : _ServerPlayer {
-void _ServerPlayerEx(PlayerBase player) {
-    if(player != NULL) {
-        this.id = player.GetPlainId(); // Steam64
-        this.name = player.GetPlayerName();
+    void _ServerPlayerEx(PlayerBase player) {
+        if(player != NULL) {
+            this.id = player.GetPlainId(); // Steam64
+            this.name = player.GetPlayerName();
 
-        this.position = player.GetPosition();
-        this.health = player.GetHealth("GlobalHealth", "Health");
-        if(GetGame().GetMission().IsPlayerDisconnecting(player))
-            this.loggingOut = 1;
+            this.gamesessionId = player.GetUpstreamIdentity();
 
-        if(player.IsInVehicle())
-            this.insideVehicle = 1;
-    }
+            this.position = player.GetPosition();
+            this.health = player.GetHealth("GlobalHealth", "Health");
+            if(GetGame().GetMission().IsPlayerDisconnecting(player))
+                this.loggingOut = 1;
 
-    if(player.GetItemInHands())
-        this.item = player.GetItemInHands().GetType();
-};
+            if(player.IsInVehicle())
+                this.insideVehicle = 1;
+
+            if(player.IsUnconscious())
+                this.unconscious = 1;
+        }
+
+        if(player.GetItemInHands())
+            this.item = player.GetItemInHands().GetType();
+    };
 };
 
 class _Callback_ServerDummy : _Callback {};

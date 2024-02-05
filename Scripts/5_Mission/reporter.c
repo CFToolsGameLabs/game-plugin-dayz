@@ -22,23 +22,83 @@ class GameLabsReporter {
             int itemCount = 0;
             ref array < ref TrackedItem > items = new array < ref TrackedItem > ();
 
+            float nonAsciiThreshold = 0.5;
+            if(GetGameLabs().GetConfiguration().GetItemNameASCIIRequired()) {
+                nonAsciiThreshold = 0.0;
+            }
+
             for (int i = 0; i < cfgPaths.Count(); ++i) {
                 string cfgPath = cfgPaths.Get(i);
                 int nClasses = g_Game.ConfigGetChildrenCount(cfgPath);
 
                 for (int nClass = 0; nClass < nClasses; ++nClass) {
                     string strName;
-                    GetGame().ConfigGetChildName(cfgPath, nClass, strName);
+                    if(!GetGame().ConfigGetChildName(cfgPath, nClass, strName))
+                        continue;
 
                     int scope = GetGame().ConfigGetInt(cfgPath + " " + strName + " scope");
 
                     if (scope <= 0)
                         continue;
 
+                    if(cfgPath == "CfgVehicles") {
+                        int cfgType = GetGame().ConfigGetType(CFG_VEHICLESPATH + " " + strName + " inventorySlot");
+                        if(cfgType == CT_ARRAY) {
+                            array<string> attachments = {};
+                            GetGame().ConfigGetTextArray(CFG_VEHICLESPATH + " " + strName + " inventorySlot", attachments);
+                            foreach(string attachment : attachments) {
+                                if (attachment == string.Empty)
+                                    break;
+
+                                attachment.ToLower();
+                                if (GetGameLabs()._vehicleSlotMap[attachment] == NULL) {
+                                    GetGameLabs()._vehicleSlotMap[attachment] = new array<string>;
+                                }
+
+                                if (GetGameLabs()._vehicleSlotMap[attachment].Find(strName) == -1)
+                                    GetGameLabs()._vehicleSlotMap[attachment].Insert(strName);
+                            }
+                        } else if (cfgType == CT_STRING) {
+                            string slot = string.Empty;
+                            if (GetGame().ConfigGetText("CfgVehicles " + strName + " inventorySlot", slot) && slot != string.Empty) {
+                                slot.ToLower();
+                                if (GetGameLabs()._vehicleSlotMap[slot] == NULL){
+                                    GetGameLabs()._vehicleSlotMap[slot] = new array<string>;
+                                }
+
+                                if (GetGameLabs()._vehicleSlotMap[slot].Find(strName) == -1)
+                                    GetGameLabs()._vehicleSlotMap[slot].Insert(strName);
+                            }
+                        }
+                    }
+
                     string displayName = "";
-                    if (scope == 2) {
-                        if (!GetGame().ConfigGetText(cfgPath + " " + strName + " displayName", displayName))
-                            displayName = "";
+                    if(scope != 2)
+                        continue;
+
+                    if (!GetGame().ConfigGetText(cfgPath + " " + strName + " displayName", displayName))
+                        displayName = "";
+
+                    if(GetGameLabs().GetConfiguration().GetItemNameASCIIFilter()) {
+                        if(displayName.Length()) {
+                            int nonAsciiCharacters = 0;
+                            for (int c = 0; c < displayName.Length(); c++) {
+                                if (displayName.Get(c).ToAscii() < 0 || displayName.Get(c).ToAscii() > 127) {
+                                    nonAsciiCharacters++;
+                                }
+                            }
+
+                            float nonAsciiPortion;
+                            if(displayName.Length() == 0) {
+                                nonAsciiPortion = 0;
+                            } else {
+                                nonAsciiPortion = nonAsciiCharacters / displayName.Length();
+                            }
+
+                            if(nonAsciiPortion >= nonAsciiThreshold) {
+                                displayName = strName;
+                            }
+                        }
                     }
 
                     itemCount++;
