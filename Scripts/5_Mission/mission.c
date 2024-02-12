@@ -14,10 +14,12 @@ modded class MissionServer {
     override void OnEvent(EventType eventTypeId, Param params) {
         super.OnEvent(eventTypeId, params);
         if(eventTypeId == ClientNewEventTypeID) {
-            string steam64 = m_player.GetIdentity().GetPlainId();
-            string name = m_player.GetIdentity().GetName();
-            m_player.GameLabs_MakeReady(steam64, name);
-            this.PrivilegedEquip();
+            if(m_player.GetIdentity()) {
+                string steam64 = m_player.GetIdentity().GetPlainId();
+                string name = m_player.GetIdentity().GetName();
+                m_player.GameLabs_MakeReady(steam64, name);
+                this.PrivilegedEquip();
+            }
         }
     };
 
