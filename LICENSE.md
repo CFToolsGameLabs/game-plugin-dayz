@@ -1,2 +1,2 @@
 # License
-(C) 2021 CFTools Software UG (haftungsbeschränkt). All rights reserved.
+(C) 2020-2024 CFTools Software GmbH. All rights reserved.
