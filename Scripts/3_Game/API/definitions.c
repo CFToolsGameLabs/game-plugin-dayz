@@ -281,6 +281,8 @@ class _Payload_PlayerDeath : _Payload {
 // Register: /v1/player/damage
 class _Payload_PlayerDamage : _Payload {
     string weapon;
+    string weaponNiceName;
+
     string zone;
     float damage;
     float distance;
@@ -294,7 +296,10 @@ class _Payload_PlayerDamage : _Payload {
 
         this.zone = zone;
         this.damage = damage;
-        if(weapon) this.weapon = weapon.GetType();
+        if(weapon) {
+            this.weapon = weapon.GetType();
+            this.weaponNiceName = weapon.GetDisplayName();
+        }
         if(this.murderer) {
             this.distance = vector.Distance(player.position, murderer.position);
         }
