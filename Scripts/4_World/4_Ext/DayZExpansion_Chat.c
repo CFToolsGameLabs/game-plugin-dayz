@@ -4,6 +4,7 @@ modded class ExpansionGlobalChatModule: CF_ModuleWorld {
         super.AddChatMessage_Server(sender, target, ctx, data);
 
         if(!sender) return;
+        PlayerBase player;
         player = GetPlayerByIdentity(sender);
         if(!player) return;
 
