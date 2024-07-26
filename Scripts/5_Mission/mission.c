@@ -14,10 +14,12 @@ modded class MissionServer {
     override void OnEvent(EventType eventTypeId, Param params) {
         super.OnEvent(eventTypeId, params);
         if(eventTypeId == ClientNewEventTypeID) {
-            string steam64 = m_player.GetIdentity().GetPlainId();
-            string name = m_player.GetIdentity().GetName();
-            m_player.GameLabs_MakeReady(steam64, name);
-            this.PrivilegedEquip();
+            if(m_player.GetIdentity()) {
+                string steam64 = m_player.GetIdentity().GetPlainId();
+                string name = m_player.GetIdentity().GetName();
+                m_player.GameLabs_MakeReady(steam64, name);
+                this.PrivilegedEquip();
+            }
         }
     };
 
@@ -361,6 +363,8 @@ modded class MissionGameplay extends MissionBase {
         if(eventTypeId == ChatMessageEventTypeID) {
             chatParams = ChatMessageEventParams.Cast(params);
 
+            // Old expansion stuff is deprecated
+            /*
             #ifdef EXPANSIONMODCORE
             if(chatParams.param1 > CCBattlEye) {
                 if(this.name == chatParams.param2) {
@@ -373,7 +377,8 @@ modded class MissionGameplay extends MissionBase {
                     this.gameLabsClient.SyncExpansionChat(chatParams);
                 }
             }
-            #endif                
+            #endif
+            */
 
             if(m_LifeState == EPlayerStates.ALIVE) {
                 int channel = chatParams.param1;

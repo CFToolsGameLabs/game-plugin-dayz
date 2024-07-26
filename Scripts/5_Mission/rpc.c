@@ -93,6 +93,8 @@ class GameLabsRPC {
                 GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SERVERFPS, payloadRQServerFps, true, sender);
                 return;
             }
+            // Old expansion stuff is deprecated
+            /*
             #ifdef EXPANSIONMODCORE
             case GameLabsRPCS.SY_EXPANSIONCHAT: {
                 ChatMessageEventParams data;
@@ -144,6 +146,7 @@ class GameLabsRPC {
                 return;
             }
             #endif
+            */
             case GameLabsRPCS.RQ_INVALIDBULLET: {
                 player = this.GetPlayerByIdentity(sender);
                 if(!player) {
