@@ -363,6 +363,8 @@ modded class MissionGameplay extends MissionBase {
         if(eventTypeId == ChatMessageEventTypeID) {
             chatParams = ChatMessageEventParams.Cast(params);
 
+            // Old expansion stuff is deprecated
+            /*
             #ifdef EXPANSIONMODCORE
             if(chatParams.param1 > CCBattlEye) {
                 if(this.name == chatParams.param2) {
@@ -375,7 +377,8 @@ modded class MissionGameplay extends MissionBase {
                     this.gameLabsClient.SyncExpansionChat(chatParams);
                 }
             }
-            #endif                
+            #endif
+            */
 
             if(m_LifeState == EPlayerStates.ALIVE) {
                 int channel = chatParams.param1;
