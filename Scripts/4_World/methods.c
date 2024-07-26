@@ -1,4 +1,4 @@
-PlayerBase GetPlayerBySteam64(string steam64) {
+PlayerBase GLGetPlayerBySteam64(string steam64) {
     array<Man> players = new array<Man>;
     GetGame().GetWorld().GetPlayerList( players );
 
@@ -10,7 +10,7 @@ PlayerBase GetPlayerBySteam64(string steam64) {
     return NULL;
 }
 
-PlayerBase GetPlayerByIdentity(PlayerIdentity identity) {
+PlayerBase GLGetPlayerByIdentity(PlayerIdentity identity) {
     array<Man> players = new array<Man>;
     GetGame().GetPlayers( players );
 

@@ -13,7 +13,7 @@ class _Callback_PlayerConnect : _Callback {
         GetGameLabs().SetPlayerGamesessionId(response.steam64, response.gamesession_id);
         GetGameLabs().SetPlayerUpstreamIdentity(response.steam64, response.cftools_id);
 
-        PlayerBase player = GetPlayerBySteam64(response.steam64);
+        PlayerBase player = GLGetPlayerBySteam64(response.steam64);
         player.SetUpstreamIdentity(response.cftools_id);
         player.SetGamesessionId(response.gamesession_id);
         player.OnUpstreamIdentityReceived();
@@ -157,7 +157,7 @@ class _Callback_ServerPoll : _Callback {
             // TODO: Add new abstraction layer in 4_World
             if(order.action == "teleport") { //GetGameLabs()._TeleportPlayer(order.target, order.x, order.y);
                 GetGameLabs().GetLogger().Warn(string.Format("[Order] Teleporting %1 to %2, %3", order.target, order.x, order.y));
-                man = GetPlayerBySteam64(order.target);
+                man = GLGetPlayerBySteam64(order.target);
                 if(man != NULL) {
                     player = PlayerBase.Cast(man);
 
@@ -169,7 +169,7 @@ class _Callback_ServerPoll : _Callback {
             } else if(order.action == "heal") {
                 GetGameLabs().GetLogger().Warn(string.Format("[Order] Healing %1", order.target));
                 // GetGameLabs()._KillPlayer(order.target);
-                man = GetPlayerBySteam64(order.target);
+                man = GLGetPlayerBySteam64(order.target);
                 if(man != NULL) {
                     player = PlayerBase.Cast(man);
 
@@ -188,7 +188,7 @@ class _Callback_ServerPoll : _Callback {
             else if(order.action == "kill") {
                 GetGameLabs().GetLogger().Warn(string.Format("[Order] Killing %1", order.target));
                 // GetGameLabs()._HealPlayer(order.target);
-                man = GetPlayerBySteam64(order.target);
+                man = GLGetPlayerBySteam64(order.target);
                 if(man != NULL) {
                     player = PlayerBase.Cast(man);
                     player.SetHealth(0);
@@ -197,7 +197,7 @@ class _Callback_ServerPoll : _Callback {
             else if(order.action == "spawn") {
                 GetGameLabs().GetLogger().Warn(string.Format("[Order] Spawning %1 for %2 (x%3)", order.parameter, order.target, order.quantity));
                 // GetGameLabs()._SpawnItemForPlayer(order.target, order.item);
-                man = GetPlayerBySteam64(order.target);
+                man = GLGetPlayerBySteam64(order.target);
                 if(man != NULL) {
                     player = PlayerBase.Cast(man);
                     if(order.quantity <= 1) player.SpawnEntityOnGroundPos(order.parameter, player.GetPosition());
@@ -263,7 +263,7 @@ class _Callback_ServerPoll2 : _Callback {
 
             switch(order.actionContext) {
                 case "player": {
-                    referencedObject = GetPlayerBySteam64(order.referenceKey);
+                    referencedObject = GLGetPlayerBySteam64(order.referenceKey);
                     if(referencedObject == NULL) {
                         GetGameLabs().GetLogger().Warn(string.Format("Order requires PLAYER reference, but no player found by referenceKey=%1", order.referenceKey));
                     }
