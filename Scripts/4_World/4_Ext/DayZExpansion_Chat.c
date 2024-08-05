@@ -38,6 +38,7 @@ modded class ExpansionGlobalChatModule: CF_ModuleWorld {
             // ExpansionChatChannels.CCGlobal
             case 256: {
                 channel = "side";
+                break;
             }
             // ExpansionChatChannels.CCTeam
             case 512: {
