@@ -43,10 +43,22 @@ class _Event {
     private string id;
     private string icon;
     private string className;
+    private string displayName;
     private Object _reference;
-    void _Event(string className, string icon, Object _reference) {this.className = className; this.icon = icon; this._reference = _reference; this.id = EntityAI.Cast(this._reference).GetNetworkIDString(); }
+
+    void _Event(string className, string icon, Object _reference, string displayName = "") {
+        this.className = className;
+        if(displayName) {
+            this.displayName = displayName;
+        } else this.displayName = className;
+        this.icon = icon;
+        this._reference = _reference;
+        this.id = EntityAI.Cast(this._reference).GetNetworkIDString();
+    }
+
     string GetID() { return this.id; }
     string Class() { return this.className; }
+    string DisplayName() { return this.displayName; }
     string Icon() { return this.icon; }
     Object Ref() { return this._reference; }
     bool Equals(_Event other) {

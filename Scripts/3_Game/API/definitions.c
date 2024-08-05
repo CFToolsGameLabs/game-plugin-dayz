@@ -134,12 +134,14 @@ class _ServerEvent {
     string id;
     string icon;
     string className;
+    string displayName;
     vector position;
 
     void _ServerEvent(_Event _event) {
         this.id = _event.ToString();
         this.icon = _event.Icon();
         this.className = _event.Class();
+        this.displayName = _event.DisplayName();
         if(_event.Ref() != NULL && _event.Ref() != NULL) {
             this.position = _event.Ref().GetPosition();
         }
