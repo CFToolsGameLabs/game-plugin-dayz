@@ -1,5 +1,5 @@
 modded class ContaminatedArea_Dynamic  {
-        ref _Event _registeredInstance = new _Event("Contanimated Area", "biohazard", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "biohazard", this, "Contanimated Area");
 
         override void EEInit() {
             super.EEInit();

@@ -1,5 +1,5 @@
 class StaticObj_Wreck_Decal_Small1 extends House {
-        ref _Event _registeredInstance = new _Event("Police Convoy", "bolt", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "bolt", this, "Police Convoy");
 
         override void EEInit() {
             super.EEInit();

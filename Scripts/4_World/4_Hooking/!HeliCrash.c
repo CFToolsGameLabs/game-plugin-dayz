@@ -1,5 +1,5 @@
 modded class Wreck_UH1Y extends CrashBase {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "helicopter", this);
+    ref _Event _registeredInstance = new _Event(this.GetType(), "helicopter", this, "UH1Y Wreck");
 
     override void EEInit() {
         super.EEInit();
@@ -17,7 +17,7 @@ modded class Wreck_UH1Y extends CrashBase {
 };
 
 modded class Wreck_Mi8 extends CrashBase {
-        ref _Event _registeredInstance = new _Event(this.GetType(), "helicopter", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "helicopter", this, "Mi8 Wreck");
 
         override void EEInit() {
             super.EEInit();
@@ -35,7 +35,7 @@ modded class Wreck_Mi8 extends CrashBase {
 };
 
 modded class Wreck_Mi8_Crashed extends CrashBase {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "helicopter", this);
+    ref _Event _registeredInstance = new _Event(this.GetType(), "helicopter", this, "Mi8 Wreck");
 
     override void EEInit() {
         super.EEInit();
@@ -55,7 +55,7 @@ modded class Wreck_Mi8_Crashed extends CrashBase {
 
 // TODO: Investigate crash issue
 modded class Wreck_SantasSleigh extends CrashBase {
-    ref _Event _registeredInstance = new _Event(this.GetType(), "sleigh", this);
+    ref _Event _registeredInstance = new _Event(this.GetType(), "sleigh", this, "Santa's Sleigh");
 
     override void EEInit() {
         super.EEInit();

@@ -1,5 +1,5 @@
 class Land_Wreck_V3S_DE extends House {
-        ref _Event _registeredInstance = new _Event("Convoy", "bolt", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "bolt", this, "Military Convoy");
 
         override void EEInit() {
             super.EEInit();
@@ -18,7 +18,7 @@ class Land_Wreck_V3S_DE extends House {
 
 
 class StaticObj_Wreck_BRDM_DE extends House {
-        ref _Event _registeredInstance = new _Event("Convoy", "bolt", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "bolt", this, "Military Convoy");
 
         override void EEInit() {
             super.EEInit();
@@ -37,7 +37,7 @@ class StaticObj_Wreck_BRDM_DE extends House {
 
 
 class Land_Wreck_offroad02_aban1_DE extends House {
-        ref _Event _registeredInstance = new _Event("Convoy", "bolt", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "bolt", this, "Military Convoy");
 
         override void EEInit() {
             super.EEInit();
@@ -56,7 +56,7 @@ class Land_Wreck_offroad02_aban1_DE extends House {
 
 
 class Land_Wreck_offroad02_aban2_DE extends House {
-        ref _Event _registeredInstance = new _Event("Convoy", "bolt", this);
+        ref _Event _registeredInstance = new _Event(this.GetType(), "bolt", this, "Military Convoy");
 
         override void EEInit() {
             super.EEInit();

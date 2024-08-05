@@ -9,7 +9,7 @@ modded class TerritoryFlag extends BaseBuildingBase {
 
     private void _InitGameLabs() {
         float remainingLifetime = GetLifetime() / 3600;
-        this._registeredInstance = new _Event("<b>Territory Flag</b><br/>Flag Level: " + Math.Round(GetRefresherTime01() * 100) + " %<br/>Remaining Lifetime: ~ " + Math.Round(remainingLifetime) + " hours", "pennant", this);
+        this._registeredInstance = new _Event(this.GetType(), "pennant", this, "<b>Territory Flag</b><br/>Flag Level: " + Math.Round(GetRefresherTime01() * 100) + " %<br/>Remaining Lifetime: ~ " + Math.Round(remainingLifetime) + " hours");
 
         if(GetGameLabs()) {
             if(GetGameLabs().IsServer()) {
