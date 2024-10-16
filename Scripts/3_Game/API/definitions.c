@@ -174,6 +174,8 @@ class _Response_ServerEvents : _Response {
 // Register: /v1/server/vehicles
 class _ServerVehicle {
     string id;
+    string icon;
+    string vehicleType;
     string className;
     vector position;
 
@@ -183,6 +185,8 @@ class _ServerVehicle {
     void _ServerVehicle(_Vehicle vehicle) {
         this.id = vehicle.ToString();
         this.className = vehicle.Class();
+        this.icon = vehicle.Icon();
+        this.vehicleType = vehicle.GetVehicleType();
         if(vehicle != NULL && vehicle.Ref() != NULL) {
             this.position = vehicle.Ref().GetPosition();
 
