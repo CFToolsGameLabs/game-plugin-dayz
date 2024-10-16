@@ -38,16 +38,16 @@ class _Payload_Register : _Payload {
     bool flagReauth;
     array<ref GameLabsContextAction> availableActions;
 
-    void _Payload_Register(string serverId, string apiKey, bool flagReauth) {
-        this.serverId = serverId;
-        this.apiKey = apiKey;
+    void _Payload_Register(string _serverId, string _apiKey, bool _flagReauth) {
+        this.serverId = _serverId;
+        this.apiKey = _apiKey;
         string tmp;
         if(GetGame().CommandlineGetParam("port", tmp)) {
             this.localPort = tmp;
         } else {
             this.localPort = "0";
         }
-        this.flagReauth = flagReauth;
+        this.flagReauth = _flagReauth;
         this.availableActions = GetGameLabs().GetGameLabsActions();
     }
     override string ToJson() { return JsonFileLoader<_Payload_Register>.JsonMakeData(this); }
@@ -153,15 +153,15 @@ class _Payload_ServerEvents : _Payload {
     ref array<ref _ServerEvent> added = new array<ref _ServerEvent>();
     ref array<ref _ServerEvent> removed = new array<ref _ServerEvent>();
 
-    void _Payload_ServerEvents(bool initial, int interval, array<ref _Event> added, array<ref _Event> removed) {
-        if(initial) { this.initial = 1; } else { this.initial = 0; }
-        this.interval = interval;
+    void _Payload_ServerEvents(bool _initial, int _interval, array<ref _Event> _added, array<ref _Event> _removed) {
+        if(_initial) { this.initial = 1; } else { this.initial = 0; }
+        this.interval = _interval;
 
-        for(int i = 0; i < added.Count(); i++) {
-            this.added.Insert(new _ServerEvent(added.Get(i)));
+        for(int i = 0; i < _added.Count(); i++) {
+            this.added.Insert(new _ServerEvent(_added.Get(i)));
         }
-        for(int y = 0; y < removed.Count(); y++) {
-            this.removed.Insert(new _ServerEvent(removed.Get(y)));
+        for(int y = 0; y < _removed.Count(); y++) {
+            this.removed.Insert(new _ServerEvent(_removed.Get(y)));
         }
     }
     override string ToJson() { return JsonFileLoader<_Payload_ServerEvents>.JsonMakeData(this); }
@@ -186,12 +186,36 @@ class _ServerVehicle {
         this.id = vehicle.ToString();
         this.className = vehicle.Class();
         this.icon = vehicle.Icon();
-        this.vehicleType = vehicle.GetVehicleType();
+        this.vehicleType = vehicle.VehicleType();
         if(vehicle != NULL && vehicle.Ref() != NULL) {
             this.position = vehicle.Ref().GetPosition();
 
             this.health = vehicle.Ref().GetHealth();
-            this.speed = Car.Cast(vehicle.Ref()).GetSpeedometer();
+            Car _car = Car.Cast(vehicle.Ref());
+            if(_car != NULL) {
+                this.speed = _car.GetSpeedometer();
+            } else {
+                Boat _boat = Boat.Cast(vehicle.Ref());
+                if(_boat != NULL) {
+                    vector transform[4];
+                    _boat.GetTransform(transform);
+                    vector speedVector = GetVelocity(_boat).InvMultiply3(transform);
+                    if(speedVector && speedVector.Length() == 3) {
+                        float vehicleSpeed = speedVector[2];
+                        if(speed < 0.0) {
+                            this.speed = 0.0;
+                        } else {
+                            this.speed = Math.AbsFloat(vehicleSpeed);
+                        }
+                    } else {
+                        this.speed = 0.0;
+                    }
+                } else {
+                    this.speed = 0.0;
+                }
+
+            }
+
         }
     }
 };
@@ -202,18 +226,18 @@ class _Payload_ServerVehicles : _Payload {
     ref array<ref _ServerVehicle> updated = new array<ref _ServerVehicle>();
     ref array<ref _ServerVehicle> removed = new array<ref _ServerVehicle>();
 
-    void _Payload_ServerVehicles(bool initial, int interval, array<ref _Vehicle> added, array<ref _Vehicle> updated, array<ref _Vehicle> removed) {
-        if(initial) { this.initial = 1; } else { this.initial = 0; }
-        this.interval = interval;
+    void _Payload_ServerVehicles(bool _initial, int _interval, array<ref _Vehicle> _added, array<ref _Vehicle> _updated, array<ref _Vehicle> _removed) {
+        if(_initial) { this.initial = 1; } else { this.initial = 0; }
+        this.interval = _interval;
 
-        for(int i = 0; i < added.Count(); i++) {
-            this.added.Insert(new _ServerVehicle(added.Get(i)));
+        for(int i = 0; i < _added.Count(); i++) {
+            this.added.Insert(new _ServerVehicle(_added.Get(i)));
         }
-        for(int x = 0; x < updated.Count(); x++) {
-            this.updated.Insert(new _ServerVehicle(updated.Get(x)));
+        for(int x = 0; x < _updated.Count(); x++) {
+            this.updated.Insert(new _ServerVehicle(_updated.Get(x)));
         }
-        for(int y = 0; y < removed.Count(); y++) {
-            this.removed.Insert(new _ServerVehicle(removed.Get(y)));
+        for(int y = 0; y < _removed.Count(); y++) {
+            this.removed.Insert(new _ServerVehicle(_removed.Get(y)));
         }
     }
     override string ToJson() { return JsonFileLoader<_Payload_ServerVehicles>.JsonMakeData(this); }
@@ -248,10 +272,10 @@ class _Payload_ServerPlayers : _Payload {
     int interval;
     ref array<ref _ServerPlayer> updated = new array<ref _ServerPlayer>();
 
-    void _Payload_ServerPlayers(bool initial, int interval, array<ref _ServerPlayer> updated) {
-        if(initial) { this.initial = 1; } else { this.initial = 0; }
-        this.interval = interval;
-        this.updated = updated;
+    void _Payload_ServerPlayers(bool _initial, int _interval, array<ref _ServerPlayer> _updated) {
+        if(_initial) { this.initial = 1; } else { this.initial = 0; }
+        this.interval = _interval;
+        this.updated = _updated;
     }
     override string ToJson() { return JsonFileLoader<_Payload_ServerPlayers>.JsonMakeData(this); }
 };
@@ -270,12 +294,12 @@ class _Payload_PlayerDeath : _Payload {
     ref _LogPlayer player;
     ref _LogPlayer murderer;
 
-    void _Payload_PlayerDeath(_LogPlayer player, _LogPlayer murderer, string weapon, string weaponNiceName) {
-        this.player = player;
-        this.murderer = murderer;
+    void _Payload_PlayerDeath(_LogPlayer _player, _LogPlayer _murderer, string _weapon, string _weaponNiceName) {
+        this.player = _player;
+        this.murderer = _murderer;
 
-        if(weapon) this.weapon = weapon;
-        if(weaponNiceName) this.weaponNiceName = weaponNiceName;
+        if(_weapon) this.weapon = _weapon;
+        if(_weaponNiceName) this.weaponNiceName = _weaponNiceName;
         if(this.murderer) {
             this.distance = vector.Distance(player.position, murderer.position);
         }
@@ -296,15 +320,15 @@ class _Payload_PlayerDamage : _Payload {
     ref _LogPlayer player;
     ref _LogPlayer murderer;
 
-    void _Payload_PlayerDamage(ref _LogPlayer player, ref _LogPlayer murderer, Object weapon, float damage, string zone) {
-        this.player = player;
-        this.murderer = murderer;
+    void _Payload_PlayerDamage(ref _LogPlayer _player, ref _LogPlayer _murderer, Object _weapon, float _damage, string _zone) {
+        this.player = _player;
+        this.murderer = _murderer;
 
-        this.zone = zone;
-        this.damage = damage;
-        if(weapon) {
-            this.weapon = weapon.GetType();
-            this.weaponNiceName = weapon.GetDisplayName();
+        this.zone = _zone;
+        this.damage = _damage;
+        if(_weapon) {
+            this.weapon = _weapon.GetType();
+            this.weaponNiceName = _weapon.GetDisplayName();
         }
         if(this.murderer) {
             this.distance = vector.Distance(player.position, murderer.position);
@@ -323,12 +347,12 @@ class _Payload_ItemInteract : _Payload {
     ref _LogPlayer player;
 
 
-    void _Payload_ItemInteract(ref _LogPlayer player, string item, string target, string action) {
-        this.player = player;
+    void _Payload_ItemInteract(ref _LogPlayer _player, string _item, string _target, string _action) {
+        this.player = _player;
 
-        this.item = item;
-        this.target = target;
-        this.action = action;
+        this.item = _item;
+        this.target = _target;
+        this.action = _action;
     }
     override string ToJson() { return JsonFileLoader<_Payload_ItemInteract>.JsonMakeData(this); }
 };
@@ -340,10 +364,10 @@ class _Payload_ItemPlace : _Payload {
 
     ref _LogPlayer player;
 
-    void _Payload_ItemPlace(ref _LogPlayer player, string item) {
-        this.player = player;
+    void _Payload_ItemPlace(ref _LogPlayer _player, string _item) {
+        this.player = _player;
 
-        this.item = item;
+        this.item = _item;
     }
     override string ToJson() { return JsonFileLoader<_Payload_ItemPlace>.JsonMakeData(this); }
 };
@@ -356,11 +380,11 @@ class _Payload_PlayerChat : _Payload {
 
     ref _LogPlayer player;
 
-    void _Payload_PlayerChat(ref _LogPlayer player, string channel, string message) {
-        this.player = player;
+    void _Payload_PlayerChat(ref _LogPlayer _player, string _channel, string _message) {
+        this.player = _player;
 
-        this.channel = channel;
-        this.message = message;
+        this.channel = _channel;
+        this.message = _message;
     }
     override string ToJson() { return JsonFileLoader<_Payload_PlayerChat>.JsonMakeData(this); }
 };
@@ -372,9 +396,9 @@ class _Payload_PlayerConnect : _Payload {
     string steam64;
     vector position;
 
-    void _Payload_PlayerConnect(string steam64, vector position) {
-        this.steam64 = steam64;
-        this.position = position;
+    void _Payload_PlayerConnect(string _steam64, vector _position) {
+        this.steam64 = _steam64;
+        this.position = _position;
     }
     override string ToJson() { return JsonFileLoader<_Payload_PlayerConnect>.JsonMakeData(this); }
 };
@@ -400,16 +424,16 @@ class TrackedItem {
     string className;
     string displayName;
 
-    void TrackedItem(string className, string displayName) {
-        this.className = className;
-        this.displayName = displayName;
+    void TrackedItem(string _className, string _displayName) {
+        this.className = _className;
+        this.displayName = _displayName;
     }
 };
 class _Payload_ItemList : _Payload {
     ref array<ref TrackedItem> items = new array<ref TrackedItem>();
 
-    void _Payload_ItemList(array<ref TrackedItem> items) {
-        this.items = items;
+    void _Payload_ItemList(array<ref TrackedItem> _items) {
+        this.items = _items;
         if(GetGameLabs().GetDebugStatus()) {
             JsonFileLoader <_Payload_ItemList>.JsonSaveFile("$profile:@Logging/server_items.json", this);
         }
@@ -430,13 +454,13 @@ class _Payload_KVOperation : _Payload {
 
     int expires;
 
-    void _Payload_KVOperation(string operation, string key, string value, int expires) {
-        this.operation = operation;
+    void _Payload_KVOperation(string _operation, string _key, string _value, int _expires) {
+        this.operation = _operation;
 
-        this.key = key;
-        this.value = value;
+        this.key = _key;
+        this.value = _value;
 
-        this.expires = expires;
+        this.expires = _expires;
     }
     override string ToJson() { return JsonFileLoader<_Payload_KVOperation>.JsonMakeData(this); }
 };
@@ -453,13 +477,13 @@ class _Callback_KVOperation : _Callback {
 
     int expires;
 
-    void _Callback_KVOperation(string operation, string key, string value, int expires) {
-        this.operation = operation;
+    void _Callback_KVOperation(string _operation, string _key, string _value, int _expires) {
+        this.operation = _operation;
 
-        this.key = key;
-        this.value = value;
+        this.key = _key;
+        this.value = _value;
 
-        this.expires = expires;
+        this.expires = _expires;
     }
 
     override void OnError(int errorCode) {
@@ -522,12 +546,12 @@ class _Payload_DiscordWebHook : _Payload {
 
     void _Payload_DiscordWebHook() {}
 
-    void SetContent(string content) {
-        this.content = content;
+    void SetContent(string _content) {
+        this.content = _content;
     }
 
-    void AddEmbed(_Payload_DiscordWebHookEmbed embed) {
-        this.embeds.Insert(embed);
+    void AddEmbed(_Payload_DiscordWebHookEmbed _embed) {
+        this.embeds.Insert(_embed);
     }
     override string ToJson() { return JsonFileLoader<_Payload_DiscordWebHook>.JsonMakeData(this); }
 };
