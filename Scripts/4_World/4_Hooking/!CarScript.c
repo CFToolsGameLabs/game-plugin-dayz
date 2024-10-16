@@ -1,10 +1,21 @@
 modded class CarScript {
-    private ref _Vehicle _registeredInstance = new _Vehicle(this);
+    private ref _Vehicle _registeredInstance = new _Vehicle(this, "fa-car", "car");
     void CarScript() {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
         GetGameLabs().RegisterVehicle(this._registeredInstance);
         GetGameLabs().IncrVehicleCount();
+        switch(this.GetType()) {
+            case "Truck_01_Base": {
+                this._registeredInstance.SetVehicleType("truck");
+                break;
+            }
+            case "Truck_02": {
+                this._registeredInstance.SetVehicleType("truck");
+                break;
+            }
+            default: {};
+        }
     }
 
     void ~CarScript() {
