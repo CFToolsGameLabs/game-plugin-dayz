@@ -20,12 +20,18 @@ class _AI {
 
 class _Vehicle {
     private string id;
+    private string icon;
+    private string vehicleType;
     private string className;
     private vector _lastPos;
     private Object _reference;
-    void _Vehicle(Object _reference) { this._reference = _reference; this.className = this.Ref().GetType(); this.id = EntityAI.Cast(this._reference).GetNetworkIDString(); };
+    void _Vehicle(Object _reference, string icon, string vehicleType) { this._reference = _reference; this.className = this.Ref().GetType(); this.id = EntityAI.Cast(this._reference).GetNetworkIDString(); this.icon = icon; this.vehicleType = vehicleType; };
     string GetID() { return this.id; }
     string Class() { return className; }
+    string Icon() { return this.icon; }
+    string VehicleType() { return this.vehicleType; }
+    void SetIcon(string icon) { this.icon = icon; }
+    void SetVehicleType(string vehicleType) { this.vehicleType = vehicleType; }
     Object Ref() { return this._reference; }
     bool HasUpdated() {
         if(this._reference == NULL) return true;
