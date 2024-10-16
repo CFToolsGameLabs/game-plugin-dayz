@@ -8,17 +8,17 @@ class GameLabsLogger {
     private bool allowDebug;
     private bool logrotate;
 
-    void GameLabsLogger(string modIdentifier, bool allowDebug = false, bool logrotate = true) {
-        this.allowDebug = allowDebug;
-        this.logrotate  = logrotate;
+    void GameLabsLogger(string _modIdentifier, bool _allowDebug = false, bool _logrotate = true) {
+        this.allowDebug = _allowDebug;
+        this.logrotate  = _logrotate;
 
-        this.modIdentifier = modIdentifier;
+        this.modIdentifier = _modIdentifier;
 
         this._Setup();
     }
 
-    void OverrideDebugStatus(bool allowDebug) {
-        this.allowDebug = allowDebug;
+    void OverrideDebugStatus(bool _allowDebug) {
+        this.allowDebug = _allowDebug;
     }
 
     void Debug(string message) {

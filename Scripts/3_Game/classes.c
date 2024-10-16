@@ -2,7 +2,7 @@ class _AI {
     private Object _reference;
     private vector _lastPos;
     private bool _infected = false;
-    void _AI(Object _reference, bool infected) { this._reference = _reference; this._infected = infected; this._lastPos = _reference.GetPosition(); };
+    void _AI(Object __reference, bool infected) { this._reference = __reference; this._infected = infected; this._lastPos = _reference.GetPosition(); };
     Object Ref() { return this._reference; }
     bool IsInfected() { return this._infected; }
     bool IsActive() {
@@ -25,13 +25,13 @@ class _Vehicle {
     private string className;
     private vector _lastPos;
     private Object _reference;
-    void _Vehicle(Object _reference, string icon, string vehicleType) { this._reference = _reference; this.className = this.Ref().GetType(); this.id = EntityAI.Cast(this._reference).GetNetworkIDString(); this.icon = icon; this.vehicleType = vehicleType; };
+    void _Vehicle(Object __reference, string _icon, string _vehicleType) { this._reference = __reference; this.className = this.Ref().GetType(); this.id = EntityAI.Cast(this._reference).GetNetworkIDString(); this.icon = _icon; this.vehicleType = _vehicleType; };
     string GetID() { return this.id; }
     string Class() { return className; }
     string Icon() { return this.icon; }
     string VehicleType() { return this.vehicleType; }
-    void SetIcon(string icon) { this.icon = icon; }
-    void SetVehicleType(string vehicleType) { this.vehicleType = vehicleType; }
+    void SetIcon(string _icon) { this.icon = _icon; }
+    void SetVehicleType(string _vehicleType) { this.vehicleType = _vehicleType; }
     Object Ref() { return this._reference; }
     bool HasUpdated() {
         if(this._reference == NULL) return true;
@@ -52,13 +52,13 @@ class _Event {
     private string displayName;
     private Object _reference;
 
-    void _Event(string className, string icon, Object _reference, string displayName = "") {
-        this.className = className;
+    void _Event(string _className, string _icon, Object __reference, string _displayName = "") {
+        this.className = _className;
         if(displayName) {
-            this.displayName = displayName;
-        } else this.displayName = className;
-        this.icon = icon;
-        this._reference = _reference;
+            this.displayName = _displayName;
+        } else this.displayName = _className;
+        this.icon = _icon;
+        this._reference = __reference;
         this.id = EntityAI.Cast(this._reference).GetNetworkIDString();
     }
 
@@ -79,10 +79,10 @@ class GameLabsActionContext {
 
     ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
-    void GameLabsActionContext(string contextType, Class referencedObject, ref map<string, ref GameLabsActionParameter> parameters) {
-        this.contextType = contextType;
-        this.referencedObject = referencedObject;
-        this.parameters = parameters;
+    void GameLabsActionContext(string _contextType, Class _referencedObject, ref map<string, ref GameLabsActionParameter> _parameters) {
+        this.contextType = _contextType;
+        this.referencedObject = _referencedObject;
+        this.parameters = _parameters;
     }
 
     string GetContextType() {
@@ -122,10 +122,10 @@ class GameLabsActionParameter {
     float valueVectorY;
     float valueVectorZ;
 
-    void GameLabsActionParameter(string displayName, string description, string dataType) {
-        this.displayName = displayName;
-        this.description = description;
-        this.dataType = dataType;
+    void GameLabsActionParameter(string _displayName, string _description, string _dataType) {
+        this.displayName = _displayName;
+        this.description = _description;
+        this.dataType = _dataType;
     }
 
     int GetInt() {
@@ -222,9 +222,9 @@ class GameLabsResponsePayload extends _Payload {
     bool status;
     GameLabsActionContext action;
 
-    void GameLabsResponsePayload(bool status, GameLabsActionContext context) {
-        this.status = status;
-        this.action = context;
+    void GameLabsResponsePayload(bool _status, GameLabsActionContext _context) {
+        this.status = _status;
+        this.action = _context;
     }
 
     override string ToJson() { return JsonFileLoader<GameLabsResponsePayload>.JsonMakeData(this); }
@@ -241,11 +241,11 @@ class GameLabsActionResponse {
 
     private string webhookUrl;
 
-    void GameLabsActionResponse(string responseType, string webhookUrl = "") {
-        this.responseType = responseType;
+    void GameLabsActionResponse(string _responseType, string _webhookUrl = "") {
+        this.responseType = _responseType;
 
-        if(webhookUrl && webhookUrl.Length()) {
-            this.webhookUrl = webhookUrl;
+        if(_webhookUrl && _webhookUrl.Length()) {
+            this.webhookUrl = _webhookUrl;
         }
     }
 
@@ -279,8 +279,8 @@ class GLClientHitInfo {
     float tick_time;
     string object;
 
-    void GLClientHitInfo(string object) {
-        this.object = object;
+    void GLClientHitInfo(string _object) {
+        this.object = _object;
         this.tick_time = GetGame().GetTickTime();
     }
 };

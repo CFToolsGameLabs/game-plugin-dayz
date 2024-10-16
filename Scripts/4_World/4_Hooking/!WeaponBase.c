@@ -71,7 +71,7 @@ class GameLabsBulletPostprocessor {
                     vector expectedPosition = initialPosition + (initialDirection * (vector.Distance(trajectory[i], initialPosition) / initialDistance));
 
                     // Calculate the deviation between expected and actual positions
-                    vector deviation = currentPosition - expectedPosition;
+                    vector deviationVector = currentPosition - expectedPosition;
                     float actualDeviation = vector.Distance(currentPosition, expectedPosition);
                     totalDeviation += actualDeviation;
 
@@ -92,8 +92,8 @@ class GameLabsBulletPostprocessor {
                     previousDeviation = actualDeviation;
 
                     // Update total deviations for vertical and horizontal axes
-                    totalDeviationVertical += Math.AbsFloat(deviation[2]);
-                    totalDeviationHorizontal += Math.AbsFloat(deviation[0]);
+                    totalDeviationVertical += Math.AbsFloat(deviationVector[2]);
+                    totalDeviationHorizontal += Math.AbsFloat(deviationVector[0]);
 
                     // Update initial values for the next iteration
                     initialPosition = lastExpectedPosition;

@@ -12,10 +12,10 @@ class _Payload_KVSet : _Payload {
     string key;
     string value;
 
-    void _Payload_KVSet(string modId, string key, string value) {
-        this.modId = modId;
-        this.key = key;
-        this.value = value;
+    void _Payload_KVSet(string _modId, string _key, string _value) {
+        this.modId = _modId;
+        this.key = _key;
+        this.value = _value;
     }
     override string ToJson() { return JsonFileLoader<_Payload_KVSet>.JsonMakeData(this); }
 };
@@ -26,9 +26,9 @@ class _Payload_KVGet : _Payload {
     string modId;
     string key;
 
-    void _Payload_KVGet(string modId, string key) {
-        this.modId = modId;
-        this.key = key;
+    void _Payload_KVGet(string _modId, string _key) {
+        this.modId = _modId;
+        this.key = _key;
     }
     override string ToJson() { return JsonFileLoader<_Payload_KVGet>.JsonMakeData(this); }
 };
@@ -43,10 +43,10 @@ class _Payload_KVIncr : _Payload {
     string key;
     float value;
 
-    void _Payload_KVIncr(string modId, string key, float value) {
-        this.modId = modId;
-        this.key = key;
-        this.value = value;
+    void _Payload_KVIncr(string _modId, string _key, float _value) {
+        this.modId = _modId;
+        this.key = _key;
+        this.value = _value;
     }
     override string ToJson() { return JsonFileLoader<_Payload_KVIncr>.JsonMakeData(this); }
 };
@@ -58,10 +58,10 @@ class _Payload_KVDecr : _Payload {
     string key;
     float value;
 
-    void _Payload_KVDecr(string modId, string key, float value) {
-        this.modId = modId;
-        this.key = key;
-        this.value = value;
+    void _Payload_KVDecr(string _modId, string _key, float _value) {
+        this.modId = _modId;
+        this.key = _key;
+        this.value = _value;
     }
     override string ToJson() { return JsonFileLoader<_Payload_KVDecr>.JsonMakeData(this); }
 };
@@ -74,8 +74,8 @@ class GameLabsDataStore {
 
     private string modId;
 
-    void GameLabsDataStore(string modId) {
-        this.modId = modId;
+    void GameLabsDataStore(string _modId) {
+        this.modId = _modId;
         this.api = GetGameLabs().GetApi();
     }
 };

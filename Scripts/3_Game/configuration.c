@@ -72,7 +72,7 @@ class GameLabsConfiguration {
     bool GetConnectionVerificationStatus() { return this.connectionVerification; }
     bool GetDebugStatus() { return this.debugEnabled; }
     bool CanSendDynamicItemList() { return !this.preventDynamicItemPopulation; }
-    void OverrideDebugStatus(bool debugEnabled) { this.debugEnabled = debugEnabled; }
+    void OverrideDebugStatus(bool _debugEnabled) { this.debugEnabled = _debugEnabled; }
 
     void _ValidateAndExtend() {
         if(this.playerTickInterval < 1) this.playerTickInterval = 2.5;

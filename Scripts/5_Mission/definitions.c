@@ -77,8 +77,8 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
     ref PlayerDisconnectStatistics statistics;
     ref GLPlayerStatistics playerStatistics;
 
-    void _Payload_PlayerDisconnectEx(string gamesession_id, PlayerBase player) {
-        this.gamesession_id = gamesession_id;
+    void _Payload_PlayerDisconnectEx(string _gamesession_id, PlayerBase player) {
+        this.gamesession_id = _gamesession_id;
         this.position = player.GetPosition();
 
         this.statistics = new PlayerDisconnectStatistics(player);
