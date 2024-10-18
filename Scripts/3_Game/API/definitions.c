@@ -28,6 +28,14 @@ class _LogPlayer {
     int bleedingSources = -1;
 };
 
+class _DebugDynamicActions {
+    array<ref GameLabsContextAction> dynamicActions;
+    void _DebugDynamicActions() {
+        this.dynamicActions = GetGameLabs().GetGameLabsActions();
+        JsonFileLoader <_DebugDynamicActions>.JsonSaveFile("$profile:@Logging/dynamic_actions.json", this);
+    }
+    string ToJson() { return JsonFileLoader<_DebugDynamicActions>.JsonMakeData(this); }
+};
 
 // Register: /v1/auth/register
 class _Payload_Register : _Payload {
@@ -49,6 +57,9 @@ class _Payload_Register : _Payload {
         }
         this.flagReauth = _flagReauth;
         this.availableActions = GetGameLabs().GetGameLabsActions();
+        if(GetGameLabs().GetDebugStatus()) {
+            _DebugDynamicActions debugDynamicActions = new _DebugDynamicActions();
+        }
     }
     override string ToJson() { return JsonFileLoader<_Payload_Register>.JsonMakeData(this); }
 };

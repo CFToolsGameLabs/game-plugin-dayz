@@ -94,6 +94,16 @@ class GameLabsActionContext {
     }
 };
 
+class GameLabsActionParameterOption{
+    string displayName;
+    string value;
+
+    void GameLabsActionParameterOption(string _displayName, string _value) {
+        this.displayName = _displayName;
+        this.value = _value;
+    }
+};
+
 class GameLabsActionParameter {
     string displayName;
     string description;
@@ -107,6 +117,7 @@ class GameLabsActionParameter {
      * boolean: true or false
      * vector: a X, Y, Z vector
      * cf_itemlist: A dropdown list of all available game items
+     * list: a dropdown list from predefined options
      *
      * Advanced types:
      * webhook_url: Used in conjunction with a response of type WebHook, this will automatically populate the WebHook URL for your responses
@@ -117,6 +128,8 @@ class GameLabsActionParameter {
     float valueFloat;
     string valueString;
     bool valueBoolean;
+
+    ref map<string, ref GameLabsActionParameter> options = new map<string, ref GameLabsActionParameter>;
 
     float valueVectorX;
     float valueVectorY;
