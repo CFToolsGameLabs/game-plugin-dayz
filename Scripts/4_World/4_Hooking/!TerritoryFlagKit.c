@@ -10,24 +10,29 @@ modded class TerritoryFlagKit extends KitBase {
             vector playerPos				= player.GetPosition();
             array<Object> nearestObjects	= new array<Object>();
 
-            GetGame().GetObjectsAtPosition(playerPos, 1.0, nearestObjects, null);
+            GetGame().GetObjectsAtPosition(playerPos, 15.0, nearestObjects, null);
 
-            TerritoryFlag totem;
+            TerritoryFlag relatedObject, tmpObject;
             foreach (Object nearestObject : nearestObjects) {
                 EntityAI ent = EntityAI.Cast(nearestObject);
                 if(ent) {
                     if(ent.GetType() == "TerritoryFlag") {
-                        totem = TerritoryFlag.Cast(ent);
-                        break;
+                        tmpObject = TerritoryFlag.Cast(ent);
+                        if(tmpObject.GL_GetStorage()) {
+                            if(!tmpObject.GL_GetStorage().Available()) {
+                                relatedObject = tmpObject;
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
-            if(totem != NULL) {
-                GetGameLabs().GetLogger().Debug(string.Format("TerritoryFlagKit.OnPlacementComplete > totem=%1; playerBase=%2; steam64=%3", totem, playerBase, steam64));
-                totem.GL_SetSteam64(steam64);
-                totem.GL_GatherPersistentID();
-                totem.GL_Save(true);
+            if(relatedObject != NULL) {
+                GetGameLabs().GetLogger().Debug(string.Format("TerritoryFlagKit.OnPlacementComplete > totem=%1; playerBase=%2; steam64=%3", relatedObject, playerBase, steam64));
+                relatedObject.GL_SetSteam64(steam64);
+                relatedObject.GL_GatherPersistentID();
+                relatedObject.GL_Save(true);
             } else {
                 GetGameLabs().GetLogger().Debug(string.Format("TerritoryFlagKit.OnPlacementComplete > TOTEM_NOT_FOUND; playerBase=%1; steam64=%2", playerBase, steam64));
             }

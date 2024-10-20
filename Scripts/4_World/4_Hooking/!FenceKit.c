@@ -10,15 +10,20 @@ modded class FenceKit extends KitBase {
             vector playerPos				= player.GetPosition();
             array<Object> nearestObjects	= new array<Object>();
 
-            GetGame().GetObjectsAtPosition(playerPos, 1.0, nearestObjects, null);
+            GetGame().GetObjectsAtPosition(playerPos, 15.0, nearestObjects, null);
 
-            Fence relatedObject;
+            Fence relatedObject, tmpObject;
             foreach (Object nearestObject : nearestObjects) {
                 EntityAI ent = EntityAI.Cast(nearestObject);
                 if(ent) {
                     if(ent.GetType() == "Fence") {
-                        relatedObject = Fence.Cast(ent);
-                        break;
+                        tmpObject = Fence.Cast(ent);
+                        if(tmpObject.GL_GetStorage()) {
+                            if(!tmpObject.GL_GetStorage().Available()) {
+                                relatedObject = tmpObject;
+                                break;
+                            }
+                        }
                     }
                 }
             }

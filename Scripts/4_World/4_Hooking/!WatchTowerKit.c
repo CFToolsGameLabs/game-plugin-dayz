@@ -10,15 +10,20 @@ modded class WatchtowerKit extends KitBase {
             vector playerPos				= player.GetPosition();
             array<Object> nearestObjects	= new array<Object>();
 
-            GetGame().GetObjectsAtPosition(playerPos, 1.0, nearestObjects, null);
+            GetGame().GetObjectsAtPosition(playerPos, 15.0, nearestObjects, null);
 
-            Watchtower relatedObject;
+            Watchtower relatedObject, tmpObject;
             foreach (Object nearestObject : nearestObjects) {
                 EntityAI ent = EntityAI.Cast(nearestObject);
                 if(ent) {
                     if(ent.GetType() == "Watchtower") {
-                        relatedObject = Watchtower.Cast(ent);
-                        break;
+                        tmpObject = Watchtower.Cast(ent);
+                        if(tmpObject.GL_GetStorage()) {
+                            if(!tmpObject.GL_GetStorage().Available()) {
+                                relatedObject = tmpObject;
+                                break;
+                            }
+                        }
                     }
                 }
             }
