@@ -7,9 +7,9 @@
 class RegisterResult {
     int status;
     string error;
-    void RegisterResult(int status, string error) {
-        this.status = status;
-        this.error = error;
+    void RegisterResult(int _status, string _error) {
+        this.status = _status;
+        this.error = _error;
     }
 };
 
@@ -59,12 +59,12 @@ class GameLabsAPI {
     /* KV */
     private bool kvEnabled = false;
 
-    void GameLabsAPI(string serverId, string apiKey, string baseUrl = "https://api.gamelabs.cloud/dz", string storeUrl = "https://api.gamelabs.cloud/dz") {
-        this.serverId = serverId;
-        this.apiKey = apiKey;
+    void GameLabsAPI(string _serverId, string _apiKey, string _baseUrl = "https://api.gamelabs.cloud/dz", string _storeUrl = "https://api.gamelabs.cloud/dz") {
+        this.serverId = _serverId;
+        this.apiKey = _apiKey;
 
-        if(baseUrl) this.baseUrl = baseUrl;
-        if(storeUrl) this.storeUrl = storeUrl;
+        if(_baseUrl) this.baseUrl = _baseUrl;
+        if(_storeUrl) this.storeUrl = _storeUrl;
 
         this.restApi = CreateRestApi();
         this.restContext = this.restApi.GetRestContext(this.baseUrl);
@@ -78,8 +78,8 @@ class GameLabsAPI {
     void Disable() { this.active = false; }
     bool IsEnabled() { return this.active; }
 
-    void SetAuthkey(string authKey) {
-        this.authKey = authKey;
+    void SetAuthkey(string _authKey) {
+        this.authKey = _authKey;
         this.restContext.SetHeader(authKey); // Currently setting to Content-Type; DZ does not allow to set custom headers
         GetGameLabs().GetLogger().Debug(string.Format("authKey=%1", authKey));
     }

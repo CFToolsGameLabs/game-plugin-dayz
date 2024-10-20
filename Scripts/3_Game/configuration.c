@@ -29,6 +29,9 @@ class GameLabsConfiguration {
 
     private string reportingEndpointMagicBullet = "";
 
+    private bool lockServerOnStart = false;
+    private bool debugAutoCompleteConstruction = false;
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -65,6 +68,10 @@ class GameLabsConfiguration {
     bool GetItemNameASCIIRequired() { return this.requireASCIIItemNames; }
     bool GetItemNameASCIIFilter() { return this.filterASCIIItemNames; }
 
+    bool GetLockOnStart() { return this.lockServerOnStart; }
+    void SetLockOnStart(bool value) { this.lockServerOnStart = value; }
+
+    bool GetAutoCompleteConstruction() { return this.debugAutoCompleteConstruction; }
     string GetServerId() { return this.serverId; }
     string GetApiKey() { return this.apiKey; }
     string GetBaseURL() { return this.baseUrl; }
@@ -72,7 +79,7 @@ class GameLabsConfiguration {
     bool GetConnectionVerificationStatus() { return this.connectionVerification; }
     bool GetDebugStatus() { return this.debugEnabled; }
     bool CanSendDynamicItemList() { return !this.preventDynamicItemPopulation; }
-    void OverrideDebugStatus(bool debugEnabled) { this.debugEnabled = debugEnabled; }
+    void OverrideDebugStatus(bool _debugEnabled) { this.debugEnabled = _debugEnabled; }
 
     void _ValidateAndExtend() {
         if(this.playerTickInterval < 1) this.playerTickInterval = 2.5;

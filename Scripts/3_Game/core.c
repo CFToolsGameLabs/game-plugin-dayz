@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.934";
+    private const string modControlledVersionIdentifier = "1.938";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -104,6 +104,11 @@ class GameLabsCore {
         #ifdef GAMELABSCLIENTCONSENT
         this.logger.Info(string.Format("(Defines) Client Consent Enabled - Players will be shown a banner"));
         #endif
+
+        if(!FileExist("$profile:@GameLabsStorage")) {
+            this.logger.Info(string.Format("Creating GameLabs storage folder..."));
+            MakeDirectory("$profile:@GameLabsStorage");
+        }
     }
 
     string GetVersionIdentifier() { return this.modControlledVersionIdentifier; }

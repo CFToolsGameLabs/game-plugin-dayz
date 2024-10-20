@@ -183,11 +183,19 @@ class CFCloud_DeleteVehicle extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
-
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", vehicleEntity));
-            vehicleEntity.Delete();
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car carEntity;
+                Car.CastTo(carEntity, vehicle.Ref());
+                carEntity.Delete();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", carEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+                boatEntity.Delete();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1 is not categorized and can not be deleted.", vehicle));
+            }
             return true;
         }
 };
@@ -206,25 +214,49 @@ class CFCloud_VehicleEjectDriver extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
+            int c;
+            Human crew;
+            PlayerBase player;
+            HumanCommandVehicle vehCommand;
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car vehicleEntity;
+                Car.CastTo(vehicleEntity, vehicle.Ref());
+                for(c = 0; c < vehicleEntity.CrewSize(); ++c) {
+                    crew = vehicleEntity.CrewMember(c);
+                    if(!crew)
+                        continue;
 
-            for(int c = 0; c < vehicleEntity.CrewSize(); ++c) {
-                Human crew = vehicleEntity.CrewMember(c);
-                if(!crew)
-                    continue;
-
-                PlayerBase player;
-                if(Class.CastTo(player, crew)) {
-                    if(vehicleEntity.CrewMemberIndex(player) == DayZPlayerConstants.VEHICLESEAT_DRIVER) {
-                        HumanCommandVehicle vehCommand = player.GetCommand_Vehicle();
-                        vehCommand.GetOutVehicle();
-                        GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 driver=%2", vehicleEntity, player));
-                        return true;
+                    if(Class.CastTo(player, crew)) {
+                        if(vehicleEntity.CrewMemberIndex(player) == DayZPlayerConstants.VEHICLESEAT_DRIVER) {
+                            vehCommand = player.GetCommand_Vehicle();
+                            vehCommand.GetOutVehicle();
+                            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 driver=%2", vehicleEntity, player));
+                            return true;
+                        }
                     }
                 }
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 - no driver found", vehicleEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+                for(c = 0; c < boatEntity.CrewSize(); ++c) {
+                    crew = boatEntity.CrewMember(c);
+                    if(!crew)
+                        continue;
+
+                    if(Class.CastTo(player, crew)) {
+                        if(boatEntity.CrewMemberIndex(player) == DayZPlayerConstants.VEHICLESEAT_DRIVER) {
+                            vehCommand = player.GetCommand_Vehicle();
+                            vehCommand.GetOutVehicle();
+                            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 driver=%2", boatEntity, player));
+                            return true;
+                        }
+                    }
+                }
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 - no driver found", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 is not categorized and can not be deleted.", vehicle));
             }
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 - no driver found", vehicleEntity));
             return true;
         }
 };
@@ -242,12 +274,19 @@ class CFCloud_VehicleExplode extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
-
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1", vehicleEntity));
-
-            vehicleEntity.Explode(DT_EXPLOSION, "LandFuelFeed_Ammo");
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car vehicleEntity;
+                Car.CastTo(vehicleEntity, vehicle.Ref());
+                vehicleEntity.Explode(DT_EXPLOSION, "LandFuelFeed_Ammo");
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1", vehicleEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+                boatEntity.Explode(DT_EXPLOSION, "LandFuelFeed_Ammo");
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1 is not categorized and can not be deleted.", vehicle));
+            }
             return true;
         }
 };
@@ -265,12 +304,21 @@ class CFCloud_KillVehicleEngine extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car vehicleEntity;
+                Car.CastTo(vehicleEntity, vehicle.Ref());
+                CarScript.Cast(vehicleEntity).EngineStop();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1", vehicleEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+                BoatScript.Cast(boatEntity).EngineStop();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1 is not categorized and can not be deleted.", vehicle));
+            }
 
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1", vehicleEntity));
 
-            CarScript.Cast(vehicleEntity).EngineStop();
             return true;
         }
 };
@@ -288,22 +336,34 @@ class CFCloud_RefuelVehicle extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
-
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1", vehicleEntity));
-
-            CarScript vehicleEntityScript = CarScript.Cast(vehicleEntity);
-            float fuel = vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) * vehicleEntityScript.GetFluidFraction(CarFluid.FUEL));
-            float oil = vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) * vehicleEntityScript.GetFluidFraction(CarFluid.OIL));
-            float coolant = vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) - (vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) * vehicleEntityScript.GetFluidFraction(CarFluid.COOLANT));
-            float brake = vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) - (vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) * vehicleEntityScript.GetFluidFraction(CarFluid.BRAKE));
-            vehicleEntityScript.Fill(CarFluid.FUEL, fuel);
-            vehicleEntityScript.Fill(CarFluid.OIL, oil);
-            vehicleEntityScript.Fill(CarFluid.COOLANT, coolant);
-            vehicleEntityScript.Fill(CarFluid.BRAKE, brake);
-            vehicleEntityScript.SetSynchDirty();
-            vehicleEntityScript.Synchronize();
+            float fuel, oil, coolant, brake;
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car vehicleEntity;
+                Car.CastTo(vehicleEntity, vehicle.Ref());
+                CarScript vehicleEntityScript = CarScript.Cast(vehicleEntity);
+                fuel = vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) * vehicleEntityScript.GetFluidFraction(CarFluid.FUEL));
+                oil = vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) * vehicleEntityScript.GetFluidFraction(CarFluid.OIL));
+                coolant = vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) - (vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) * vehicleEntityScript.GetFluidFraction(CarFluid.COOLANT));
+                brake = vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) - (vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) * vehicleEntityScript.GetFluidFraction(CarFluid.BRAKE));
+                vehicleEntityScript.Fill(CarFluid.FUEL, fuel);
+                vehicleEntityScript.Fill(CarFluid.OIL, oil);
+                vehicleEntityScript.Fill(CarFluid.COOLANT, coolant);
+                vehicleEntityScript.Fill(CarFluid.BRAKE, brake);
+                vehicleEntityScript.SetSynchDirty();
+                vehicleEntityScript.Synchronize();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1", vehicleEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+                BoatScript boatEntityScript = BoatScript.Cast(boatEntity);
+                fuel = boatEntityScript.GetFluidCapacity(BoatFluid.FUEL) - (boatEntityScript.GetFluidCapacity(BoatFluid.FUEL) * boatEntityScript.GetFluidFraction(BoatFluid.FUEL));
+                boatEntityScript.Fill(BoatFluid.FUEL, fuel);
+                boatEntityScript.SetSynchDirty();
+                boatEntityScript.Synchronize();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1 is not categorized and can not be deleted.", vehicle));
+            }
             return true;
         }
 };
@@ -321,86 +381,104 @@ class CFCloud_RepairVehicle extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
-            EntityAI vehicleEntityAI = vehicleEntity;
+            float fuel, oil, coolant, brake;
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car vehicleEntity;
+                Car.CastTo(vehicleEntity, vehicle.Ref());
+                EntityAI vehicleEntityAI = vehicleEntity;
 
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1", vehicleEntity));
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1", vehicleEntity));
 
-            // Base entity
-            vehicleEntityAI.SetHealthMax("", "Health");
-            vehicleEntityAI.SetHealthMax();
+                // Base entity
+                vehicleEntityAI.SetHealthMax("", "Health");
+                vehicleEntityAI.SetHealthMax();
 
-            CarScript vehicleEntityScript = CarScript.Cast(vehicleEntity);
-            float fuel = vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) * vehicleEntityScript.GetFluidFraction(CarFluid.FUEL));
-            float oil = vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) * vehicleEntityScript.GetFluidFraction(CarFluid.OIL));
-            float coolant = vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) - (vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) * vehicleEntityScript.GetFluidFraction(CarFluid.COOLANT));
-            float brake = vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) - (vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) * vehicleEntityScript.GetFluidFraction(CarFluid.BRAKE));
-            vehicleEntityScript.Fill(CarFluid.FUEL, fuel);
-            vehicleEntityScript.Fill(CarFluid.OIL, oil);
-            vehicleEntityScript.Fill(CarFluid.COOLANT, coolant);
-            vehicleEntityScript.Fill(CarFluid.BRAKE, brake);
-            vehicleEntityScript.SetSynchDirty();
-            vehicleEntityScript.Synchronize();
+                CarScript vehicleEntityScript = CarScript.Cast(vehicleEntity);
+                fuel = vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.FUEL) * vehicleEntityScript.GetFluidFraction(CarFluid.FUEL));
+                oil = vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) - (vehicleEntityScript.GetFluidCapacity(CarFluid.OIL) * vehicleEntityScript.GetFluidFraction(CarFluid.OIL));
+                coolant = vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) - (vehicleEntityScript.GetFluidCapacity(CarFluid.COOLANT) * vehicleEntityScript.GetFluidFraction(CarFluid.COOLANT));
+                brake = vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) - (vehicleEntityScript.GetFluidCapacity(CarFluid.BRAKE) * vehicleEntityScript.GetFluidFraction(CarFluid.BRAKE));
+                vehicleEntityScript.Fill(CarFluid.FUEL, fuel);
+                vehicleEntityScript.Fill(CarFluid.OIL, oil);
+                vehicleEntityScript.Fill(CarFluid.COOLANT, coolant);
+                vehicleEntityScript.Fill(CarFluid.BRAKE, brake);
+                vehicleEntityScript.SetSynchDirty();
+                vehicleEntityScript.Synchronize();
 
-            // Repair components
-            string cfg_path = string.Format("%1 %2 DamageSystem", CFG_VEHICLESPATH, vehicleEntity.GetType());
-            if(GetGame().ConfigIsExisting(cfg_path)) {
-                string child_zone;
-                string child_class;
-                array<string> damaged_zones = new array<string>;
+                // Repair components
+                string cfg_path = string.Format("%1 %2 DamageSystem", CFG_VEHICLESPATH, vehicleEntity.GetType());
+                if(GetGame().ConfigIsExisting(cfg_path)) {
+                    string child_zone;
+                    string child_class;
+                    array<string> damaged_zones = new array<string>;
 
-                int zone_count = GetGame().ConfigGetChildrenCount(cfg_path);
-                if(zone_count > 0) {
-                    for(int x = 0; x < zone_count; ++x) {
-                        GetGame().ConfigGetChildName(cfg_path, x, child_class);
-                        child_class.ToLower();
-                        if(child_class == "damagezones") {
-                            for (int y = 0; y < GetGame().ConfigGetChildrenCount(string.Format("%1 DamageZones", cfg_path)); ++y) {
-                                GetGame().ConfigGetChildName(string.Format("%1 DamageZones", cfg_path), y, child_zone);
-                                damaged_zones.Insert(child_zone);
+                    int zone_count = GetGame().ConfigGetChildrenCount(cfg_path);
+                    if(zone_count > 0) {
+                        for(int x = 0; x < zone_count; ++x) {
+                            GetGame().ConfigGetChildName(cfg_path, x, child_class);
+                            child_class.ToLower();
+                            if(child_class == "damagezones") {
+                                for (int y = 0; y < GetGame().ConfigGetChildrenCount(string.Format("%1 DamageZones", cfg_path)); ++y) {
+                                    GetGame().ConfigGetChildName(string.Format("%1 DamageZones", cfg_path), y, child_zone);
+                                    damaged_zones.Insert(child_zone);
+                                }
                             }
+                        }
+                    }
+
+                    if(damaged_zones.Count() > 0) {
+                        foreach(string zone: damaged_zones) {
+                            vehicleEntityAI.SetHealthMax(zone, "Health");
                         }
                     }
                 }
 
-                if(damaged_zones.Count() > 0) {
-                    foreach(string zone: damaged_zones) {
-                        vehicleEntityAI.SetHealthMax(zone, "Health");
-                    }
-                }
-            }
+                // Repair & complete attachments
+                TStringArray vehicle_slots = new TStringArray;
+                cfg_path = string.Format("%1 %2 attachments", CFG_VEHICLESPATH, vehicleEntity.GetType());
+                GetGame().ConfigGetTextArray(cfg_path, vehicle_slots);
 
-            // Repair & complete attachments
-            TStringArray vehicle_slots = new TStringArray;
-            cfg_path = string.Format("%1 %2 attachments", CFG_VEHICLESPATH, vehicleEntity.GetType());
-            GetGame().ConfigGetTextArray(cfg_path, vehicle_slots);
+                foreach(string slot : vehicle_slots) {
+                    slot.ToLower();
 
-            foreach(string slot : vehicle_slots) {
-                slot.ToLower();
+                    int slot_id = InventorySlots.GetSlotIdFromString(slot);
+                    EntityAI attachment = vehicleEntity.GetInventory().FindAttachment(slot_id);
+                    if(!attachment) {
+                        string type = GetGameLabs()._vehicleSlotMap[slot].GetRandomElement();
+                        type.ToLower();
+                        if(type.Contains("_ruined")) {
+                            type = GetGameLabs()._vehicleSlotMap[slot][0];
+                        }
+                        vehicleEntity.GetInventory().CreateAttachmentEx(type, slot_id);
 
-                int slot_id = InventorySlots.GetSlotIdFromString(slot);
-                EntityAI attachment = vehicleEntity.GetInventory().FindAttachment(slot_id);
-                if(!attachment) {
-                    string type = GetGameLabs()._vehicleSlotMap[slot].GetRandomElement();
-                    type.ToLower();
-                    if(type.Contains("_ruined")) {
-                        type = GetGameLabs()._vehicleSlotMap[slot][0];
-                    }
-                    vehicleEntity.GetInventory().CreateAttachmentEx(type, slot_id);
-
-                } else {
-                    string part = attachment.GetType();
-                    part.ToLower();
-                    if(part.Contains("_ruined")) {
-                        part.Replace("_ruined", "");
-                        GetGame().ObjectDelete(attachment);
-                        vehicleEntity.GetInventory().CreateInInventory(part);
                     } else {
-                        attachment.SetHealthMax("", "Health");
-                        attachment.SetSynchDirty();
+                        string part = attachment.GetType();
+                        part.ToLower();
+                        if(part.Contains("_ruined")) {
+                            part.Replace("_ruined", "");
+                            GetGame().ObjectDelete(attachment);
+                            vehicleEntity.GetInventory().CreateInInventory(part);
+                        } else {
+                            attachment.SetHealthMax("", "Health");
+                            attachment.SetSynchDirty();
+                        }
                     }
                 }
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+
+                boatEntity.SetHealthMax("", "Health");
+                boatEntity.SetHealthMax();
+
+                BoatScript boatEntityScript = BoatScript.Cast(boatEntity);
+                fuel = boatEntityScript.GetFluidCapacity(BoatFluid.FUEL) - (boatEntityScript.GetFluidCapacity(BoatFluid.FUEL) * boatEntityScript.GetFluidFraction(BoatFluid.FUEL));
+                boatEntityScript.Fill(BoatFluid.FUEL, fuel);
+                boatEntityScript.SetSynchDirty();
+                boatEntityScript.Synchronize();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1 is not categorized and can not be deleted.", vehicle));
             }
             return true;
         }
@@ -419,14 +497,28 @@ class CFCloud_UnstuckVehicle extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
+            vector position;
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car vehicleEntity;
+                Car.CastTo(vehicleEntity, vehicle.Ref());
 
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1", vehicleEntity));
+                position = vehicleEntity.GetPosition();
+                position[1] = GetGame().SurfaceY(position[0], position[2]) + 1;
+                vehicleEntity.SetPosition(position);
 
-            vector position = vehicleEntity.GetPosition();
-            position[1] = GetGame().SurfaceY(position[0], position[2]) + 1;
-            vehicleEntity.SetPosition(position);
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1", vehicleEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+
+                position = boatEntity.GetPosition();
+                position[1] = GetGame().SurfaceY(position[0], position[2]) + 1;
+                boatEntity.SetPosition(position);
+
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1 is not categorized and can not be deleted.", vehicle));
+            }
             return true;
         }
 };
@@ -681,6 +773,127 @@ class GameLabsInternal_DummyActionWithWebHook extends GameLabsContextAction {
 
         override bool Execute(GameLabsActionContext context) {
             GetGameLabs().GetLogger().Debug(string.Format("Dummy action called webhookUrl=%1", context.parameters.Get("webhookUrl").GetString()));
+            return true;
+        }
+};
+
+class CFCloud_SakhalBunkerTeleport extends GameLabsContextAction {
+        void CFCloud_SakhalBunkerTeleport() {
+            this.actionCode = "CFCloud_SakhalBunkerTeleport";
+            this.actionName = "Sakhal Bunker Teleport";
+            this.actionIcon = "map-marker-alt";
+            this.actionColour = "default";
+            this.actionContext = "player";
+
+            GameLabsActionParameter teleportLocation = new GameLabsActionParameter("Teleport to Bunker POI", "", "options");
+
+            vector generatorVector = {3004.38,33.2784,5852.18};
+            GameLabsActionParameter generator = new GameLabsActionParameter("Generator", "", "vector");
+            generator.valueVectorX = generatorVector[0];
+            generator.valueVectorZ = generatorVector[1];
+            generator.valueVectorY = generatorVector[2];
+            teleportLocation.options.Insert("generator", generator);
+
+            vector room1Vector = {2566.97,15.2524,5954.86};
+            GameLabsActionParameter room1 = new GameLabsActionParameter("Room A-1", "", "vector");
+            room1.valueVectorX = room1Vector[0];
+            room1.valueVectorZ = room1Vector[1];
+            room1.valueVectorY = room1Vector[2];
+            teleportLocation.options.Insert("room1", room1);
+
+            vector room2Vector = {2568.14,15.2524,5961.31};
+            GameLabsActionParameter room2 = new GameLabsActionParameter("Room A-2", "", "vector");
+            room2.valueVectorX = room2Vector[0];
+            room2.valueVectorZ = room2Vector[1];
+            room2.valueVectorY = room2Vector[2];
+            teleportLocation.options.Insert("room2", room2);
+
+            vector room3Vector = {2574.2,15.2524,5966.15};
+            GameLabsActionParameter room3 = new GameLabsActionParameter("Room A-3", "", "vector");
+            room3.valueVectorX = room3Vector[0];
+            room3.valueVectorZ = room3Vector[1];
+            room3.valueVectorY = room3Vector[2];
+            teleportLocation.options.Insert("room3", room3);
+
+            vector room4Vector = {2573.62,15.2523,5972.42};
+            GameLabsActionParameter room4 = new GameLabsActionParameter("Room A-4", "", "vector");
+            room4.valueVectorX = room4Vector[0];
+            room4.valueVectorZ = room4Vector[1];
+            room4.valueVectorY = room4Vector[2];
+            teleportLocation.options.Insert("room4", room4);
+
+            this.parameters.Insert("teleportLocation", teleportLocation);
+        }
+
+        override bool Execute(GameLabsActionContext context) {
+            PlayerBase player;
+            PlayerBase.CastTo(player, context.GetReferencedObject());
+
+            vector position = context.parameters.Get("teleportLocation").GetVector();
+
+            GetGameLabs().GetLogger().Warn(string.Format("[SakhalBunkerDebug] %1 position=%2", player, position));
+
+            player.SetPositionEx(position);
+            return true;
+        }
+};
+
+class GameLabsInternal_DumpPlayerPosition extends GameLabsContextAction {
+        void GameLabsInternal_DumpPlayerPosition() {
+            this.actionCode = "GameLabsInternal_DumpPlayerPosition";
+            this.actionName = "Dump player coordinates";
+            this.actionIcon = "terminal";
+            this.actionColour = "info";
+            this.actionContext = "player";
+
+            GameLabsActionParameter message = new GameLabsActionParameter("Message", "", "string");
+            message.valueString = "";
+            this.parameters.Insert("message", message);
+        }
+
+        override bool Execute(GameLabsActionContext context) {
+            PlayerBase player;
+            PlayerBase.CastTo(player, context.GetReferencedObject());
+
+            vector position = player.GetPosition();
+            GetGameLabs().GetLogger().Info(string.Format("[DumpPlayerPosition] {%1} player=%2; position=%3;", context.parameters.Get("message").GetString(), player, position));
+            return true;
+        }
+};
+
+class GameLabsInternal_RestartMission extends GameLabsContextAction {
+        void GameLabsInternal_RestartMission() {
+            this.actionCode = "GameLabsInternal_RestartMission";
+            this.actionName = "Restart Mission";
+            this.actionIcon = "terminal";
+            this.actionColour = "danger";
+            this.actionContext = "world";
+        }
+
+        override bool Execute(GameLabsActionContext context) {
+            GetGame().RestartMission();
+            return true;
+        }
+};
+
+class GameLabsInternal_DumpDebugParameters extends GameLabsContextAction {
+        void GameLabsInternal_DumpDebugParameters() {
+            this.actionCode = "GameLabsInternal_DumpDebugParameters";
+            this.actionName = "Dump debug parameters";
+            this.actionIcon = "terminal";
+            this.actionColour = "info";
+            this.actionContext = "world";
+        }
+
+        override bool Execute(GameLabsActionContext context) {
+            GetGameLabs().GetLogger().Info("****************** DumpDebugParameters ******************");
+            // World Name
+            string worldName = "";
+            GetGame().GetWorldName(worldName);
+            GetGameLabs().GetLogger().Info(string.Format("GetWorldName() %1;", worldName));
+            GetGameLabs().GetLogger().Info(string.Format("GetWorldSize() %1;", GetGame().GetWorld().GetWorldSize()));
+            GetGameLabs().GetLogger().Info(string.Format("GetMission() %1;", GetGame().GetMission()));
+            GetGameLabs().GetLogger().Info(string.Format("GetMissionPath() %1;", GetDayZGame().GetMissionPath()));
             return true;
         }
 };

@@ -1,5 +1,5 @@
 modded class PluginAdminLog extends PluginBase {
-    void OnContinouousAction(ActionData action_data) {
+    override void OnContinouousAction(ActionData action_data) {
         super.OnContinouousAction(action_data);
         if(!GetGameLabs().IsStatReportingEnabled()) return;
 
@@ -39,7 +39,7 @@ modded class PluginAdminLog extends PluginBase {
         GetGameLabs().GetApi().ItemInteract(new _Callback(), payload);
     };
 
-    void OnPlacementComplete(Man player, ItemBase item) {
+    override void OnPlacementComplete(Man player, ItemBase item) {
         super.OnPlacementComplete(player, item);
         if(!GetGameLabs().IsStatReportingEnabled()) return;
 

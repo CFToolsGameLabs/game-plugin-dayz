@@ -116,12 +116,40 @@ modded class MissionServer {
         CFCloud_ObjectDelete().Register();
         CFCloud_TerritoryFlagClear().Register();
 
+        // Terrain specific
+        string terrain = GL_GetTerrainName();
+        if(terrain == "sakhal") {
+            GetGameLabs().GetLogger().Debug("Registering 'sakhal' specific functions");
+            CFCloud_SakhalBunkerTeleport().Register();
+        }
+
         // Other
         string tmp;
         if(GetGame().CommandlineGetParam("gamelabstesting", tmp)) {
+            GetGameLabs().GetLogger().Warn("Registering 'gamelabstesting' specific functions");
             GameLabsInternal_DummyAction().Register();
             GameLabsInternal_DummyActionWithWebHook().Register();
+            GameLabsInternal_DumpPlayerPosition().Register();
+            GameLabsInternal_RestartMission().Register();
+            GameLabsInternal_DumpDebugParameters().Register();
         }
+    }
+
+    string GL_GetTerrainName() {
+        string missionPath = GetDayZGame().GetMissionPath();
+
+        TStringArray pathParts = new TStringArray;
+        missionPath.Split("\\", pathParts);
+
+        int index = pathParts.Count() - 2;
+        string missionName = pathParts.Get(index);
+
+        TStringArray missionNameParts = new TStringArray;
+        missionName.Split(".", missionNameParts);
+
+        string terrain = missionNameParts.Get(1);
+        terrain.ToLower();
+        return terrain;
     }
 
     void MissionServer() {
@@ -133,6 +161,13 @@ modded class MissionServer {
         this.GLActionRegisterHook();
 
         this.gameLabs = GetGameLabs();
+
+        if(GetGameLabs().GetConfiguration().GetLockOnStart()) {
+            GetGame().ChatPlayer("#lock")
+            GetGameLabs().GetLogger().Info("Server locked on start");
+        }
+
+
         string shutdownHeader, shutdownTitle, shutdownContent, shutdownFooter;
         shutdownHeader = "************* GAME LABS *************";
         shutdownFooter = "*************************************";
@@ -164,7 +199,7 @@ modded class MissionServer {
             this.gameLabs.GetApi().Enable();
             int apiStatus = this.gameLabs.GetApi().Verify();
             if(apiStatus == 1) {
-                this.gameLabs.GetLogger().Info(string.Format("Server up (GameLabs v%1)", this.gameLabs.GetVersionIdentifier()));
+                this.gameLabs.GetLogger().Info(string.Format("Server up (GameLabs v%1; terrain=%2;)", this.gameLabs.GetVersionIdentifier(), GL_GetTerrainName()));
                 this._Setup();
             } else {
                 shutdownTitle = string.Format("Failed to verify api registration (apiStatus=%1)", apiStatus);
