@@ -183,11 +183,19 @@ class CFCloud_DeleteVehicle extends GameLabsContextAction {
             _Vehicle vehicle;
             _Vehicle.CastTo(vehicle, context.GetReferencedObject());
 
-            Car vehicleEntity;
-            Car.CastTo(vehicleEntity, vehicle.Ref());
-
-            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", vehicleEntity));
-            vehicleEntity.Delete();
+            if(vehicle.VehicleType() == "car" || vehicle.VehicleType() == "truck") {
+                Car carEntity;
+                Car.CastTo(carEntity, vehicle.Ref());
+                carEntity.Delete();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", carEntity));
+            } else if(vehicle.VehicleType() == "boat") {
+                Boat boatEntity;
+                Boat.CastTo(boatEntity, vehicle.Ref());
+                boatEntity.Delete();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1", boatEntity));
+            } else {
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Delete] %1 is not categorized and can not be deleted.", vehicle));
+            }
             return true;
         }
 };
