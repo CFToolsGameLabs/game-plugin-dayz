@@ -16,10 +16,9 @@ modded class TerritoryFlag extends BaseBuildingBase {
 	}
 
     private void _InitGameLabs() {
-        this._registeredInstance = new _Event(this.GetType(), "pennant", this, GL_GetDisplayName());
-
         if(GetGameLabs()) {
             if(GetGameLabs().IsServer()) {
+                this._registeredInstance = new _Event(this.GetType(), "pennant", this, GL_GetDisplayName());
                 GetGameLabs().RegisterEvent(this._registeredInstance);
             }
         }
@@ -36,7 +35,15 @@ modded class TerritoryFlag extends BaseBuildingBase {
 
     private string GL_GetDisplayName() {
         float remainingLifetime = GetLifetime() / 3600;
-        string displayName = string.Format("<b>Territory Flag</b><br/>Flag Level: %1 %%<br/>Remaining Lifetime: ~ %2 hours", Math.Round(GetRefresherTime01() * 100), Math.Round(remainingLifetime));
+        string steam64 = GL_GetSteam64();
+
+        string displayName;
+        if(steam64) {
+            displayName = string.Format("<b>Territory Flag</b><br/>Flag Level: %1 %%<br/>Remaining Lifetime: ~ %2 hours<br/>Owner: %3", Math.Round(GetRefresherTime01() * 100), Math.Round(remainingLifetime), steam64);
+        } else {
+            displayName = string.Format("<b>Territory Flag</b><br/>Flag Level: %1 %%<br/>Remaining Lifetime: ~ %2 hours", Math.Round(GetRefresherTime01() * 100), Math.Round(remainingLifetime));
+        }
+
         return displayName;
     }
 
