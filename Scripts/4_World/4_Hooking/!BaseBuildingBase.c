@@ -65,10 +65,13 @@ modded class BaseBuildingBase extends ItemBase {
         }
     }
 
+    /*
+     * TODO: Other mechanism for perpetual saving
     void OnStoreSave(ParamsWriteContext ctx) {
         super.OnStoreSave(ctx);
         GL_Save();
     }
+     */
 
     override void EEOnAfterLoad() {
         super.EEOnAfterLoad();
@@ -80,6 +83,10 @@ modded class BaseBuildingBase extends ItemBase {
     override void EEDelete(EntityAI parent) {
         super.EEDelete(parent);
         GL_Delete();
+    }
+
+    GLBaseBuildingMetaStorage GL_GetStorage() {
+        return this.gl_storage;
     }
 
     override void GL_GatherPersistentID() {
@@ -97,7 +104,7 @@ modded class BaseBuildingBase extends ItemBase {
             if(this.gl_storage.steam64) {
                 GL_SetSteam64(this.gl_storage.steam64);
                 GL_SetOwnerUpstreamIdentity(this.gl_storage.cftoolsId);
-                GetGameLabs().GetLogger().Debug(string.Format("[Storage] [Load] %1 loaded %2", this, GL_GetSteam64()));
+                GetGameLabs().GetLogger().Debug(string.Format("[Storage] [Load] %1 loaded owner", this, GL_GetSteam64()));
             } else {
                 GetGameLabs().GetLogger().Debug(string.Format("[Storage] [Load] %1 has no stored owner", this));
             }
