@@ -104,6 +104,11 @@ class GameLabsCore {
         #ifdef GAMELABSCLIENTCONSENT
         this.logger.Info(string.Format("(Defines) Client Consent Enabled - Players will be shown a banner"));
         #endif
+
+        if(!FileExist("$profile:@GameLabsStorage")) {
+            this.logger.Info(string.Format("Creating GameLabs storage folder..."));
+            MakeDirectory("$profile:@GameLabsStorage");
+        }
     }
 
     string GetVersionIdentifier() { return this.modControlledVersionIdentifier; }
