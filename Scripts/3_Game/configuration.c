@@ -30,6 +30,7 @@ class GameLabsConfiguration {
     private string reportingEndpointMagicBullet = "";
 
     private bool lockServerOnStart = false;
+    private bool debugAutoCompleteConstruction = false;
 
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
@@ -70,6 +71,7 @@ class GameLabsConfiguration {
     bool GetLockOnStart() { return this.lockServerOnStart; }
     void SetLockOnStart(bool value) { this.lockServerOnStart = value; }
 
+    bool GetAutoCompleteConstruction() { return this.debugAutoCompleteConstruction; }
     string GetServerId() { return this.serverId; }
     string GetApiKey() { return this.apiKey; }
     string GetBaseURL() { return this.baseUrl; }
