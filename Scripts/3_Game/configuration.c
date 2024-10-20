@@ -29,6 +29,8 @@ class GameLabsConfiguration {
 
     private string reportingEndpointMagicBullet = "";
 
+    private bool lockServerOnStart = false;
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
 
@@ -64,6 +66,9 @@ class GameLabsConfiguration {
 
     bool GetItemNameASCIIRequired() { return this.requireASCIIItemNames; }
     bool GetItemNameASCIIFilter() { return this.filterASCIIItemNames; }
+
+    bool GetLockOnStart() { return this.lockServerOnStart; }
+    void SetLockOnStart(bool value) { this.lockServerOnStart = value; }
 
     string GetServerId() { return this.serverId; }
     string GetApiKey() { return this.apiKey; }
