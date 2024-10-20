@@ -54,7 +54,7 @@ class _Event {
 
     void _Event(string _className, string _icon, Object __reference, string _displayName = "") {
         this.className = _className;
-        if(displayName) {
+        if(_displayName) {
             this.displayName = _displayName;
         } else this.displayName = _className;
         this.icon = _icon;
@@ -71,6 +71,8 @@ class _Event {
         if(this._reference == NULL) return false;
         return this._reference.GetPosition() == other._reference.GetPosition();
     }
+
+    void SetDisplayName(string _displayName) { this.displayName = _displayName; }
 };
 
 class GameLabsActionContext {
