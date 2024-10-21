@@ -225,8 +225,8 @@ modded class MissionServer {
                     }
 
                     case "invalid": {
-                        shutdownTitle = "INTERNAL ERROR";
-                        shutdownContent = "GameLabs API encountered an error while attempting to initiate the connection. Please contact CFTools Cloud support for more details.";
+                        shutdownTitle = "INVALID CREDENTIALS";
+                        shutdownContent = "The configured serverId does not exist or your configuration is outdated.";
                         break;
                     }
 
@@ -239,6 +239,12 @@ modded class MissionServer {
                     case "bad-server": {
                         shutdownTitle = "BAD SERVER CONFIGURATION";
                         shutdownContent = "You are attempting to start GameLabs with API credentials of a different server. Startup is denied to ensure data integrity.";
+                        break;
+                    }
+
+                    default: {
+                        shutdownTitle = "INTERNAL ERROR";
+                        shutdownContent = "GameLabs API encountered an error while attempting to initiate the connection. Please contact CFTools Cloud support for more details.";
                         break;
                     }
                 }
