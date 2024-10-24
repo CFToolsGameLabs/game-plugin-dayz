@@ -93,7 +93,7 @@ modded class BaseBuildingBase extends ItemBase {
         if(this.GL_GetPersistentItemId()) return;
         this.GL_SetPersistentItemId(GL_GeneratePersistentId());
         this.gl_storage.SetPersistentId(GL_GetPersistentItemId());
-        GetGameLabs().GetLogger().Info(string.Format("[BaseBuildingBase] %1 uuid=%2;", this, GL_GetPersistentItemId()));
+        GetGameLabs().GetLogger().Debug(string.Format("[BaseBuildingBase] %1 uuid=%2;", this, GL_GetPersistentItemId()));
     }
 
     void GL_Load() {
