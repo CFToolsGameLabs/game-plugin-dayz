@@ -8,7 +8,7 @@ class GameLabsConfiguration {
     private string baseUrl = "https://api.gamelabs.cloud/dz";
     private string storeUrl = "https://api.gamelabs.cloud/dz";
 
-    private bool speedCheckDisabled = false;
+    private bool speedCheckDisabled = true;
     private float speedCheckThresholdFoot = 8.0;
     private float speedCheckThresholdVehicle = 100.0;
 
@@ -50,7 +50,7 @@ class GameLabsConfiguration {
 
     float GetPlayerTickInterval() { return this.playerTickInterval; }
 
-    bool GetSpeedCheckStatus() { return !this.speedCheckDisabled; }
+    bool GetSpeedCheckStatus() { return false; }
     float GetSpeedCheckThresholdFoot() { return this.speedCheckThresholdFoot; }
     float GetSpeedCheckThresholdVehicle() { return this.speedCheckThresholdVehicle; }
 
