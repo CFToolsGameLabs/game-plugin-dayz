@@ -167,7 +167,6 @@ modded class MissionServer {
             GetGameLabs().GetLogger().Info("Server locked on start");
         }
 
-
         string shutdownHeader, shutdownTitle, shutdownContent, shutdownFooter;
         shutdownHeader = "************* GAME LABS *************";
         shutdownFooter = "*************************************";
