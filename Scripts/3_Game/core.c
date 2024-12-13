@@ -92,7 +92,7 @@ class GameLabsCore {
             }
 
             string tmp;
-            if(!GetGame().CommandlineGetParam("gamelabstesting", tmp) && !this.configuration.GetBaseURL().Contains("https://api.gamelabs.cloud")) {
+            if(!GetGame().CommandlineGetParam("gamelabstesting", tmp) && !this.configuration.GetBaseURL().Contains("gamelabs.cloud")) {
                 GetGame().RequestExit(1);
             }
         }
