@@ -50,7 +50,7 @@ class GameLabsLogger {
         }
     }
 
-    private string GetTimeZoneOffset() {
+    string GetTimeZoneOffset() {
         int localHour, localMinute, localSecond;
         int utcHour, utcMinute, utcSecond;
         int localYear, localMonth, localDay;
@@ -73,8 +73,7 @@ class GameLabsLogger {
             if (localYear > utcYear || (localMonth > utcMonth) || (localDay > utcDay)) {
                 // Local time is ahead of UTC, add 24 hours (86400 seconds) to UTC
                 utcTotalSeconds += 86400;
-            }
-            else {
+            } else {
                 // UTC is ahead of local time, add 24 hours (86400 seconds) to local
                 localTotalSeconds += 86400;
             }
@@ -88,10 +87,12 @@ class GameLabsLogger {
         int offsetMinutes = (offsetSeconds % 3600) / 60;
 
         // Format as "+hh:mm" or "-hh:mm"
-        return string.Format("%1%2:%3",
-                             offsetHours >= 0 ? "+" : "-",
-                             Math.Abs(offsetHours).ToStringLen(2),
-                             Math.Abs(offsetMinutes).ToStringLen(2));
+        if(offsetHours >= 0) {
+            return string.Format("%1%2:%3", "+", Math.AbsInt(offsetHours).ToStringLen(2), Math.AbsInt(offsetMinutes).ToStringLen(2));
+        } else {
+            return string.Format("%1%2:%3", "-", Math.AbsInt(offsetHours).ToStringLen(2), Math.AbsInt(offsetMinutes).ToStringLen(2));
+        }
+
     }
 
     private string GetISO8601DT() {
