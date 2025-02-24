@@ -355,7 +355,7 @@ modded class MissionServer {
 };
 
 modded class MissionGameplay extends MissionBase {
-    private string name;
+    private string gl_name;
     private ref GameLabsCore gameLabs;
     private ref GameLabsClient gameLabsClient;
 
@@ -372,13 +372,13 @@ modded class MissionGameplay extends MissionBase {
             return;
         }
 
-        GetGame().GetPlayerName(this.name);
+        GetGame().GetPlayerName(this.gl_name);
         this.gameLabs = GetGameLabs();
         this.gameLabsClient = new GameLabsClient();
 
         this.gameLabsRPC = new GameLabsRPC();
         this.gameLabs.GetLogger().Info("Loaded MissionGameplay (Client)");
-        this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.name));
+        this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.gl_name));
     }
 
     void ~MissionGameplay() {
@@ -407,13 +407,13 @@ modded class MissionGameplay extends MissionBase {
             /*
             #ifdef EXPANSIONMODCORE
             if(chatParams.param1 > CCBattlEye) {
-                if(this.name == chatParams.param2) {
+                if(this.gl_name == chatParams.param2) {
                     this.gameLabsClient.SyncExpansionChat(chatParams);
                 }
             }
             #else
             if(chatParams.param1 > 64) {
-                if(this.name == chatParams.param2) {
+                if(this.gl_name == chatParams.param2) {
                     this.gameLabsClient.SyncExpansionChat(chatParams);
                 }
             }
