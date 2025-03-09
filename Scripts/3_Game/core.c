@@ -212,11 +212,15 @@ class GameLabsCore {
         return this._serverAI;
     }
     void RegisterAI(_AI _reference) {
+        if(_reference == NULL) return;
+        if(_reference.Ref() == NULL) return;
         if(IsProcessingBlocked()) return;
         this._serverAI.Insert(_reference);
-        this.GetLogger().Debug(string.Format("RegisterAI(%1) - success", _reference));
+        this.GetLogger().Debug(string.Format("RegisterAI(%1<%2>) - success", _reference, _reference.Ref().GetType()));
     }
     void RemoveAI(_AI _reference) {
+        if(_reference == NULL) return;
+        if(_reference.Ref() == NULL) return;
         if(IsProcessingBlocked()) return;
         for(int i = 0; i < this._serverAI.Count(); i++) {
             if(this._serverAI.Get(i) == _reference) {
@@ -233,17 +237,18 @@ class GameLabsCore {
         }
     }
 
-
     array<ref _Vehicle> GetVehicles() {
         return this._serverVehicles;
     }
     void RegisterVehicle(_Vehicle _reference) {
+        if(_reference == NULL) return;
         if(IsProcessingBlocked()) return;
         this._serverVehicles.Insert(_reference);
         this._serverVehiclesBufferAdded.Insert(_reference);
-        this.GetLogger().Debug(string.Format("RegisterVehicle(%1) - success", _reference));
+        this.GetLogger().Debug(string.Format("RegisterVehicle(%1<%2>) - success", _reference, _reference.Ref().GetType()));
     }
     void RemoveVehicle(_Vehicle _reference) {
+        if(_reference == NULL) return;
         if(IsProcessingBlocked()) return;
         for(int i = 0; i < this._serverVehicles.Count(); i++) {
             if(this._serverVehicles.Get(i) == _reference) {
@@ -273,6 +278,7 @@ class GameLabsCore {
         return this._serverEvents;
     }
     void RegisterEvent(_Event _reference) {
+        if(_reference == NULL) return;
         if(IsProcessingBlocked()) return;
         for(int i = 0; i < this._serverEvents.Count(); i++) {
             if(this._serverEvents.Get(i).Equals(_reference)) {
@@ -282,9 +288,10 @@ class GameLabsCore {
         }
         this._serverEvents.Insert(_reference);
         this._serverEventsBufferAdded.Insert(_reference);
-        this.GetLogger().Debug(string.Format("RegisterEvent(%1) - success", _reference));
+        this.GetLogger().Debug(string.Format("RegisterEvent(%1<%2>) - success", _reference, _reference.Ref().GetType()));
     }
     void RegisterEventRadiusExclusive(_Event _reference, float radius) {
+        if(_reference == NULL) return;
         if(IsProcessingBlocked()) return;
 
         float distance;
@@ -304,9 +311,10 @@ class GameLabsCore {
         }
         this._serverEvents.Insert(_reference);
         this._serverEventsBufferAdded.Insert(_reference);
-        this.GetLogger().Debug(string.Format("RegisterEventRadiusExclusive(%1, %2) - success", _reference, radius));
+        this.GetLogger().Debug(string.Format("RegisterEventRadiusExclusive(%1<%3>, %2) - success", _reference, radius, _reference.Ref().GetType()));
     }
     void RegisterEventRadiusExclusiveSecondary(_Event _reference, float radius, string blocker) {
+        if(_reference == NULL) return;
         if(IsProcessingBlocked()) return;
         float distance;
         for(int i = 0; i < this._serverEvents.Count(); i++) {
@@ -325,9 +333,10 @@ class GameLabsCore {
         }
         this._serverEvents.Insert(_reference);
         this._serverEventsBufferAdded.Insert(_reference);
-        this.GetLogger().Debug(string.Format("RegisterEventRadiusExclusiveSecondary(%1, %2, %3) - success", _reference, radius, blocker));
+        this.GetLogger().Debug(string.Format("RegisterEventRadiusExclusiveSecondary(%1<%4>, %2, %3) - success", _reference, radius, blocker, _reference.Ref().GetType()));
     }
     void RemoveEvent(_Event _reference) {
+        if(_reference == NULL) return;
         if(IsProcessingBlocked()) return;
         for(int i = 0; i < this._serverEvents.Count(); i++) {
             if(this._serverEvents.Get(i) == _reference) {

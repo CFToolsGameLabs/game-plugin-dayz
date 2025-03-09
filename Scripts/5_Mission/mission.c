@@ -114,7 +114,11 @@ modded class MissionServer {
 
         // Object
         CFCloud_ObjectDelete().Register();
+
+        // Specific
         CFCloud_TerritoryFlagClear().Register();
+        CFCloud_LockedContainerOpen().Register();
+        CFCloud_ScientificBriefcaseOpen().Register();
 
         // Terrain specific
         string terrain = GL_GetTerrainName();
@@ -163,7 +167,7 @@ modded class MissionServer {
         this.gameLabs = GetGameLabs();
 
         if(GetGameLabs().GetConfiguration().GetLockOnStart()) {
-            GetGame().ChatPlayer("#lock")
+            GetGame().ChatPlayer("#lock");
             GetGameLabs().GetLogger().Info("Server locked on start");
         }
 
