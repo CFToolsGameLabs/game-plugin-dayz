@@ -158,11 +158,8 @@ modded class PlayerBase extends ManBase {
 
             if(unitsPerSecond >= warningThreshold) {
                 this.gl_speedHackTriggers++;
-                GetGameLabs().GetLogger().Warn("********* EXPERIMENTAL FEATURE *********");
-                GetGameLabs().GetLogger().Warn("THIS MAY BE A FALSE POSITIVE; DO NOT BLANKET BAN");
                 GetGameLabs().GetLogger().Warn(string.Format("[SPEED-HACK] Potential speed-hack player=%1, distance=%2u, unitsPerSecond=%3 [threshold=%4, inVehicle=%5, triggers=%6])", this.GetPlainId(), distance, unitsPerSecond, warningThreshold, this.IsInVehicle(),this.gl_speedHackTriggers));
                 GetGameLabs().GetLogger().Warn("THIS MAY BE A FALSE POSITIVE; DO NOT BLANKET BAN");
-                GetGameLabs().GetLogger().Warn("****************************************");
             }
             if (this.gl_speedHackTriggers > 2) {
                 // TODO: Invoke remote action
