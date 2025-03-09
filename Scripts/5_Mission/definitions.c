@@ -128,6 +128,8 @@ class _Callback_ServerDummy : _Callback {};
 
 // Poll Protocols
 
+/*
+ * Deprecated
 // v1
 class _Callback_ServerPoll : _Callback {
     override void OnError(int errorCode) {
@@ -221,6 +223,7 @@ class _Callback_ServerPoll : _Callback {
         }
     };
 };
+*/
 
 class _Response_ServerPoll2 : _Response {
     ref array<GameLabsContextAction> orders;
