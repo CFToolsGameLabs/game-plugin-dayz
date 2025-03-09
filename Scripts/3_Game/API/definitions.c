@@ -102,6 +102,7 @@ class _Payload_ServerPoll : _Payload {
     float rain;
     float fog;
     float windspeed;
+    float snowfall;
 
     void _Payload_ServerPoll(bool isFirst = false) {
         this.serverFps = GetGameLabs().GetServerFPS();
@@ -120,6 +121,7 @@ class _Payload_ServerPoll : _Payload {
             this.overcast = weather.GetOvercast().GetActual()*100;
             this.rain = weather.GetRain().GetActual()*100;
             this.fog = weather.GetFog().GetActual()*100;
+            this.snowfall = weather.GetSnowfall().GetActual()*100;
             // Windspeed in km/h
             this.windspeed = weather.GetWindSpeed();
         }
@@ -331,7 +333,7 @@ class _Payload_PlayerDamage : _Payload {
     ref _LogPlayer player;
     ref _LogPlayer murderer;
 
-    void _Payload_PlayerDamage(ref _LogPlayer _player, ref _LogPlayer _murderer, Object _weapon, float _damage, string _zone) {
+    void _Payload_PlayerDamage(_LogPlayer _player, _LogPlayer _murderer, Object _weapon, float _damage, string _zone) {
         this.player = _player;
         this.murderer = _murderer;
 
@@ -357,8 +359,7 @@ class _Payload_ItemInteract : _Payload {
 
     ref _LogPlayer player;
 
-
-    void _Payload_ItemInteract(ref _LogPlayer _player, string _item, string _target, string _action) {
+    void _Payload_ItemInteract(_LogPlayer _player, string _item, string _target, string _action) {
         this.player = _player;
 
         this.item = _item;
@@ -375,7 +376,7 @@ class _Payload_ItemPlace : _Payload {
 
     ref _LogPlayer player;
 
-    void _Payload_ItemPlace(ref _LogPlayer _player, string _item) {
+    void _Payload_ItemPlace(_LogPlayer _player, string _item) {
         this.player = _player;
 
         this.item = _item;
@@ -391,7 +392,7 @@ class _Payload_PlayerChat : _Payload {
 
     ref _LogPlayer player;
 
-    void _Payload_PlayerChat(ref _LogPlayer _player, string _channel, string _message) {
+    void _Payload_PlayerChat(_LogPlayer _player, string _channel, string _message) {
         this.player = _player;
 
         this.channel = _channel;
