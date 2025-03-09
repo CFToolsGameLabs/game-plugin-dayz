@@ -141,7 +141,7 @@ class GameLabsReporter {
                 break;
             }
             default: {
-                GetGameLabs().GetApi().ServerPoll(new _Callback_ServerPoll(), payload);
+                GetGameLabs().GetLogger().Error("[activePolling] Unsupported polling protocol");
             }
         }
         if(this.isFirstEventsReport) this.isFirstEventsReport = false;
