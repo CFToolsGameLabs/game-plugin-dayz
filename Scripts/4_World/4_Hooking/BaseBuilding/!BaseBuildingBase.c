@@ -2,6 +2,7 @@ class GLBaseBuildingMetaStorage {
     string _id;
     string steam64;
     string cftoolsId;
+    string objectType;
 
     [NonSerialized()]
     private const string storagePath = "$profile:@GameLabsStorage";
@@ -96,7 +97,7 @@ modded class BaseBuildingBase extends ItemBase {
         GetGameLabs().GetLogger().Debug(string.Format("[BaseBuildingBase] %1 uuid=%2;", this, GL_GetPersistentItemId()));
     }
 
-    void GL_Load() {
+    override void GL_Load() {
         if(this.gl_storage == NULL) return;
         if(!this.gl_storage.Available()) return;
         if(this.gl_storage.CheckDiskPresence()) {
@@ -113,11 +114,12 @@ modded class BaseBuildingBase extends ItemBase {
         }
     }
 
-    void GL_Save(bool forceSave = false) {
+    override void GL_Save(bool forceSave = false) {
         if(this.gl_storage == NULL) return;
         if(!this.gl_storage.Available()) return;
         if(!this.gl_storage.CheckDiskPresence()) {
             if(forceSave && GL_GetSteam64()) {
+                this.gl_storage.objectType = GetType();
                 this.gl_storage.steam64 = GL_GetSteam64();
                 this.gl_storage.cftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(this.gl_storage.steam64);
                 this.gl_storage.SaveToDisk();
@@ -130,7 +132,7 @@ modded class BaseBuildingBase extends ItemBase {
         }
     }
 
-    void GL_Delete() {
+    override void GL_Delete() {
         if(this.gl_storage == NULL) return;
         if(!this.gl_storage.Available()) return;
         if(this.gl_storage.CheckDiskPresence()) {
