@@ -1,18 +1,29 @@
-modded class ZombieBase  {
-    private ref _AI _registeredInstance = new _AI(this, true);
+modded class ZombieBase extends DayZInfected  {
+    private ref _AI gl_registeredInstance;
 
     void ZombieBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        GetGameLabs().IncrAICount();
-        GetGameLabs().RegisterAI(this._registeredInstance);
+
+        // Deferred init
+        GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(this._InitGameLabs);
     }
 
     void ~ZombieBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
+
         GetGameLabs().DecrAICount();
-        if(this._registeredInstance) GetGameLabs().RemoveAI(this._registeredInstance);
+        if(this.gl_registeredInstance) GetGameLabs().RemoveAI(this.gl_registeredInstance);
+    }
+
+    private void _InitGameLabs() {
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+        GetGameLabs().IncrAICount();
+
+        this.gl_registeredInstance = new _AI(this, true);
+        GetGameLabs().RegisterAI(this.gl_registeredInstance);
     }
 
     override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {

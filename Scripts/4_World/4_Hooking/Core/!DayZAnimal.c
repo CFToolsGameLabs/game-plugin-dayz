@@ -1,18 +1,29 @@
-modded class AnimalBase  {
-    private ref _AI _registeredInstance = new _AI(this, false);
+modded class AnimalBase extends DayZAnimal  {
+    private ref _AI gl_registeredInstance;
 
     void AnimalBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        GetGameLabs().IncrAnimalCount();
-        GetGameLabs().RegisterAI(this._registeredInstance);
+
+        // Deferred init
+        GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(this._InitGameLabs);
     }
 
     void ~AnimalBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
+
         GetGameLabs().DecrAnimalCount();
-        if(this._registeredInstance) GetGameLabs().RemoveAI(this._registeredInstance);
+        if(this.gl_registeredInstance) GetGameLabs().RemoveAI(this.gl_registeredInstance);
+    }
+
+    private void _InitGameLabs() {
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+        GetGameLabs().IncrAnimalCount();
+
+        this.gl_registeredInstance = new _AI(this, false);
+        GetGameLabs().RegisterAI(this.gl_registeredInstance);
     }
 
     override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {

@@ -1,27 +1,40 @@
 modded class BoatScript {
-    private ref _Vehicle _registeredInstance = new _Vehicle(this, "fa-ship", "boat");
+    private ref _Vehicle gl_registeredInstance;
+
     void BoatScript() {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        GetGameLabs().RegisterVehicle(this._registeredInstance);
-        GetGameLabs().IncrVehicleCount();
-        switch(this.GetType()) {
-            /*
-            // Example type difference
-            case "Boat_01": {
-                this._registeredInstance.SetVehicleType("other-boat");
-                break;
-            }
-            */
-            default: {};
-        }
+
+        // Deferred init
+        GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(this._InitGameLabs);
     }
 
     void ~BoatScript() {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        if(this._registeredInstance) GetGameLabs().RemoveVehicle(this._registeredInstance);
+
         GetGameLabs().DecrVehicleCount();
+        if(this.gl_registeredInstance) GetGameLabs().RemoveVehicle(this.gl_registeredInstance);
+    }
+
+    private void _InitGameLabs() {
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+
+        GetGameLabs().IncrVehicleCount();
+
+        this.gl_registeredInstance = new _Vehicle(this, "fa-ship", "boat");
+        GetGameLabs().RegisterVehicle(this.gl_registeredInstance);
+        switch(this.GetType()) {
+            /*
+            // Example type difference
+            case "Boat_01": {
+                this.gl_registeredInstance.SetVehicleType("other-boat");
+                break;
+            }
+            */
+            default: {};
+        }
     }
 
     override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {
