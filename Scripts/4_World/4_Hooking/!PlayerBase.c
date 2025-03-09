@@ -19,6 +19,7 @@ modded class PlayerBase extends ManBase {
     private vector gl_position;
 
     /*
+     * // Keep in code as reference, however doesnt work in a real environment :(
     private ref array<GLClientHitInfo> _hitCache = new array<GLClientHitInfo>;
 
     void AddHitToCache(GLClientHitInfo hitInfo) {
@@ -180,6 +181,9 @@ modded class PlayerBase extends ManBase {
         this.SetHealth(this.GetMaxHealth("", ""));
         this.SetHealth("", "Blood", this.GetMaxHealth("", "Blood"));
         this.SetHealth("", "Shock", this.GetMaxHealth("", "Shock"));
+        this.SetWet(this.GetWetInit());
+        this.SetTemperatureDirect(GameConstants.ITEM_TEMPERATURE_NEUTRAL_ZONE_MIDDLE);
+        this.GetStatHeatBuffer().Set(this.GetStatHeatBuffer().GetMax());
         this.GetStatHeatComfort().Set(this.GetStatHeatComfort().GetMax());
         this.GetStatTremor().Set(this.GetStatTremor().GetMin());
         this.GetStatWet().Set(this.GetStatWet().GetMin());
@@ -218,8 +222,11 @@ modded class PlayerBase extends ManBase {
             modifiers_manager.DeactivateModifier(eModifiers.MDF_BRAIN);
 
         // Infections
+        /*
+         * // Deprecated in base game
         if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION))
             modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION);
+        */
         if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION1))
             modifiers_manager.DeactivateModifier(eModifiers.MDF_WOUND_INFECTION1);
         if(modifiers_manager.IsModifierActive(eModifiers.MDF_WOUND_INFECTION2))
