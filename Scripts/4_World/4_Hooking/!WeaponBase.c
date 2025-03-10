@@ -7,7 +7,7 @@ class GameLabsBulletPostprocessor {
 
     ref array<Object> bullets = new array<Object>;
     ref map<Object, ref array<vector>> bulletTracing = new map<Object, ref array<vector>>;
-    void GameLabsBulletPostprocessor(ref array<Object> p_bullets) {
+    void GameLabsBulletPostprocessor(array<Object> p_bullets) {
         this.bullets = p_bullets;
         this.start = GetGame().GetTickTime();
     }
@@ -119,7 +119,7 @@ class GameLabsBulletPostprocessor {
             #endif
     }
 
-    EntityAI GetClosestEntity(ref array<EntityAI> entities, vector bulletPosition) {
+    EntityAI GetClosestEntity(array<EntityAI> entities, vector bulletPosition) {
         int n = entities.Count();
 
         for (int i = 0; i < n - 1; ++i) {

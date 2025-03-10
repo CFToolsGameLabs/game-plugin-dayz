@@ -50,6 +50,51 @@ class GameLabsLogger {
         }
     }
 
+    string GetTimeZoneOffset() {
+        int localHour, localMinute, localSecond;
+        int utcHour, utcMinute, utcSecond;
+        int localYear, localMonth, localDay;
+        int utcYear, utcMonth, utcDay;
+
+        // Get local time
+        GetHourMinuteSecond(localHour, localMinute, localSecond);
+        GetYearMonthDay(localYear, localMonth, localDay);
+
+        // Get UTC time
+        GetHourMinuteSecondUTC(utcHour, utcMinute, utcSecond);
+        GetYearMonthDayUTC(utcYear, utcMonth, utcDay);
+
+        // Calculate total seconds for local and UTC times
+        int localTotalSeconds = (localHour * 3600) + (localMinute * 60) + localSecond;
+        int utcTotalSeconds = (utcHour * 3600) + (utcMinute * 60) + utcSecond;
+
+        // Handle day rollover if needed
+        if(localYear != utcYear || localMonth != utcMonth || localDay != utcDay) {
+            if (localYear > utcYear || (localMonth > utcMonth) || (localDay > utcDay)) {
+                // Local time is ahead of UTC, add 24 hours (86400 seconds) to UTC
+                utcTotalSeconds += 86400;
+            } else {
+                // UTC is ahead of local time, add 24 hours (86400 seconds) to local
+                localTotalSeconds += 86400;
+            }
+        }
+
+        // Compute the offset in seconds
+        int offsetSeconds = localTotalSeconds - utcTotalSeconds;
+
+        // Convert offset to hours and minutes
+        int offsetHours = offsetSeconds / 3600;
+        int offsetMinutes = (offsetSeconds % 3600) / 60;
+
+        // Format as "+hh:mm" or "-hh:mm"
+        if(offsetHours >= 0) {
+            return string.Format("%1%2:%3", "+", Math.AbsInt(offsetHours).ToStringLen(2), Math.AbsInt(offsetMinutes).ToStringLen(2));
+        } else {
+            return string.Format("%1%2:%3", "-", Math.AbsInt(offsetHours).ToStringLen(2), Math.AbsInt(offsetMinutes).ToStringLen(2));
+        }
+
+    }
+
     private string GetISO8601DT() {
         int s, mi, h, d, mo, y;
 

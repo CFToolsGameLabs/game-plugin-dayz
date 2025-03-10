@@ -9,7 +9,7 @@ modded class House : BuildingBase {
     void _GatherPersistentID() {
         if(this.GL_GetPersistentItemId()) return;
         this.GL_SetPersistentItemId(GL_GeneratePersistentId());
-        GetGameLabs().GetLogger().Info(string.Format("%1 uuid=%2;", this, GL_GetPersistentItemId()));
+        GetGameLabs().GetLogger().Debug(string.Format("%1 uuid=%2;", this, GL_GetPersistentItemId()));
     }
 
     override void EEOnAfterLoad() {

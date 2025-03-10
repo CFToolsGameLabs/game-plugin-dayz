@@ -1,28 +1,41 @@
 modded class CarScript {
-    private ref _Vehicle _registeredInstance = new _Vehicle(this, "fa-car", "car");
+    private ref _Vehicle gl_registeredInstance;
+
     void CarScript() {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        GetGameLabs().RegisterVehicle(this._registeredInstance);
-        GetGameLabs().IncrVehicleCount();
-        switch(this.GetType()) {
-            case "Truck_01_Base": {
-                this._registeredInstance.SetVehicleType("truck");
-                break;
-            }
-            case "Truck_02": {
-                this._registeredInstance.SetVehicleType("truck");
-                break;
-            }
-            default: {};
-        }
+
+        // Deferred init
+        GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(this._InitGameLabs);
     }
 
     void ~CarScript() {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
-        if(this._registeredInstance) GetGameLabs().RemoveVehicle(this._registeredInstance);
+
         GetGameLabs().DecrVehicleCount();
+        if(this.gl_registeredInstance) GetGameLabs().RemoveVehicle(this.gl_registeredInstance);
+    }
+
+    private void _InitGameLabs() {
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+
+        GetGameLabs().IncrVehicleCount();
+
+        this.gl_registeredInstance = new _Vehicle(this, "fa-car", "car");
+        GetGameLabs().RegisterVehicle(this.gl_registeredInstance);
+        switch(this.GetType()) {
+            case "Truck_01_Base": {
+                this.gl_registeredInstance.SetVehicleType("truck");
+                break;
+            }
+            case "Truck_02": {
+                this.gl_registeredInstance.SetVehicleType("truck");
+                break;
+            }
+            default: {};
+        }
     }
 
     override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {

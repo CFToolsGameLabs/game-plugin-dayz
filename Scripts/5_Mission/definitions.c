@@ -105,7 +105,7 @@ class _ServerPlayerEx : _ServerPlayer {
             this.id = player.GetPlainId(); // Steam64
             this.name = player.GetPlayerName();
 
-            this.gamesessionId = player.GetUpstreamIdentity();
+            this.gamesessionId = player.GetGamesessionId();
 
             this.position = player.GetPosition();
             this.health = player.GetHealth("GlobalHealth", "Health");
@@ -128,6 +128,8 @@ class _Callback_ServerDummy : _Callback {};
 
 // Poll Protocols
 
+/*
+ * Deprecated
 // v1
 class _Callback_ServerPoll : _Callback {
     override void OnError(int errorCode) {
@@ -221,6 +223,7 @@ class _Callback_ServerPoll : _Callback {
         }
     };
 };
+*/
 
 class _Response_ServerPoll2 : _Response {
     ref array<GameLabsContextAction> orders;

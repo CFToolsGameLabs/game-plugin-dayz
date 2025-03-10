@@ -1,3 +1,4 @@
+/*
 class HK416_Base_CFTools : RifleBoltLock_Base {
     private bool _isTestingEnvironment = false;
 
@@ -112,7 +113,9 @@ class HK416_Base_CFTools : RifleBoltLock_Base {
 		inventory.CreateInInventory( "Battery9V" );
         inventory.CreateInInventory( "Battery9V" );
 
-        inventory.CreateInInventory( "Mag_STANAGDrum_60Rnd_CFTools" );
+        //inventory.CreateInInventory( "Mag_STANAGDrum_60Rnd_CFTools" );
+        inventory.CreateInInventory("Mag_STANAG_60Rnd");
 	}
 };
 class HK416_CFTools : HK416_Base_CFTools {};
+*/

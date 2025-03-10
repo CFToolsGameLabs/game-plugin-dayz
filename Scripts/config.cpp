@@ -354,6 +354,7 @@ class CfgWeapons
         barrelArmor = -1;
     };
 
+    /*
     class Rifle_Base;
     class HK416_Base_CFTools: Rifle_Base
     {
@@ -374,7 +375,7 @@ class CfgWeapons
         chamberSize = 1;
         chamberedRound = "";
         chamberableFrom[] = {"Ammo_556x45","Ammo_556x45Tracer"};
-        magazines[] = {"Mag_STANAGDrum_60Rnd_CFTools"};
+        magazines[] = {"Mag_STANAG_60Rnd"};
         ejectType = 1;
         recoilModifier[] = {0.0,0.0,0.0};
         swayModifier[] = {0.0,0.0,0.0};
@@ -493,13 +494,17 @@ class CfgWeapons
             };
         };
     };
+    */
+    /*
     class HK416_CFTools: HK416_Base_CFTools
     {
         scope = 2;
         hiddenSelectionsTextures[] = {"GameLabs\Scripts\Assets\hk416_CF_co.paa"};
     };
+    */
 };
 
+/*
 class cfgMagazines
 {
     class Magazine_Base;
@@ -524,7 +529,7 @@ class cfgMagazines
                 class Health
                 {
                     hitpoints = 100;
-                    healthLevels[] = 
+                    healthLevels[] =
                     {
                         {1.0,{"GameLabs\Scripts\Assets\drummag.rvmat"}},
                         {0.7,{"GameLabs\Scripts\Assets\drummag.rvmat"}},
@@ -534,7 +539,7 @@ class cfgMagazines
                     };
                 };
             };
-        };  
+        };
         class AnimEvents
         {
             class SoundWeapon
@@ -613,3 +618,4 @@ class CfgNonAIVehicles
         model = "GameLabs\Scripts\Models\60rnd_drummag.p3d";
     };
 };
+*/

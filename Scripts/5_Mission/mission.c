@@ -114,7 +114,11 @@ modded class MissionServer {
 
         // Object
         CFCloud_ObjectDelete().Register();
+
+        // Specific
         CFCloud_TerritoryFlagClear().Register();
+        CFCloud_LockedContainerOpen().Register();
+        CFCloud_ScientificBriefcaseOpen().Register();
 
         // Terrain specific
         string terrain = GL_GetTerrainName();
@@ -163,10 +167,9 @@ modded class MissionServer {
         this.gameLabs = GetGameLabs();
 
         if(GetGameLabs().GetConfiguration().GetLockOnStart()) {
-            GetGame().ChatPlayer("#lock")
+            GetGame().ChatPlayer("#lock");
             GetGameLabs().GetLogger().Info("Server locked on start");
         }
-
 
         string shutdownHeader, shutdownTitle, shutdownContent, shutdownFooter;
         shutdownHeader = "************* GAME LABS *************";
@@ -225,8 +228,8 @@ modded class MissionServer {
                     }
 
                     case "invalid": {
-                        shutdownTitle = "INTERNAL ERROR";
-                        shutdownContent = "GameLabs API encountered an error while attempting to initiate the connection. Please contact CFTools Cloud support for more details.";
+                        shutdownTitle = "INVALID CREDENTIALS";
+                        shutdownContent = "The configured serverId does not exist or your configuration is outdated.";
                         break;
                     }
 
@@ -239,6 +242,12 @@ modded class MissionServer {
                     case "bad-server": {
                         shutdownTitle = "BAD SERVER CONFIGURATION";
                         shutdownContent = "You are attempting to start GameLabs with API credentials of a different server. Startup is denied to ensure data integrity.";
+                        break;
+                    }
+
+                    default: {
+                        shutdownTitle = "INTERNAL ERROR";
+                        shutdownContent = "GameLabs API encountered an error while attempting to initiate the connection. Please contact CFTools Cloud support for more details.";
                         break;
                     }
                 }
@@ -350,7 +359,7 @@ modded class MissionServer {
 };
 
 modded class MissionGameplay extends MissionBase {
-    private string name;
+    private string gl_name;
     private ref GameLabsCore gameLabs;
     private ref GameLabsClient gameLabsClient;
 
@@ -367,13 +376,13 @@ modded class MissionGameplay extends MissionBase {
             return;
         }
 
-        GetGame().GetPlayerName(this.name);
+        GetGame().GetPlayerName(this.gl_name);
         this.gameLabs = GetGameLabs();
         this.gameLabsClient = new GameLabsClient();
 
         this.gameLabsRPC = new GameLabsRPC();
         this.gameLabs.GetLogger().Info("Loaded MissionGameplay (Client)");
-        this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.name));
+        this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.gl_name));
     }
 
     void ~MissionGameplay() {
@@ -402,13 +411,13 @@ modded class MissionGameplay extends MissionBase {
             /*
             #ifdef EXPANSIONMODCORE
             if(chatParams.param1 > CCBattlEye) {
-                if(this.name == chatParams.param2) {
+                if(this.gl_name == chatParams.param2) {
                     this.gameLabsClient.SyncExpansionChat(chatParams);
                 }
             }
             #else
             if(chatParams.param1 > 64) {
-                if(this.name == chatParams.param2) {
+                if(this.gl_name == chatParams.param2) {
                     this.gameLabsClient.SyncExpansionChat(chatParams);
                 }
             }

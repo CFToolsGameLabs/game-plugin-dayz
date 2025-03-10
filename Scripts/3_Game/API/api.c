@@ -129,10 +129,13 @@ class GameLabsAPI {
         return response.status;
     }
 
+    /*
+     * Deprecated
     void ServerPoll(Managed cb, _Payload_ServerPoll payload) {
         if(!this.IsEnabled()) return;
         this.restContext.POST(RestCallback.Cast(cb), "/v1/server/poll?trace="+this.gamePort, payload.ToJson());
     }
+    */
 
     void ServerPoll2(Managed cb, _Payload_ServerPoll payload) {
         if(!this.IsEnabled()) return;
