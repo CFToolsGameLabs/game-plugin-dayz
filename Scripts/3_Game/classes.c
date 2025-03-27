@@ -79,9 +79,9 @@ class GameLabsActionContext {
     private string contextType = "world";
     private Class referencedObject;
 
-    ref map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
+    map<string, ref GameLabsActionParameter> parameters = new map<string, ref GameLabsActionParameter>;
 
-    void GameLabsActionContext(string _contextType, Class _referencedObject, ref map<string, ref GameLabsActionParameter> _parameters) {
+    void GameLabsActionContext(string _contextType, Class _referencedObject, map<string, ref GameLabsActionParameter> _parameters) {
         this.contextType = _contextType;
         this.referencedObject = _referencedObject;
         this.parameters = _parameters;
@@ -92,7 +92,7 @@ class GameLabsActionContext {
     }
 
     Object GetReferencedObject() {
-        return this.referencedObject;
+        return Object.Cast(this.referencedObject);
     }
 };
 
