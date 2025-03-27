@@ -131,140 +131,154 @@ class GameLabsAPI {
 
     /*
      * Deprecated
-    void ServerPoll(Managed cb, _Payload_ServerPoll payload) {
+    void ServerPoll(_Callback cb, _Payload_ServerPoll payload) {
         if(!this.IsEnabled()) return;
         this.restContext.POST(RestCallback.Cast(cb), "/v1/server/poll?trace="+this.gamePort, payload.ToJson());
     }
     */
 
-    void ServerPoll2(Managed cb, _Payload_ServerPoll payload) {
+    void ServerPoll2(_Callback cb, _Payload_ServerPoll payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v2/server/poll?trace="+this.gamePort, payload.ToJson());
+        this.restContext.POST(cb, "/v2/server/poll?trace="+this.gamePort, payload.ToJson());
     }
 
-    void ServerEvents(Managed cb, _Payload_ServerEvents payload) {
+    void ServerEvents(_Callback cb, _Payload_ServerEvents payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/server/events", payload.ToJson());
+        this.restContext.POST(cb, "/v1/server/events", payload.ToJson());
     }
 
-    void ServerVehicles(Managed cb, _Payload_ServerVehicles payload) {
+    void ServerVehicles(_Callback cb, _Payload_ServerVehicles payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/server/vehicles", payload.ToJson());
+        this.restContext.POST(cb, "/v1/server/vehicles", payload.ToJson());
     }
 
-    void ServerPlayers(Managed cb, _Payload_ServerPlayers payload) {
+    void ServerPlayers(_Callback cb, _Payload_ServerPlayers payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/server/players", payload.ToJson());
+        this.restContext.POST(cb, "/v1/server/players", payload.ToJson());
     }
 
-    void PlayerConnect(Managed cb, _Payload_PlayerConnect payload) {
+    void PlayerConnect(_Callback cb, _Payload_PlayerConnect payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/player/connect", payload.ToJson());
+        this.restContext.POST(cb, "/v1/player/connect", payload.ToJson());
     }
 
-    void PlayerDisconnect(Managed cb, _Payload_PlayerDisconnect payload) {
+    void PlayerDisconnect(_Callback cb, _Payload_PlayerDisconnect payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/player/disconnect", payload.ToJson());
+        this.restContext.POST(cb, "/v1/player/disconnect", payload.ToJson());
     }
 
-    void PlayerDeath(Managed cb, _Payload_PlayerDeath payload) {
+    void PlayerDeath(_Callback cb, _Payload_PlayerDeath payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/player/death", payload.ToJson());
+        this.restContext.POST(cb, "/v1/player/death", payload.ToJson());
     }
 
-    void PlayerDamage(Managed cb, _Payload_PlayerDamage payload) {
+    void PlayerDamage(_Callback cb, _Payload_PlayerDamage payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/player/damage", payload.ToJson());
+        this.restContext.POST(cb, "/v1/player/damage", payload.ToJson());
     }
 
-    void PlayerChat(Managed cb, _Payload_PlayerChat payload) {
+    void PlayerChat(_Callback cb, _Payload_PlayerChat payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/player/chat", payload.ToJson());
+        this.restContext.POST(cb, "/v1/player/chat", payload.ToJson());
     }
 
-    void ItemInteract(Managed cb, _Payload_ItemInteract payload) {
+    void ItemInteract(_Callback cb, _Payload_ItemInteract payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/item/interact", payload.ToJson());
+        this.restContext.POST(cb, "/v1/item/interact", payload.ToJson());
     }
 
-    void ItemPlace(Managed cb, _Payload_ItemPlace payload) {
+    void ItemPlace(_Callback cb, _Payload_ItemPlace payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/item/place", payload.ToJson());
+        this.restContext.POST(cb, "/v1/item/place", payload.ToJson());
     }
 
-    void ItemList(Managed cb, _Payload_ItemList payload) {
+    void ItemList(_Callback cb, _Payload_ItemList payload) {
         if(!this.IsEnabled()) return;
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/item/list", payload.ToJson());
+        this.restContext.POST(cb, "/v1/item/list", payload.ToJson());
     }
 
-    bool KV_GET(string key, ref Managed cb = NULL) {
+    bool KV_GET(string key, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         _Payload_KVOperation payload =  new _Payload_KVOperation("GET", key, "", 0);
-        if(cb == NULL) cb = new _Callback_KVOperation("GET", key, "", 0);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("GET", key, "", 0);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
-    bool KV_DELETE(string key, ref Managed cb = NULL) {
+    bool KV_DELETE(string key, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         _Payload_KVOperation payload =  new _Payload_KVOperation("DEL", key, "", 0);
-        if(cb == NULL) cb = new _Callback_KVOperation("DEL", key, "", 0);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("DEL", key, "", 0);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
-    bool KV_SET(string key, string value, int expires = 0, ref Managed cb = NULL) {
+    bool KV_SET(string key, string value, int expires = 0, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         _Payload_KVOperation payload =  new _Payload_KVOperation("SET", key, value, expires);
-        if(cb == NULL) cb = new _Callback_KVOperation("SET", key, value, expires);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("SET", key, value, expires);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
-    bool KV_INCR(string key, int value, int expires = 0, ref Managed cb = NULL) {
+    bool KV_INCR(string key, int value, int expires = 0, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         _Payload_KVOperation payload =  new _Payload_KVOperation("INCR", key, value.ToString(), expires);
-        if(cb == NULL) cb = new _Callback_KVOperation("INCR", key, value.ToString(), expires);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("INCR", key, value.ToString(), expires);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
-    bool KV_DECR(string key, int value, int expires = 0, ref Managed cb = NULL) {
+    bool KV_DECR(string key, int value, int expires = 0, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         _Payload_KVOperation payload =  new _Payload_KVOperation("DECR", key, value.ToString(), expires);
-        if(cb == NULL) cb = new _Callback_KVOperation("DECR", key, value.ToString(), expires);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("DECR", key, value.ToString(), expires);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
-    bool KV_INCRBYFLOAT(string key, float value, int expires = 0, ref Managed cb = NULL) {
+    bool KV_INCRBYFLOAT(string key, float value, int expires = 0, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         _Payload_KVOperation payload =  new _Payload_KVOperation("INCRFLOAT", key, value.ToString(), expires);
-        if(cb == NULL) cb = new _Callback_KVOperation("INCRFLOAT", key, value.ToString(), expires);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("INCRFLOAT", key, value.ToString(), expires);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
-    bool KV_DECRBYFLOAT(string key, int value, int expires = 0, ref Managed cb = NULL) {
+    bool KV_DECRBYFLOAT(string key, int value, int expires = 0, _Callback cb = NULL) {
         if(!this.IsEnabled() || !this.GetKVEnabled()) return false;
 
         value = value*-1;
         _Payload_KVOperation payload =  new _Payload_KVOperation("INCRFLOAT", key, value.ToString(), expires);
-        if(cb == NULL) cb = new _Callback_KVOperation("INCRFLOAT", key, value.ToString(), expires);
 
-        this.restContext.POST(RestCallback.Cast(cb), "/v1/kv/server", payload.ToJson());
+        _Callback callback = cb;
+        if(!callback) callback = new _Callback_KVOperation("INCRFLOAT", key, value.ToString(), expires);
+
+        this.restContext.POST(callback, "/v1/kv/server", payload.ToJson());
         return true;
     }
 
