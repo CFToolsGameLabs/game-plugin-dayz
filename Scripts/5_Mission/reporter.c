@@ -20,7 +20,7 @@ class GameLabsReporter {
             cfgPaths.Insert("CfgMagazines");
 
             int itemCount = 0;
-            ref array < ref TrackedItem > items = new array < ref TrackedItem > ();
+            array < ref TrackedItem > items = new array < ref TrackedItem > ();
 
             float nonAsciiThreshold = 0.5;
             if(GetGameLabs().GetConfiguration().GetItemNameASCIIRequired()) {

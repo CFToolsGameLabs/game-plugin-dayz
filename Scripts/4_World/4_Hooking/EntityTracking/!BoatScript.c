@@ -50,7 +50,7 @@ modded class BoatScript {
 
         if(player.HasUpstreamIdentity()) {
             string cftoolsId = player.GetUpstreamIdentity();
-            ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
             playerStatistics.shotsHit++;
             playerStatistics.shotsHitVehicles++;
         }

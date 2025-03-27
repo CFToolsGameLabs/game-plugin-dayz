@@ -544,7 +544,7 @@ class _Payload_DiscordWebHookEmbed {
     }
 
     void AddField(string name, string value, bool inlineField) {
-        ref _Payload_DiscordWebHookEmbedField field = new _Payload_DiscordWebHookEmbedField(name, value, inlineField);
+        _Payload_DiscordWebHookEmbedField field = new _Payload_DiscordWebHookEmbedField(name, value, inlineField);
         this.fields.Insert(field);
     }
 };
