@@ -1,7 +1,7 @@
 modded class DayZGame {
-    private int gl_tps = 0;
-    private int gl_ticks = 0;
-    private int gl_tpsTime = 0;
+    int gl_tps = 0;
+    int gl_ticks = 0;
+    int gl_tpsTime = 0;
 
     override void OnUpdate(bool doSim, float timeslice) {
         super.OnUpdate(doSim, timeslice);
