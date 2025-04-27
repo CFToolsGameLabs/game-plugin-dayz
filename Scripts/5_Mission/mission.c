@@ -39,7 +39,7 @@ modded class MissionServer {
                 player.SetGamesessionId(GetGameLabs().GetPlayerGamesessionId(player.GetPlainId()));
                 player.OnUpstreamIdentityReceived();
 
-                ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+                GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
                 playerStats.startingDistance = 0;
 
                 GameLabsClientSync clientSync = new GameLabsClientSync;

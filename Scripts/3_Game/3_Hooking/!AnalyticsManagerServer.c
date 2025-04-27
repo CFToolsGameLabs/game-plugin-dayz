@@ -20,7 +20,7 @@ modded class AnalyticsManagerServer {
         if(identity) {
             if(identity.GetPlainId()) {
                 string steam64 = identity.GetPlainId();
-                ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsBySteam64(steam64);
+                GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsBySteam64(steam64);
                 if(playerStatistics) {
                     playerStatistics.killsInfected++;
                 }
@@ -33,7 +33,7 @@ modded class AnalyticsManagerServer {
         if(identity) {
             if(identity.GetPlainId()) {
                 string steam64 = identity.GetPlainId();
-                ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsBySteam64(steam64);
+                GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsBySteam64(steam64);
                 if(playerStatistics) {
                     playerStatistics.killsAnimals++;
                 }

@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.953";
+    private const string modControlledVersionIdentifier = "1.955";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -159,11 +159,11 @@ class GameLabsCore {
         return this.gamesessionIdMap.Get(steam64);
     }
 
-    ref GLPlayerStatistics GetPlayerStatisticsByCFToolsId(string cftoolsId) {
+    GLPlayerStatistics GetPlayerStatisticsByCFToolsId(string cftoolsId) {
         return this.playerStatisticsMap.Get(cftoolsId);
     }
 
-    ref GLPlayerStatistics GetPlayerStatisticsBySteam64(string steam64) {
+    GLPlayerStatistics GetPlayerStatisticsBySteam64(string steam64) {
         string cftoolsId = GetPlayerUpstreamIdentity(steam64);
         if(cftoolsId) {
             return this.playerStatisticsMap.Get(cftoolsId);
@@ -368,6 +368,11 @@ class GameLabsCore {
     }
 
     void AddGameLabsAction(ref GameLabsContextAction action) {
+        ErrorEx("[Deprecated] :: Use 'AddGameLabsActionEx' instead", ErrorExSeverity.WARNING);	
+        this._gamelabsActions.Insert(action);
+    }
+
+    void AddGameLabsActionEx(GameLabsContextAction action) {
         this._gamelabsActions.Insert(action);
     }
 

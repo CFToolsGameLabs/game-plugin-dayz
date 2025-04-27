@@ -18,7 +18,7 @@ class _Callback_PlayerConnect : _Callback {
         player.SetGamesessionId(response.gamesession_id);
         player.OnUpstreamIdentityReceived();
 
-        ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(response.cftools_id);
+        GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(response.cftools_id);
         playerStats.startingDistance = player.StatGet("dist");
 
         GetGameLabs().GetLogger().Debug(string.Format("Player<%1> received CFTools Id from API cftools_id=%2, gamesession_id=%3", player, response.cftools_id, response.gamesession_id));
@@ -85,7 +85,7 @@ class _Payload_PlayerDisconnectEx : _Payload_PlayerDisconnect {
 
         if(player.HasUpstreamIdentity()) {
             string cftoolsId = player.GetUpstreamIdentity();
-            ref GLPlayerStatistics pS = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            GLPlayerStatistics pS = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
             this.playerStatistics = pS;
             if(this.playerStatistics.startingDistance != 0 && player.StatGet("dist")) {
                 this.playerStatistics.distance += (player.StatGet("dist") - this.playerStatistics.startingDistance);
@@ -318,7 +318,7 @@ class _Callback_ServerPoll2 : _Callback {
             GetGameLabs().GetLogger().Debug(string.Format("Order %1/%2 [action=%3] status=%4", i+1, response.orders.Count(), order.actionCode, orderStatus));
 
             string webhookUrl;
-            foreach(string parameterName, ref GameLabsActionParameter parameterRef : order.parameters) {
+            foreach(string parameterName, GameLabsActionParameter parameterRef : order.parameters) {
                 if(!webhookUrl) {
                     if(parameterRef.dataType == "webhook_url") {
                         if(parameterRef.GetString() && parameterRef.GetString().Length()) {

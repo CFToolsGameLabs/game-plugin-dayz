@@ -1,3 +1,27 @@
+class GameLabsMetricsDump {
+    float serverFps;
+
+    int aiCount;
+    int animalCount;
+    int vehicleCount;
+    int entityCount;
+
+    int aiActive;
+
+    void GameLabsMetricsDump() {
+        this.serverFps = GetGameLabs().GetServerFPS();
+
+        this.aiCount = GetGameLabs().GetAICount();
+        this.animalCount = GetGameLabs().GetAnimalCount();
+        this.vehicleCount = GetGameLabs().GetVehicleCount();
+        this.entityCount = GetGameLabs().GetEntityCount();
+
+        this.aiActive = GetGameLabs().GetAIActiveCount();
+    }
+    string ToJson() { return JsonFileLoader<GameLabsMetricsDump>.JsonMakeData(this); }
+};
+
+
 class GameLabsReporter {
     private bool processReporting = true;
 
@@ -11,6 +35,7 @@ class GameLabsReporter {
     private ref Timer timerPoll;
     private ref Timer timerServer;
     private ref Timer timerPlayers;
+    private ref Timer timerMetricsDump;
 
     void GameLabsReporter() {
         if(GetGameLabs().GetConfiguration().CanSendDynamicItemList()) {
@@ -20,7 +45,7 @@ class GameLabsReporter {
             cfgPaths.Insert("CfgMagazines");
 
             int itemCount = 0;
-            ref array < ref TrackedItem > items = new array < ref TrackedItem > ();
+            array < ref TrackedItem > items = new array < ref TrackedItem > ();
 
             float nonAsciiThreshold = 0.5;
             if(GetGameLabs().GetConfiguration().GetItemNameASCIIRequired()) {
@@ -121,6 +146,13 @@ class GameLabsReporter {
             this.timerServer = new Timer(CALL_CATEGORY_SYSTEM);
             this.timerServer.Run(GetGameLabs().GetReportingInterval(), this, "serverReporting", NULL, true);
         }
+
+        if(GetGameLabs().GetConfiguration().GetMetricsDump()) {
+            GetGameLabs().GetLogger().Debug(string.Format("(Reporter) Metrics Dump enabled"));
+
+            this.timerMetricsDump = new Timer(CALL_CATEGORY_SYSTEM);
+            this.timerMetricsDump.Run(GetGameLabs().GetConfiguration().GetMetricsDumpInterval(), this, "metricsDump", NULL, true);
+        }
     }
 
     void Disable() {
@@ -128,7 +160,14 @@ class GameLabsReporter {
         GetGameLabs().GetLogger().Info("(Reporter) Disabled");
         if(this.timerPoll) this.timerPoll.Stop();
         if(this.timerServer) this.timerServer.Stop();
+        if(this.timerMetricsDump) this.timerMetricsDump.Stop();
         GetGameLabs().GetLogger().Debug("(Reporter) Timers gracefully closed");
+    }
+
+    private void metricsDump() {
+        if(!GetGameLabs()) return;
+        GameLabsMetricsDump metrics = new GameLabsMetricsDump();
+        JsonFileLoader <GameLabsMetricsDump>.JsonSaveFile(GetGameLabs().GetConfiguration().GetMetricsDumpPath(), metrics);
     }
 
     private void activePolling() {

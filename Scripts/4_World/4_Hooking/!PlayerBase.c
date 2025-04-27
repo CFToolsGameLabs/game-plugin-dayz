@@ -261,7 +261,7 @@ modded class PlayerBase extends ManBase {
 
         string cftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(this.GetPlainId());
         if(cftoolsId) {
-            ref GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
             if (this.StatGet("dist") >= playerStats.startingDistance) {
                 playerStats.distance += (this.StatGet("dist") - playerStats.startingDistance);
             }
@@ -334,7 +334,6 @@ modded class PlayerBase extends ManBase {
         if(!GetGame().IsServer()) return;
         if(!GetGameLabs().IsStatReportingEnabled()) return;
 
-        DayZPlayerImplement playerImplement = DayZPlayerImplement.Cast(this);
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy.EVAL (deathSync=%1, suicide=%2)", this.m_DeathSyncSent, this.CommitedSuicide()));
         if(this.m_DeathSyncSent || this.CommitedSuicide()) return; // Prevent logging of hits for dead bodies
 
@@ -350,7 +349,7 @@ modded class PlayerBase extends ManBase {
 
         if(murderer.HasUpstreamIdentity()) {
             string cftoolsId = murderer.GetUpstreamIdentity();
-            ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+            GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
             playerStatistics.shotsHit++;
             playerStatistics.shotsHitPlayers++;
         }
