@@ -203,7 +203,7 @@ class GameLabsContextAction {
     string referenceKey;
 
     void Register() {
-        GetGameLabs().AddGameLabsAction(this);
+        GetGameLabs().AddGameLabsActionEx(this);
     }
 
     /*
