@@ -33,8 +33,11 @@ class GameLabsConfiguration {
     private bool lockServerOnStart = false;
     private bool debugAutoCompleteConstruction = false;
 
+    private bool enableMetricsDump = false;
+
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
+    private const string metricsPath = "$profile:gamelabs_metrics.json";
 
     void GameLabsConfiguration() {
         // TODO: Ensure configuration structure
@@ -71,6 +74,11 @@ class GameLabsConfiguration {
 
     bool GetLockOnStart() { return this.lockServerOnStart; }
     void SetLockOnStart(bool value) { this.lockServerOnStart = value; }
+
+    bool GetMetricsDump() { return this.enableMetricsDump; }
+    void SetMetricsDump(bool value) { this.enableMetricsDump = value; }
+    float GetMetricsDumpInterval() { return 2.0; }
+    string GetMetricsDumpPath() {return this.metricsPath; }
 
     bool GetAutoCompleteConstruction() { return this.debugAutoCompleteConstruction; }
     string GetServerId() { return this.serverId; }
