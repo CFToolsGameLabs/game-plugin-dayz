@@ -149,9 +149,9 @@ class GameLabsBulletPostprocessor {
             if(bullet != NULL) {
                 vector position = bullet.GetPosition();
 
-                ref array<vector> trajectory = this.bulletTracing.Get(bullet);
+                array<vector> trajectory = this.bulletTracing.Get(bullet);
                 if(trajectory == NULL) {
-                    trajectory = new ref array<vector>;
+                    trajectory = new array<vector>;
                     this.bulletTracing.Set(bullet, trajectory);
                     trajectory.Insert(position);
                 } else {
@@ -169,7 +169,7 @@ class GameLabsBulletPostprocessor {
                 #ifdef GAMELABSBPMAGIC
                 if(!appliedMagic) {
                     array<Object> nearestObjects = new array<Object>;
-                    ref array<EntityAI> entities = new array<EntityAI>;
+                    array<EntityAI> entities = new array<EntityAI>;
                     GetGame().GetObjectsAtPosition3D(position, 9.0, nearestObjects, null);
 
                     foreach (Object nearestObject : nearestObjects) {
@@ -244,7 +244,7 @@ modded class Weapon_Base {
                 array<Object> nearestObjects = new array<Object>;
                 GetGame().GetObjectsAtPosition3D(this.GetPosition(), 1, nearestObjects, null);
 
-                ref array<Object> bullets = new array<Object>;
+                array<Object> bullets = new array<Object>;
 
                 string objectType;
                 foreach (Object nearestObject : nearestObjects) {
@@ -266,7 +266,7 @@ modded class Weapon_Base {
             if(player) {
                 if(player.HasUpstreamIdentity()) {
                     string cftoolsId = player.GetUpstreamIdentity();
-                    ref GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+                    GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
                     if(ammoType == "Bullet_12GaugePellets") {
                         playerStatistics.shotsFired += 8; // One "shot" per pellet. Without killing performance, there is no better way. Sorry shotgun users.
                     } else {
