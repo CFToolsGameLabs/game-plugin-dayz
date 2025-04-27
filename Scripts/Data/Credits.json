@@ -10,6 +10,18 @@
                     ]
                 }
             ]
+        },
+        {
+            "DepartmentName": "Community Contributors",
+            "Sections": [
+                {
+                    "SectionName": "Community Contributors",
+                    "SectionLines": [
+                        "lava76",
+                        "wrdg"
+                    ]
+                }
+            ]
         }
     ]
 }
