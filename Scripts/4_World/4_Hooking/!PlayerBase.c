@@ -86,6 +86,11 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.HasUpstreamIdentity(%1) [%2] ", this, this.gl_cftoolsId));
         return (this.gl_cftoolsId != "");
     }
+    string GetUpstreamIdentityHotlink() {
+        string cftoolsId = this.GetUpstreamIdentity();
+        string hotlink = string.Format("https://app.cftools.cloud/profile/%1", cftoolsId);
+        return hotlink;
+    }
 
     void SetGamesessionId(string gamesessionId) {
         GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.SetGamesessionId(%1, %2)", this, gamesessionId));
