@@ -187,6 +187,11 @@ class GameLabsAPI {
         this.restContext.POST(cb, "/v1/player/ban", payload.ToJson());
     }
 
+    void PlayerKick(_Callback cb, _Payload_PlayerKick payload) {
+        if(!this.IsEnabled()) return;
+        this.restContext.POST(cb, "/v1/player/kick", payload.ToJson());
+    }
+
     void ItemInteract(_Callback cb, _Payload_ItemInteract payload) {
         if(!this.IsEnabled()) return;
         this.restContext.POST(cb, "/v1/item/interact", payload.ToJson());
