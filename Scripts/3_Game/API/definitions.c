@@ -423,6 +423,71 @@ class _Response_PlayerConnect : _Response {
 };
 // ************************
 
+// Register: /v1/player/ban
+class _Payload_PlayerBan : _Payload {
+    string gamesession_id;
+    string type;
+    string reason;
+    int hours;
+
+    void _Payload_PlayerBan(string _gamesessionId, string _type, string _reason, int _hours) {
+        this.gamesession_id = _gamesessionId;
+        this.type = _type;
+        this.reason = _reason;
+        this.hours = _hours;
+    }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerBan>.JsonMakeData(this); }
+};
+class _Response_PlayerBan : _Response {
+    void _Response_PlayerBan(string content) { JsonFileLoader<_Response_PlayerBan>.JsonLoadData(content, this); }
+};
+class _Callback_PlayerBan : _Callback {
+    override void OnError(int errorCode) {
+        GetGameLabs().GetLogger().Error(string.Format("PlayerBan errorCode(%1)", errorCode));
+    };
+
+    override void OnTimeout() {
+        GetGameLabs().GetLogger().Error(string.Format("PlayerBan timed out"));
+    };
+
+    override void OnSuccess(string data, int dataSize) {
+        _Response_PlayerBan response = new _Response_PlayerBan(data);
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerBan completed (status=%1; error=%2)", response.status, response.error));
+    };
+};
+// ************************
+
+// Register: /v1/player/kick
+class _Payload_PlayerKick : _Payload {
+    string gamesession_id;
+    string reason;
+
+    void _Payload_PlayerKick(string _gamesessionId, string _reason) {
+        this.gamesession_id = _gamesessionId;
+        this.reason = _reason;
+    }
+    override string ToJson() { return JsonFileLoader<_Payload_PlayerKick>.JsonMakeData(this); }
+};
+
+class _Response_PlayerKick : _Response {
+    void _Response_PlayerKick(string content) { JsonFileLoader<_Response_PlayerKick>.JsonLoadData(content, this); }
+};
+class _Callback_PlayerKick : _Callback {
+    override void OnError(int errorCode) {
+        GetGameLabs().GetLogger().Error(string.Format("PlayerKick errorCode(%1)", errorCode));
+    };
+
+    override void OnTimeout() {
+        GetGameLabs().GetLogger().Error(string.Format("PlayerKick timed out"));
+    };
+
+    override void OnSuccess(string data, int dataSize) {
+        _Response_PlayerKick response = new _Response_PlayerKick(data);
+        GetGameLabs().GetLogger().Debug(string.Format("PlayerKick completed (status=%1; error=%2)", response.status, response.error));
+    };
+};
+// ************************
+
 // Register: /v1/player/disconnect
 //! Everything else is located in 5_Mission/definitions
 class _Payload_PlayerDisconnect : _Payload {};
