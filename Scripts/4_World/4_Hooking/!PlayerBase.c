@@ -18,6 +18,8 @@ modded class PlayerBase extends ManBase {
     private float gl_ticktime = 0.0;
     private vector gl_position;
 
+    private bool gl_deathProcessed = false;
+
     /*
      * // Keep in code as reference, however doesnt work in a real environment :(
     private ref array<GLClientHitInfo> _hitCache = new array<GLClientHitInfo>;
@@ -85,6 +87,66 @@ modded class PlayerBase extends ManBase {
     bool HasUpstreamIdentity() {
         GetGameLabs().GetLogger().Debug(string.Format("PlayerBase.HasUpstreamIdentity(%1) [%2] ", this, this.gl_cftoolsId));
         return (this.gl_cftoolsId != "");
+    }
+    string GetUpstreamIdentityHotlink() {
+        string cftoolsId = this.GetUpstreamIdentity();
+        string hotlink = string.Format("https://app.cftools.cloud/profile/%1", cftoolsId);
+        return hotlink;
+    }
+
+    bool IssueCFToolsKick(string reason, _Callback cb = NULL) {
+        string gamesessionId = this.GetGamesessionId();
+        if(!gamesessionId) return false;
+
+        _Callback callback = cb;
+        if(!callback) {
+            callback = new _Callback_PlayerKick();
+        }
+
+        _Payload_PlayerKick payloadKick = new _Payload_PlayerKick(gamesessionId, reason);
+        GetGameLabs().GetApi().PlayerKick(callback, payloadKick);
+        return true;
+    }
+
+    /*
+     * This files a remote request to file a ban for the current player (ban_type=Account)
+     * Use optional callback to handle your own delayed response
+     * `reason` must be a string of length 3 to 40 characters
+     * Note: This is only functional if a "Primary Ban List" has been set within CFTools Cloud
+     */
+    bool IssueCFToolsBanPermanent(string reason, _Callback cb = NULL) {
+        string gamesessionId = this.GetGamesessionId();
+        if(!gamesessionId) return false;
+
+        _Callback callback = cb;
+        if(!callback) {
+            callback = new _Callback_PlayerBan();
+        }
+
+        _Payload_PlayerBan payloadBan = new _Payload_PlayerBan(gamesessionId, "permanent", reason, 0);
+        GetGameLabs().GetApi().PlayerBan(callback, payloadBan);
+        return true;
+    }
+
+    /*
+     * This files a remote request to file a ban for the current player (ban_type=Account)
+     * `reason` must be a string of length 3 to 40 characters
+     * `hours` is a relative value based on the current time
+     * Use optional callback to handle your own delayed response
+     * Note: This is only functional if a "Primary Ban List" has been set within CFTools Cloud
+     */
+    bool IssueCFToolsBanTemporary(string reason, int hours, _Callback cb = NULL) {
+        string gamesessionId = this.GetGamesessionId();
+        if(!gamesessionId) return false;
+
+        _Callback callback = cb;
+        if(!callback) {
+            callback = new _Callback_PlayerBan();
+        }
+
+        _Payload_PlayerBan payloadBan = new _Payload_PlayerBan(gamesessionId, "temporary", reason, hours);
+        GetGameLabs().GetApi().PlayerBan(callback, payloadBan);
+        return true;
     }
 
     void SetGamesessionId(string gamesessionId) {
@@ -161,9 +223,6 @@ modded class PlayerBase extends ManBase {
                 this.gl_speedHackTriggers++;
                 GetGameLabs().GetLogger().Warn(string.Format("[SPEED-HACK] Potential speed-hack player=%1, distance=%2u, unitsPerSecond=%3 [threshold=%4, inVehicle=%5, triggers=%6])", this.GetPlainId(), distance, unitsPerSecond, warningThreshold, this.IsInVehicle(),this.gl_speedHackTriggers));
                 GetGameLabs().GetLogger().Warn("THIS MAY BE A FALSE POSITIVE; DO NOT BLANKET BAN");
-            }
-            if (this.gl_speedHackTriggers > 2) {
-                // TODO: Invoke remote action
             }
         }
     }
@@ -254,11 +313,7 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("OnVehicleSwitchSeat(this=%1, seatIndex=%2)", this, seatIndex));
     }
 
-    override void EEKilled(Object killer) {
-        super.EEKilled(killer);
-        if(!GetGame().IsServer()) return;
-        if(!GetGameLabs().IsStatReportingEnabled()) return;
-
+    void GLProcessKill(Object killer) {
         string cftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(this.GetPlainId());
         if(cftoolsId) {
             GLPlayerStatistics playerStats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
@@ -326,6 +381,16 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetApi().PlayerDeath(new _Callback(), payload);
     }
 
+    override void EEKilled(Object killer) {
+        super.EEKilled(killer);
+        if(!GetGame().IsServer()) return;
+        if(!GetGameLabs().IsStatReportingEnabled()) return;
+        if(this.gl_deathProcessed) return;
+        this.gl_deathProcessed = true;
+
+        this.GLProcessKill(killer);
+    }
+
     override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {
         this.gl_lastDamageAmmo = ammo;
         this.gl_lastDamageType = damageType;
@@ -359,5 +424,12 @@ modded class PlayerBase extends ManBase {
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);
+
+        if(IsAlive()) {
+            this.gl_deathProcessed = false;
+        } else if(!this.gl_deathProcessed) {
+            GetGameLabs().GetLogger().Warn(string.Format("EEHitBy processing this hit as kill event as EEKilledBy was not correctly called. Verify all your mods are properly calling super()!"));
+            this.GLProcessKill(murderer);
+        }
     }
 };

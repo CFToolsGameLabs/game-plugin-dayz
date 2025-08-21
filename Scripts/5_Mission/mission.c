@@ -283,6 +283,10 @@ modded class MissionServer {
         }
     }
 
+    void GameLabsPostPrivilegedEquip(PlayerBase player) {
+        // can be overriden
+    }
+
     private void PrivilegedEquip() {
         if(m_player.GetPlainId() && this._testClients.Find(m_player.GetPlainId()) != -1) {
             this.gameLabs.GetLogger().Warn(string.Format("(Re-Spawn) Granting %1<name=%2;steam64=%3> CFTools staff equipment", m_player, m_player.GetPlayerName(), m_player.GetPlainId()));
@@ -350,6 +354,7 @@ modded class MissionServer {
             }
             /* ************************************************************************ */
         }
+        this.GameLabsPostPrivilegedEquip(m_player);
     }
 
     private void _Setup() {
