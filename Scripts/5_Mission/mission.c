@@ -27,6 +27,8 @@ modded class MissionServer {
                 }
                 break;
             }
+            /*
+             * // Causes null ref directly after respawn
             case ClientRespawnEventTypeID: {
                 GLPlayerStatistics stats = m_player.GetGLPlayerStatistics();
                 if(stats) {
@@ -34,6 +36,7 @@ modded class MissionServer {
                 }
                 break;
             }
+            */
             case ProgressEventTypeID: {
                 ProgressEventParams progressParams; // typedef Param3<int, float, string> ProgressEventParams;
                 if(Class.CastTo(progressParams, params)) {
