@@ -182,6 +182,17 @@ modded class PlayerBase extends ManBase {
         this.gl_name = string.Format("%1", name);
     }
 
+    GLPlayerStatistics GetGLPlayerStatistics() {
+        if(!GetGameLabs()) return NULL;
+        if(!GetGameLabs().IsServer()) return NULL;
+
+        string cftoolsId = this.GetUpstreamIdentity();
+        if(!cftoolsId || cftoolsId == "") return NULL;
+
+        GLPlayerStatistics stats = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+        return stats;
+    }
+
     override void OnScheduledTick(float deltaTime) {
         super.OnScheduledTick(deltaTime);
         if(!GetGameLabs().IsServer()) return;
@@ -428,8 +439,81 @@ modded class PlayerBase extends ManBase {
         if(IsAlive()) {
             this.gl_deathProcessed = false;
         } else if(!this.gl_deathProcessed) {
+            this.gl_deathProcessed = true;
             GetGameLabs().GetLogger().Warn(string.Format("EEHitBy processing this hit as kill event as EEKilledBy was not correctly called. Verify all your mods are properly calling super()!"));
-            this.GLProcessKill(murderer);
+            this.GLProcessKill(source);
         }
+    }
+
+    /* ********* STATS SETTER ********** */
+    void GL_IncPickedUp() {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.itemsPickedUp++;
+    }
+    void GL_IncDropped() {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.itemsDropped++;
+    }
+    void GL_IncWeaponsLooted() {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.weaponsLooted++;
+    }
+    void GL_IncPlayersLooted()  {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.playersLooted++;
+    }
+    void GL_IncAILooted()       {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.aiLooted++;
+    }
+    void GL_IncGrenadeUsed()    {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.grenadesUsed++;
+    }
+    void GL_IncBleedFixed()     {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.bleedsFixed++;
+    }
+    void GL_IncHealthItemUsed() {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.healthItemsUsed++;
+    }
+    void GL_IncRespawn()        {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.playerRespawns++;
+    }
+    void GL_IncFoodItemConsumed()   {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.foodItemsConsumed++;
+    }
+    void GL_IncDrinkItemConsumed()  {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.drinkItemsConsumed++;
+    }
+    void GL_AddFoodWeightKg(float kg)      {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.foodWeightConsumed += kg;
+    }
+    void GL_AddDrinkVolumeLiters(float l)  {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.drinkVolumeConsumed += l;
+    }
+    void GL_AddVehicleDist(float meters)   {
+        GLPlayerStatistics stats = this.GetGLPlayerStatistics();
+        if(!stats) return;
+        stats.vehicleDistance += meters;
     }
 };

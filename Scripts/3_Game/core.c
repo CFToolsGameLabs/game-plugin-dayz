@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.956";
+    private const string modControlledVersionIdentifier = "1.961";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -16,6 +16,10 @@ class GameLabsCore {
     private ref map<string, ref GLPlayerStatistics> playerStatisticsMap = new map<string, ref GLPlayerStatistics>;
 
     private int _computedServerFps = 0;
+    private float _computedTickTimeAvg = 0.0;
+    private float _computedTickTimeLow = 0.0;
+    private float _computedTickTimeHigh = 0.0;
+    private int _computedTickCount = 0;
     private int _computedAI = 0;
     private int _computedAnimals = 0;
     private int _computedVehicles = 0;
@@ -108,6 +112,8 @@ class GameLabsCore {
         if(!FileExist("$profile:@GameLabsStorage")) {
             this.logger.Info(string.Format("Creating GameLabs storage folder..."));
             MakeDirectory("$profile:@GameLabsStorage");
+            FileHandle file = OpenFile("$profile:@GameLabsStorage\\@DO_NOT_PLACE_GAMELABS_CFG_HERE", FileMode.WRITE);
+            CloseFile(file);
         }
     }
 
@@ -173,6 +179,29 @@ class GameLabsCore {
 
     int GetServerFPS() { return this._computedServerFps; }
     void SetServerFPS(int fpsValue) { this._computedServerFps = fpsValue; }
+
+    float GetTickTimeAvg() { return this._computedTickTimeAvg; }
+    float GetTickTimeLow() { return this._computedTickTimeLow; }
+    float GetTickTimeHigh() { return this._computedTickTimeHigh; }
+    void SetTickTimes(int avg, int low, int high) {
+        this._computedTickTimeAvg = avg;
+        this._computedTickTimeLow = low;
+        this._computedTickTimeHigh = high;
+    }
+    int GetTickCount() { return this._computedTickCount; }
+    void SetTickCount(int count) {
+        this._computedTickCount = count;
+    }
+    void DebugTickTimes() {
+        string tickTimes = string.Format("TickTimesSnapshot[average=%1; low=%2; high=%3; totalTicks=%4; serverFps=%5;]", this._computedTickTimeAvg, this._computedTickTimeLow, this._computedTickTimeHigh, this._computedTickCount, this._computedServerFps);
+        this.logger.Debug(tickTimes);
+    }
+
+    void HandleMissionLoaded() {
+        GetDayZGame().GLSetMissionLoaded();
+        float tickTime = GetGame().GetTickTime();
+        this.logger.Info(string.Format("Mission fully loaded in %1s. Server ready for connections.", tickTime));
+    }
 
     int GetEntityCount() { return this._computedEntities; }
     void IncrEntityCount() { this._computedEntities++; }

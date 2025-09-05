@@ -313,6 +313,23 @@ class GLPlayerStatistics {
     int killsInfected       = 0;
     int killsAnimals        = 0;
 
-    float startingDistance  = 0;
-    float distance          = 0;
+    float startingDistance  = 0.0;
+    float distance          = 0.0;
+    float vehicleDistance   = 0.0;
+
+    int itemsDropped        = 0;
+    int itemsPickedUp       = 0;
+    int weaponsLooted       = 0;
+    int playersLooted       = 0;
+    int aiLooted            = 0;
+    int grenadesUsed        = 0;
+
+    int bleedsFixed         = 0;
+    int healthItemsUsed     = 0;
+    int playerRespawns      = 0;
+
+    int foodItemsConsumed   = 0;
+    float foodWeightConsumed = 0.0;
+    int drinkItemsConsumed  = 0;
+    float drinkVolumeConsumed = 0.0;
 };

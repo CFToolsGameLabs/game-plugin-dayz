@@ -6,6 +6,8 @@ modded class MissionServer {
     private ref GameLabsRPC gameLabsRPC;
     private ref GameLabsReporter gameLabsReporter;
 
+    private bool gl_MissionLoaded = false;
+
     static ref array<string> _testClients = {
         "76561198410213019",
         "76561198084367441"
@@ -13,12 +15,39 @@ modded class MissionServer {
 
     override void OnEvent(EventType eventTypeId, Param params) {
         super.OnEvent(eventTypeId, params);
-        if(eventTypeId == ClientNewEventTypeID) {
-            if(m_player.GetIdentity()) {
-                string steam64 = m_player.GetIdentity().GetPlainId();
-                string name = m_player.GetIdentity().GetName();
-                m_player.GameLabs_MakeReady(steam64, name);
-                this.PrivilegedEquip();
+        if(!GetGameLabs()) return;
+
+        switch(eventTypeId) {
+            case ClientNewEventTypeID: {
+                if(m_player.GetIdentity()) {
+                    string steam64 = m_player.GetIdentity().GetPlainId();
+                    string name = m_player.GetIdentity().GetName();
+                    m_player.GameLabs_MakeReady(steam64, name);
+                    this.PrivilegedEquip();
+                }
+                break;
+            }
+            case ClientRespawnEventTypeID: {
+                GLPlayerStatistics stats = m_player.GetGLPlayerStatistics();
+                if(stats) {
+                    stats.playerRespawns++;
+                }
+                break;
+            }
+            case ProgressEventTypeID: {
+                ProgressEventParams progressParams; // typedef Param3<int, float, string> ProgressEventParams;
+                if(Class.CastTo(progressParams, params)) {
+                    if(progressParams.param1 == PROGRESS_FINISH) {
+                        if(!this.gl_MissionLoaded) {
+                            this.gl_MissionLoaded = true;
+                            GetGameLabs().HandleMissionLoaded();
+                        }
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
             }
         }
     };
@@ -175,6 +204,9 @@ modded class MissionServer {
         shutdownHeader = "************* GAME LABS *************";
         shutdownFooter = "*************************************";
         if(this.gameLabs.errorFlag) {
+            FileHandle file = OpenFile("$profile:@CREATE_GAMELABS_CFG_HERE", FileMode.WRITE);
+            CloseFile(file);
+
             shutdownTitle = "YOUR SERVER WAS FORCEFULLY CLOSED";
             shutdownContent = "You are missing a gamelabs.cfg, server can not start without it";
             Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
@@ -361,6 +393,26 @@ modded class MissionServer {
         this.gameLabsRPC = new GameLabsRPC();
         this.gameLabsReporter = new GameLabsReporter();
     }
+
+    override void OnMissionStart() {
+        super.OnMissionStart();
+        if(GetGameLabs()) {
+            GetGameLabs().GetLogger().Debug(string.Format("MissionServer.OnMissionStart();"));
+        }
+    }
+    override void OnGameplayDataHandlerLoad() {
+        super.OnGameplayDataHandlerLoad();
+        if(GetGameLabs()) {
+            GetGameLabs().GetLogger().Debug(string.Format("MissionServer.OnGameplayDataHandlerLoad();"));
+        }
+    }
+    override void OnInit() {
+        super.OnInit();
+        if(GetGameLabs()) {
+            GetGameLabs().GetLogger().Debug(string.Format("MissionServer.OnInit();"));
+        }
+    }
+
 };
 
 modded class MissionGameplay extends MissionBase {

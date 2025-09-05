@@ -8,6 +8,11 @@ class GameLabsMetricsDump {
 
     int aiActive;
 
+    int tickCount;
+    float tickTimeAvg;
+    float tickTimeLow;
+    float tickTimeHigh;
+
     void GameLabsMetricsDump() {
         this.serverFps = GetGameLabs().GetServerFPS();
 
@@ -17,6 +22,11 @@ class GameLabsMetricsDump {
         this.entityCount = GetGameLabs().GetEntityCount();
 
         this.aiActive = GetGameLabs().GetAIActiveCount();
+
+        this.tickCount = GetGameLabs().GetTickCount();
+        this.tickTimeAvg = GetGameLabs().GetTickTimeAvg();
+        this.tickTimeLow = GetGameLabs().GetTickTimeLow();
+        this.tickTimeHigh = GetGameLabs().GetTickTimeHigh();
     }
     string ToJson() { return JsonFileLoader<GameLabsMetricsDump>.JsonMakeData(this); }
 };
@@ -226,6 +236,8 @@ class GameLabsReporter {
             _Payload_ServerPlayers payloadPlayers = new _Payload_ServerPlayers(this.isFirstReport, this.effectiveInterval, updatedPlayers);
             GetGameLabs().GetApi().ServerPlayers(new _Callback_ServerDummy(), payloadPlayers);
         }
+
+        GetDayZGame().GLSetAllTickTimeValues();
 
         if(this.isFirstReport) this.isFirstReport = false;
     }

@@ -104,6 +104,10 @@ class _Payload_ServerPoll : _Payload {
     float windspeed;
     float snowfall;
 
+    float tickTimeAvg;
+    float tickTimeLow;
+    float tickTickHigh;
+
     void _Payload_ServerPoll(bool isFirst = false) {
         this.serverFps = GetGameLabs().GetServerFPS();
 
@@ -125,6 +129,10 @@ class _Payload_ServerPoll : _Payload {
             // Windspeed in km/h
             this.windspeed = weather.GetWindSpeed();
         }
+
+        this.tickTimeAvg = GetGameLabs().GetTickTimeAvg();
+        this.tickTimeLow = GetGameLabs().GetTickTimeLow();
+        this.tickTickHigh = GetGameLabs().GetTickTimeHigh();
     }
     override string ToJson() { return JsonFileLoader<_Payload_ServerPoll>.JsonMakeData(this); }
 };
