@@ -1,5 +1,6 @@
 modded class ItemBase extends InventoryItem {
     private string gl_persistentItemId;
+    float m_GLStartQty; // Used for quantity measurements
 
     void ItemBase() {
         if(!GetGameLabs()) return;
@@ -49,4 +50,40 @@ modded class ItemBase extends InventoryItem {
     void GL_SaveHook() {}
     void GL_Save(bool forceSave = false) {}
     void GL_Delete() {}
+
+    /* **************** Pickup Tracking **************** */
+    override void EEItemLocationChanged(notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc) {
+        super.EEItemLocationChanged(oldLoc, newLoc);
+        if(!GetGameLabs()) return;
+        if(!GetGameLabs().IsServer()) return;
+
+        PlayerBase oldOwner = null;
+        PlayerBase newOwner = null;
+
+        EntityAI oldParent = oldLoc.GetParent();
+        if(oldParent) oldOwner = PlayerBase.Cast(oldParent.GetHierarchyRootPlayer());
+
+        EntityAI newParent = newLoc.GetParent();
+        if(newParent) newOwner = PlayerBase.Cast(newParent.GetHierarchyRootPlayer());
+
+        if(newOwner && newOwner != oldOwner)
+            newOwner.GL_IncPickedUp();
+
+        if(oldOwner && oldOwner != newOwner)
+            oldOwner.GL_IncDropped();
+
+        // classify the *source* for the new owner
+        if(newOwner && newOwner != oldOwner) {
+            // player -> player transfer
+            if (oldOwner) newOwner.GL_IncPlayersLooted();
+
+            // AI (infected/animal) -> player
+            if (oldParent && (oldParent.IsInherited(DayZInfected) || oldParent.IsInherited(AnimalBase)))
+                newOwner.GL_IncAILooted();
+
+            // weapons looted from anywhere
+            if (IsInherited(Weapon_Base))
+                newOwner.GL_IncWeaponsLooted();
+        }
+    }
 };
