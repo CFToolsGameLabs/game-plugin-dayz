@@ -440,7 +440,6 @@ modded class PlayerBase extends ManBase {
             this.gl_deathProcessed = false;
         } else if(!this.gl_deathProcessed) {
             this.gl_deathProcessed = true;
-            GetGameLabs().GetLogger().Warn(string.Format("EEHitBy processing this hit as kill event as EEKilledBy was not correctly called. Verify all your mods are properly calling super()!"));
             this.GLProcessKill(source);
         }
     }
