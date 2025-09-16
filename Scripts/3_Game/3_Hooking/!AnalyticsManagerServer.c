@@ -10,6 +10,12 @@ modded class AnalyticsManagerServer {
                     OnInfectedKilledGL(killer_survivor, target);
                 } else if(target.IsAnimal()) {
                     OnAnimalKilledGL(killer_survivor, target);
+                } else {
+                #ifdef EXPANSIONMODAI
+                    if(target.IsAI()) {
+                        OnAIKilledGL(killer_survivor, target);
+                    }
+                #endif
                 }
             }
         }
@@ -36,6 +42,19 @@ modded class AnalyticsManagerServer {
                 GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsBySteam64(steam64);
                 if(playerStatistics) {
                     playerStatistics.killsAnimals++;
+                }
+            }
+        }
+    }
+
+    void OnAIKilledGL(Man killer, EntityAI target) {
+        PlayerIdentity identity = killer.GetIdentity();
+        if(identity) {
+            if(identity.GetPlainId()) {
+                string steam64 = identity.GetPlainId();
+                GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsBySteam64(steam64);
+                if(playerStatistics) {
+                    playerStatistics.killsAI++;
                 }
             }
         }
