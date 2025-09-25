@@ -1,6 +1,8 @@
 modded class AnimalBase extends DayZAnimal  {
     private ref _AI gl_registeredInstance;
 
+    private bool gl_hitTracked = false;
+
     void AnimalBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
@@ -31,7 +33,13 @@ modded class AnimalBase extends DayZAnimal  {
 
         if(damageType != DamageType.FIRE_ARM) return;
 
-        if( !IsAlive() ) return;
+        if(!IsAlive()) {
+            if(this.gl_hitTracked) {
+                return;
+            } else {
+                this.gl_hitTracked = true;
+            }
+        }
 
         PlayerBase player;
         if(source) {

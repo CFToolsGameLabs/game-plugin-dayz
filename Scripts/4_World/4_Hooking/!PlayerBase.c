@@ -19,6 +19,7 @@ modded class PlayerBase extends ManBase {
     private vector gl_position;
 
     private bool gl_deathProcessed = false;
+    private bool gl_hitTracked = false;
 
     /*
      * // Keep in code as reference, however doesnt work in a real environment :(
@@ -423,11 +424,23 @@ modded class PlayerBase extends ManBase {
         }
         if(!source || !murderer) return;
 
+        // Only tracks players that have an upstream identity eg. are actual players with CFCloud info
         if(murderer.HasUpstreamIdentity()) {
             string cftoolsId = murderer.GetUpstreamIdentity();
             GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
-            playerStatistics.shotsHit++;
-            playerStatistics.shotsHitPlayers++;
+
+            if(!IsAlive()) {
+                // Player dead, last shot that actually killed the player
+                if(!this.gl_hitTracked) {
+                    this.gl_hitTracked = true;
+                    playerStatistics.shotsHit++;
+                    playerStatistics.shotsHitPlayers++;
+                }
+            } else {
+                // Player alive
+                playerStatistics.shotsHit++;
+                playerStatistics.shotsHitPlayers++;
+            }
         }
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy(this=%1, murderer=%2, source=%3, component=%4, dmgZone=%5, ammo=%6, modelPos=%7, speedCoef=%8)", this, murderer, source, component, dmgZone, ammo, modelPos, speedCoef));
