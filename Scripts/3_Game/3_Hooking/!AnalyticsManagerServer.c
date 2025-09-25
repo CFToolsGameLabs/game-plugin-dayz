@@ -10,13 +10,15 @@ modded class AnalyticsManagerServer {
                     OnInfectedKilledGL(killer_survivor, target);
                 } else if(target.IsAnimal()) {
                     OnAnimalKilledGL(killer_survivor, target);
-                } else {
+                }
+                /*else {
                 #ifdef EXPANSIONMODAI
                     if(target.IsAI()) {
                         OnAIKilledGL(killer_survivor, target);
                     }
                 #endif
                 }
+                */
             }
         }
     }
