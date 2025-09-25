@@ -1,6 +1,8 @@
 modded class ZombieBase extends DayZInfected  {
     private ref _AI gl_registeredInstance;
 
+    private bool gl_hitTracked = false;
+
     void ZombieBase () {
         if(!GetGameLabs()) return;
         if(!GetGameLabs().IsServer()) return;
@@ -31,7 +33,13 @@ modded class ZombieBase extends DayZInfected  {
 
         if(damageType != DamageType.FIRE_ARM) return;
 
-        if( !IsAlive() ) return;
+        if(!IsAlive()) {
+            if(this.gl_hitTracked) {
+                return;
+            } else {
+                this.gl_hitTracked = true;
+            }
+        }
 
         PlayerBase player;
         if(source) {

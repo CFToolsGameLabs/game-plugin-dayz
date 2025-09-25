@@ -1,46 +1,12 @@
-class GLBaseBuildingMetaStorage {
-    string _id;
-    string steam64;
-    string cftoolsId;
-    string objectType;
-
-    [NonSerialized()]
-    private const string storagePath = "$profile:@GameLabsStorage";
-
-    [NonSerialized()]
-    private string path;
-
-    [NonSerialized()]
-    private bool ready = false;
-
-    void GLBaseBuildingMetaStorage() {}
-    string ToJson() { return JsonFileLoader<GLBaseBuildingMetaStorage>.JsonMakeData(this); }
-    void SetPersistentId(string persistentId) {
-        this.ready = true;
-        this._id = persistentId;
-        this.path = string.Format("%1/%2.json", this.storagePath, this._id);
-        GetGameLabs().GetLogger().Debug(string.Format("[Storage] %1 established for %2 @ %3", this, this._id, this.path));
-    }
-    bool Available() {
-        return this.ready;
-    }
-    void LoadFromDisk() {
-        JsonFileLoader<GLBaseBuildingMetaStorage>.JsonLoadFile(this.path, this);
-    }
-    void SaveToDisk() {
-        JsonFileLoader <GLBaseBuildingMetaStorage>.JsonSaveFile(this.path, this);
-    }
-    void DeleteFromDisk() {
-        DeleteFile(this.path);
-    }
-    bool CheckDiskPresence() {
-        return FileExist(this.path);
-    }
-};
+/*
+ * For GLBaseBuildingMetaStorage see Scripts/4_World/classes.c
+ */
 
 modded class BaseBuildingBase extends ItemBase {
     private string gl_steam64 = "";
     private string gl_cftoolsId = "";
+
+    private bool gl_hitTracked = false;
 
     private ref GLBaseBuildingMetaStorage gl_storage;
 
@@ -158,6 +124,39 @@ modded class BaseBuildingBase extends ItemBase {
 
     string GL_GetOwnerUpstreamIdentity() {
         return this.gl_cftoolsId;
+    }
+
+    override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef) {
+        super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
+
+        if(!GetGame().IsServer()) return;
+        if(!GetGameLabs().IsStatReportingEnabled()) return;
+
+        PlayerBase murderer;
+        if(source) {
+            murderer = PlayerBase.Cast(source.GetHierarchyParent());
+        }
+        if(!source || !murderer) return;
+
+        if(murderer.HasUpstreamIdentity()) {
+            string cftoolsId = murderer.GetUpstreamIdentity();
+            GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+
+            if(!IsAlive()) {
+                if(!this.gl_hitTracked) {
+                    this.gl_hitTracked = true;
+                    /* This should NOT increase the shot hit
+                     * playerStatistics.shotsHit++;
+                    */
+                    playerStatistics.shotsHitBaseObjects++;
+                }
+            } else {
+                /* This should NOT increase the shot hit
+                 * playerStatistics.shotsHit++;
+                */
+                playerStatistics.shotsHitBaseObjects++;
+            }
+        }
     }
 
     // Copied BaseBuildingBase.OnPartBuiltServer

@@ -306,12 +306,14 @@ class GLPlayerStatistics {
     int shotsFired          = 0;
     int shotsHit            = 0;
     int shotsHitPlayers     = 0;
+    int shotsHitBaseObjects = 0;
     int shotsHitInfected    = 0;
     int shotsHitAnimals     = 0;
     int shotsHitVehicles    = 0;
 
     int killsInfected       = 0;
     int killsAnimals        = 0;
+    int killsAI             = 0;
 
     float startingDistance  = 0.0;
     float distance          = 0.0;

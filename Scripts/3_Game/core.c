@@ -1,5 +1,5 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.961";
+    private const string modControlledVersionIdentifier = "1.963";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
@@ -396,6 +396,16 @@ class GameLabsCore {
         this.GetLogger().Warn(string.Format("\"%1\" has been added as monitored action by a third party application", action));
     }
 
+    void IngestMonitoredActions(array<ref string> actions) {
+        for(int i = 0; i < actions.Count(); i++) {
+            string action = actions.Get(i);
+            if(!this.IsMonitoredAction(action)) {
+                this._monitoredActions.Insert(action);
+                this.GetLogger().Debug(string.Format("\"%1\" has been added as monitored action", action));
+            }
+        }
+    }
+
     void AddGameLabsAction(ref GameLabsContextAction action) {
         ErrorEx("[Deprecated] :: Use 'AddGameLabsActionEx' instead", ErrorExSeverity.WARNING);	
         this._gamelabsActions.Insert(action);
@@ -427,7 +437,7 @@ class GameLabsCore {
             return;
         }
 
-        this._monitoredActions = registerResponse.monitoredActions;
+        this.IngestMonitoredActions(registerResponse.monitoredActions);
 
         this._metricsInterval = registerResponse.features.metricsInterval;
         this._reportingInterval = registerResponse.features.reportingInterval;

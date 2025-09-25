@@ -267,11 +267,19 @@ modded class Weapon_Base {
                 if(player.HasUpstreamIdentity()) {
                     string cftoolsId = player.GetUpstreamIdentity();
                     GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
+
+                    // If not defined, should be 0 or null, so swap to 1
+                    int projectilesCount = Math.Max(1, GetGame().ConfigGetInt("CfgAmmo " + ammoType + " projectilesCount"));
+                    playerStatistics.shotsFired += projectilesCount;
+
+                    /*
+                     * Old static method
                     if(ammoType == "Bullet_12GaugePellets") {
                         playerStatistics.shotsFired += 8; // One "shot" per pellet. Without killing performance, there is no better way. Sorry shotgun users.
                     } else {
                         playerStatistics.shotsFired++;
                     }
+                    */
                 }
             }
         }
