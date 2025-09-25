@@ -1,4 +1,4 @@
-modded class ActionEat {
+modded class ActionEatBig {
     override void OnStartServer(ActionData action_data) {
         super.OnStartServer(action_data);
         ItemBase it = ItemBase.Cast(action_data.m_MainItem);
