@@ -4,6 +4,8 @@ cd /D "%~dp0"
 
 set /a failed=0
 
+echo Running LaunchLocalMP.bat
+
 if exist ../project.cfg (
 	echo Found the project.cfg
 ) else (
@@ -18,33 +20,31 @@ if exist ../user.cfg (
 	set /a failed=1
 )
 
-set port=0
+if %failed%==1 (
+    endlocal
+
+    echo Failed to package the mod.
+    goto:eof
+)
+
 set password=
 set gameDirectory=
 set serverDirectory=
 set serverProfileDirectory=
-set serverConfig=
 set modName=
 set mods=
 set mission=
 set serverEXE=
 set serverLaunchParams=
 set modBuildDirectory=
+set playerName=
 
 for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ModName') do (
     set modName=%%a
 )
 
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg AdditionalMPMods') do (
+for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ExpansionMods') do (
     set mods=%%a
-)
-
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg Port') do (
-    set port=%%a
-)
-
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ServerPassword') do (
-    set password=%%a
 )
 
 for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg GameDirectory') do (
@@ -59,11 +59,7 @@ for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg Server
     set serverProfileDirectory=%%a
 )
 
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ServerConfig') do (
-    set serverConfig=%%a
-)
-
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg MPMission') do (
+for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg SPMission') do (
     set mission=%%a
 )
 
@@ -79,8 +75,8 @@ for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg Client
     set clientLaunchParams=%%a
 )
 
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ServerLaunchParams') do (
-    set serverLaunchParams=%%a
+for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg PlayerName') do (
+    set playerName=%%a
 )
 
 for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ModBuildDirectory') do (
@@ -91,14 +87,7 @@ setlocal enableextensions enabledelayedexpansion
 
 echo ClientLaunchParams is: "%clientLaunchParams%"
 if "%clientLaunchParams%"=="" (
-    set /a failed=1
     echo ClientLaunchParams parameter was not set in the project.cfg
-)
-
-echo ServerLaunchParams is: "%serverLaunchParams%"
-if "%serverLaunchParams%"=="" (
-    set /a failed=1
-    echo ServerLaunchParams parameter was not set in the project.cfg
 )
 
 echo ClientEXE is: "%clientEXE%"
@@ -113,10 +102,10 @@ if "%serverEXE%"=="" (
     echo ServerEXE parameter was not set in the project.cfg
 )
 
-echo MPMission is: "%mission%"
+echo SPMission is: "%mission%"
 if "%mission%"=="" (
     set /a failed=1
-    echo MPMission parameter was not set in the project.cfg
+    echo SPMission parameter was not set in the project.cfg
 )
 
 echo ModName is: "%modName%"
@@ -132,21 +121,6 @@ if "%mods%"=="" (
     set mods=%modName%
 ) else (
     set mods=%mods%;%modName%
-)
-
-echo Port is: "%port%"
-if "%port%"==0 (
-    echo Port parameter was not set in the project.cfg, using 2302.
-    set port=-port=2302
-) else (
-    set port=-port=%port%
-)
-
-echo ServerPassword is: "%password%"
-if "%password%"=="" (
-    echo ServerPassword parameter was not set in the project.cfg, continuing.
-) else (
-    set password=-password=%password%
 )
 
 echo GameDirectory is: "%gameDirectory%"
@@ -167,16 +141,24 @@ if "%serverProfileDirectory%"=="" (
     echo ServerProfileDirectory parameter was not set in the project.cfg
 )
 
-echo ServerConfig is: "%serverConfig%"
-if "%serverConfig%"=="" (
-    set /a failed=1
-    echo ServerConfig parameter was not set in the project.cfg
+echo PlayerName is: "%playerName%"
+if "%playerName%"=="" (
+    echo PlayerName parameter was not set in the project.cfg, continuing.
+) else (
+    set playerName=-name=%playerName%
 )
 
 echo ModBuildDirectory is: "%modBuildDirectory%"
 if "%modBuildDirectory%"=="" (
 	set /a failed=1
 	echo ModBuildDirectory parameter was not set in the project.cfg
+)
+
+if %failed%==1 (
+    endlocal
+
+    echo Failed to package the mod.
+    goto:eof
 )
 
 for %%a in ("%mods:;=" "%") do (
@@ -188,8 +170,9 @@ for %%a in ("%mods:;=" "%") do (
     )
 )
 
-chdir /d "%serverDirectory%"
-echo start %serverEXE% %serverLaunchParams% "-config=%serverConfig%" "%port%" "-profiles=%serverProfileDirectory%" -dologs -adminlog -freezecheck "-scriptDebug=true" "-cpuCount=4" "-mission=%mission%" "-mod=%modList%" "-gamelabstesting=1"
-start %serverEXE% %serverLaunchParams% "-config=%serverConfig%" "%port%" "-profiles=%serverProfileDirectory%" -dologs -adminlog -freezecheck "-scriptDebug=true" "-cpuCount=4" "-mission=%mission%" "-mod=%modList%" "-gamelabstesting=1"
+chdir /d "%gameDirectory%"
+echo start %clientEXE% %clientLaunchParams% "-mod=%modList%" "%playerName%" -dologs -adminlog -freezecheck "-scriptDebug=true"
 
-TIMEOUT /T 3 /NOBREAK
+start %clientEXE% %clientLaunchParams% "-mod=%modList%" "%playerName%" -dologs -adminlog -freezecheck "-scriptDebug=true" -connect=127.0.0.1:2302
+
+

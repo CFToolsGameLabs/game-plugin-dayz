@@ -208,7 +208,9 @@ echo ADD "+^!" +O to obfuscate
 If "%pboName%"=="Scripts" (
 	START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 ) Else If "%pboName%"=="GUI" (
-       	START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
+    START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
+) Else If "%pboName%"=="GameLabs_Dependencies" (
+      START /w %pboProject% %pboProject% +K +W -F +Stop -P +Z -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 ) Else (
 	START /w %pboProject% %pboProject% +K +W -F +Stop -P -B -E=dayz +R "%workDrive%!prefixName!" "+Mod=%modBuildDirectory%%modName%" "+Key=F:\@DayZ\@Keys\cftoolsRoot.biprivatekey"
 )
@@ -221,8 +223,19 @@ if not errorlevel 1 (
 	
 	cd /D "%modBuildDirectory%%modName%\Addons\"
 
+	REM Decide prefix: 000_ for Scripts/GUI, else ZZZ_
+    set "prefix=ZZZ_"
+    if /I "!pboName!"=="Scripts" set "prefix=000_"
+    if /I "!pboName!"=="GUI"     set "prefix=001_"
+
+    REM echo "%modBuildDirectory%%modName%\Addons\!pboName!.pbo" "%modBuildDirectory%%modName%\Addons\%prefix%!pboName!.pbo"
+    REM ren "%modBuildDirectory%%modName%\Addons\!pboName!.pbo" "%prefix%!pboName!.pbo"
+
+    REM echo "%modBuildDirectory%%modName%\Addons\!pboName!.pbo.%keyName%.bisign" "%modBuildDirectory%%modName%\Addons\%prefix%!pboName!.pbo.%keyName%.bisign"
+    REM ren "%modBuildDirectory%%modName%\Addons\!pboName!.pbo.%keyName%.bisign" "%prefix%!pboName!.pbo.%keyName%.bisign"
+
 	echo Renaming PBO to %modBuildDirectory%%modName%\Addons\!pboName!.pbo
-	rename "%modBuildDirectory%%modName%\Addons\!currentFolder!.pbo" "!pboName!.pbo"
+	rename "%modBuildDirectory%%modName%\Addons\!currentFolder!.pbo" "%prefix%!pboName!.pbo"
 
 
 echo %signFile% %keyDirectory%%keyName%.biprivatekey %modBuildDirectory%%modName%\Addons\!pboName!.pbo
