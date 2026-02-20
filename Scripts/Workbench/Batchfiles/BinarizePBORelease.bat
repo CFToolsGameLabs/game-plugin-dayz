@@ -227,13 +227,17 @@ if not errorlevel 1 (
 	echo %signFile% %keyDirectory%%keyName%.biprivatekey %modBuildDirectory%%modName%\Addons\!pboName!.pbo
 	%signFile% "%keyDirectory%%keyName%.biprivatekey" "%modBuildDirectory%%modName%\Addons\!pboName!.pbo"
 
-	echo "%modBuildDirectory%%modName%\Addons\!pboName!.pbo" "%modBuildDirectory%%modName%\Addons\000_!pboName!.pbo"
-	ren "%modBuildDirectory%%modName%\Addons\!pboName!.pbo" "000_!pboName!.pbo"
+    REM Decide prefix: 000_ for Scripts/GUI, else ZZZ_
+    set "prefix=ZZZ_"
+    if /I "!pboName!"=="Scripts" set "prefix=000_"
+    if /I "!pboName!"=="GUI"     set "prefix=001_"
 
-	echo "%modBuildDirectory%%modName%\Addons\!pboName!.pbo.%keyName%.bisign" "%modBuildDirectory%%modName%\Addons\000_!pboName!.pbo.%keyName%.bisign"
-	ren "%modBuildDirectory%%modName%\Addons\!pboName!.pbo.%keyName%.bisign" "000_!pboName!.pbo.%keyName%.bisign"
+	echo "%modBuildDirectory%%modName%\Addons\!pboName!.pbo" "%modBuildDirectory%%modName%\Addons\!prefix!!pboName!.pbo"
+	ren "%modBuildDirectory%%modName%\Addons\!pboName!.pbo" "!prefix!!pboName!.pbo"
 
-	
+	echo "%modBuildDirectory%%modName%\Addons\!pboName!.pbo.%keyName%.bisign" "%modBuildDirectory%%modName%\Addons\!prefix!!pboName!.pbo.%keyName%.bisign"
+	ren "%modBuildDirectory%%modName%\Addons\!pboName!.pbo.%keyName%.bisign" "!prefix!!pboName!.pbo.%keyName%.bisign"
+
 	goto end
 ) else (
 	echo /////////////////////////////////////////////////////////////

@@ -136,6 +136,30 @@ class LaunchServerClientServerMod: DayZProjectManager
 	}
 }
 
+[WorkbenchPluginAttribute("-> Launch Server+Client (Expansion)", "Launches Server+Client (Expansion)", "", "", {"ResourceManager", "ScriptEditor"})]
+class LaunchServerClientExpansion: DayZProjectManager
+{
+string BatchFile;
+string BatchFile1;
+string BatchFile2;
+string BatchFile3;
+
+void LaunchServerClientExpansion()
+{
+    BatchFile = GetWorkDriveDirectory() + "Batchfiles\\Exit.bat";
+    BatchFile1 = GetWorkDriveDirectory() + "Batchfiles\\ZBinarizeDeploy.bat";
+    BatchFile2 = GetWorkDriveDirectory() + "Batchfiles\\LaunchServerExpansion.bat";
+    BatchFile3 = GetWorkDriveDirectory() + "Batchfiles\\LaunchLocalMPExpansion.bat";
+}
+
+override void Run()
+{
+    RunDayZBat(BatchFile, true);
+    RunDayZBat(BatchFile1, true);
+    RunDayZBat(BatchFile2, true);
+    RunDayZBat(BatchFile3, true);
+}
+}
 
 [WorkbenchPluginAttribute("-> Edit Project", "Edit Project", "", "", {"ResourceManager", "ScriptEditor"})]
 class DayZProjectManager: DayZTool

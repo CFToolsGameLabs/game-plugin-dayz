@@ -6,11 +6,11 @@ class GLBaseBuildingLockStorage extends GLBaseBuildingMetaStorage {
     bool isLocked;
 
     void GLBaseBuildingLockStorage() {}
-    string ToJson() { return JsonFileLoader<GLBaseBuildingLockStorage>.JsonMakeData(this); }
-    void LoadFromDisk() {
+    override string ToJson() { return JsonFileLoader<GLBaseBuildingLockStorage>.JsonMakeData(this); }
+    override void LoadFromDisk() {
         JsonFileLoader<GLBaseBuildingLockStorage>.JsonLoadFile(this.path, this);
     }
-    void SaveToDisk() {
+    override void SaveToDisk() {
         JsonFileLoader <GLBaseBuildingLockStorage>.JsonSaveFile(this.path, this);
     }
 };

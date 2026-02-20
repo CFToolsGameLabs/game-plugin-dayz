@@ -35,7 +35,7 @@ for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ModNam
     set modName=%%a
 )
 
-for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg AdditionalMPMods') do (
+for /f "delims=" %%a in ('call ExtractData.bat ../project.cfg ../user.cfg ExpansionMods') do (
     set mods=%%a
 )
 
