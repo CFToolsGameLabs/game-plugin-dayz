@@ -316,6 +316,13 @@ class GLPlayerStatistics {
     int killsAI             = 0;
     int deathsAI            = 0;
 
+    int deaths              = 0;
+    int pvpKills            = 0;
+    int headshotKills       = 0;
+    float damageDealt       = 0.0;
+    float damageTaken       = 0.0;
+    float longestKillDistanceMeters = 0.0;
+
     float startingDistance  = 0.0;
     float distance          = 0.0;
     float vehicleDistance   = 0.0;

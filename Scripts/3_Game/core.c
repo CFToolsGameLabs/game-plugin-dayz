@@ -4,6 +4,7 @@ class GameLabsCore {
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
     private ref GameLabsConfiguration configuration;
+    private ref GLLoadoutManager loadoutManager;
 
     private bool blockProcessing = false;
     private bool isServer = false;
@@ -119,6 +120,12 @@ class GameLabsCore {
             FileHandle file = OpenFile("$profile:@GameLabsStorage\\@DO_NOT_PLACE_GAMELABS_CFG_HERE", FileMode.WRITE);
             CloseFile(file);
         }
+
+        this.loadoutManager = new GLLoadoutManager(this.logger);
+        if(this.isServer) {
+            this.loadoutManager.EnsureExamplePreset();
+            this.loadoutManager.LoadPresets();
+        }
     }
 
     string GetVersionIdentifier() { return this.modControlledVersionIdentifier; }
@@ -127,6 +134,7 @@ class GameLabsCore {
     GameLabsAPI GetApi() { return this.api; }
     GameLabsLogger GetLogger() { return this.logger; }
     GameLabsConfiguration GetConfiguration() { return this.configuration; }
+    GLLoadoutManager GetLoadoutManager() { return this.loadoutManager; }
 
     // Config getter passthrough
     bool GetDebugStatus() { return this.configuration.GetDebugStatus(); }

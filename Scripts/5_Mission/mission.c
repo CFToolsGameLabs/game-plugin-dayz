@@ -127,6 +127,8 @@ modded class MissionServer {
         CFCloud_SpawnPlayerItem().Register();
         CFCloud_StripPlayer().Register();
         CFCloud_ExplodePlayer().Register();
+        CFCloud_SetPlayerVitals().Register();
+        CFCloud_GivePlayerLoadout().Register();
         //CFCloud_PlayerDropItem().Register(); // TODO: not working
 
         // Vehicle
@@ -146,6 +148,7 @@ modded class MissionServer {
         CFCloud_WorldWipeAI().Register();
         CFCloud_WorldWipeVehicles().Register();
         CFCloud_SpawnItemWorld().Register();
+        CFCloud_SpawnVehicle().Register();
 
         // Object
         CFCloud_ObjectDelete().Register();

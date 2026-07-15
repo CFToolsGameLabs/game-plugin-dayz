@@ -341,6 +341,60 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("OnVehicleSwitchSeat(this=%1, seatIndex=%2)", this, seatIndex));
     }
 
+    // Recursively describe an entity (with its attachments and cargo) using the
+    // shared loadout schema so the result can be re-spawned as a loadout preset.
+    GLLoadoutItem GL_BuildLoadoutNode(EntityAI entity) {
+        if(!entity) return NULL;
+
+        GLLoadoutItem node = new GLLoadoutItem();
+        node.className = entity.GetType();
+
+        ItemBase itemBase;
+        if(ItemBase.CastTo(itemBase, entity)) {
+            node.quantity = itemBase.GetQuantity();
+        }
+        node.health = entity.GetHealth01("", "");
+
+        GameInventory inventory = entity.GetInventory();
+        if(inventory) {
+            int attachmentCount = inventory.AttachmentCount();
+            for(int a = 0; a < attachmentCount; a++) {
+                EntityAI attachment = inventory.GetAttachmentFromIndex(a);
+                if(attachment) node.attachments.Insert(GL_BuildLoadoutNode(attachment));
+            }
+
+            CargoBase cargo = inventory.GetCargo();
+            if(cargo) {
+                int cargoCount = cargo.GetItemCount();
+                for(int c = 0; c < cargoCount; c++) {
+                    EntityAI cargoItem = cargo.GetItem(c);
+                    if(cargoItem) node.cargo.Insert(GL_BuildLoadoutNode(cargoItem));
+                }
+            }
+        }
+
+        return node;
+    }
+
+    string GLSerializeInventoryJson() {
+        GLLoadoutPreset preset = new GLLoadoutPreset();
+        preset.name = this.GetPlainId();
+
+        GameInventory inventory = this.GetInventory();
+        if(inventory) {
+            int attachmentCount = inventory.AttachmentCount();
+            for(int a = 0; a < attachmentCount; a++) {
+                EntityAI attachment = inventory.GetAttachmentFromIndex(a);
+                if(attachment) preset.items.Insert(GL_BuildLoadoutNode(attachment));
+            }
+        }
+
+        EntityAI inHands = this.GetItemInHands();
+        if(inHands) preset.items.Insert(GL_BuildLoadoutNode(inHands));
+
+        return preset.ToJson();
+    }
+
     string GLResolveEnvironmentReason() {
         if(this.GetBleedingManagerServer() && this.GetBleedingManagerServer().GetBleedingSourcesCount() > 0)
             return GL_DEATH_REASON_BLOOD_LOSS;
@@ -370,6 +424,7 @@ modded class PlayerBase extends ManBase {
             if (this.StatGet("dist") >= playerStats.startingDistance) {
                 playerStats.distance += (this.StatGet("dist") - playerStats.startingDistance);
             }
+            playerStats.deaths++;
         }
 
         _Payload_PlayerDeath payload;
@@ -456,6 +511,10 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy.EVAL (deathSync=%1, suicide=%2)", this.m_DeathSyncSent, this.CommitedSuicide()));
         if(this.m_DeathSyncSent || this.CommitedSuicide()) return; // Prevent logging of hits for dead bodies
 
+        // Damage taken by the victim, regardless of source type
+        GLPlayerStatistics gl_victimStats = this.GetGLPlayerStatistics();
+        if(gl_victimStats) gl_victimStats.damageTaken += damageResult.GetDamage(dmgZone, "Health");
+
         _Payload_PlayerDamage payload;
         _LogPlayerEx logObjectMurderer;
         _LogPlayerEx logObjectPlayer = new _LogPlayerEx(this);
@@ -471,12 +530,22 @@ modded class PlayerBase extends ManBase {
             string cftoolsId = murderer.GetUpstreamIdentity();
             GLPlayerStatistics playerStatistics = GetGameLabs().GetPlayerStatisticsByCFToolsId(cftoolsId);
 
+            playerStatistics.damageDealt += damageResult.GetDamage(dmgZone, "Health");
+
             if(!IsAlive()) {
                 // Player dead, last shot that actually killed the player
                 if(!this.gl_hitTracked) {
                     this.gl_hitTracked = true;
                     playerStatistics.shotsHit++;
                     playerStatistics.shotsHitPlayers++;
+
+                    playerStatistics.pvpKills++;
+                    if(dmgZone == "Head") playerStatistics.headshotKills++;
+
+                    float killDistance = vector.Distance(murderer.GetPosition(), this.GetPosition());
+                    if(killDistance > playerStatistics.longestKillDistanceMeters) {
+                        playerStatistics.longestKillDistanceMeters = killDistance;
+                    }
                 }
             } else {
                 // Player alive
