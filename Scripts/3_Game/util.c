@@ -37,4 +37,59 @@ class GameLabsUtil {
         }
         return dec;
     }
+
+    // Parses a customizable notification payload of the form:
+    //   <duration>|<icon>|<title>|<text>
+    // The first three '|' delimiters are significant; everything after the third
+    // is treated as the text, so the body may itself contain '|'.
+    // Empty fields fall back to defaults.
+    static bool ParseNotificationCommand(string payload, out float duration, out string icon, out string title, out string text) {
+        duration = 5.0;
+        icon = "";
+        title = "Server";
+        text = "";
+
+        if(payload == "") return false;
+
+        int cursor = 0;
+        string durationRaw = "";
+        int delimiter = payload.IndexOf("|");
+        if(delimiter != -1) {
+            durationRaw = payload.Substring(cursor, delimiter - cursor);
+            cursor = delimiter + 1;
+        } else {
+            durationRaw = payload.Substring(cursor, payload.Length() - cursor);
+            cursor = payload.Length();
+        }
+        if(durationRaw != "") {
+            float parsed = durationRaw.ToFloat();
+            if(parsed > 0) duration = parsed;
+        }
+
+        string iconRaw = "";
+        delimiter = payload.IndexOfFrom(cursor, "|");
+        if(delimiter != -1) {
+            iconRaw = payload.Substring(cursor, delimiter - cursor);
+            cursor = delimiter + 1;
+        } else {
+            iconRaw = payload.Substring(cursor, payload.Length() - cursor);
+            cursor = payload.Length();
+        }
+        if(iconRaw != "") icon = iconRaw;
+
+        string titleRaw = "";
+        delimiter = payload.IndexOfFrom(cursor, "|");
+        if(delimiter != -1) {
+            titleRaw = payload.Substring(cursor, delimiter - cursor);
+            cursor = delimiter + 1;
+        } else {
+            titleRaw = payload.Substring(cursor, payload.Length() - cursor);
+            cursor = payload.Length();
+        }
+        if(titleRaw != "") title = titleRaw;
+
+        text = payload.Substring(cursor, payload.Length() - cursor);
+
+        return true;
+    }
 };

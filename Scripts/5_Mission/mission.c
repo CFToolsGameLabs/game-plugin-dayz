@@ -570,6 +570,13 @@ modded class MissionGameplay extends MissionBase {
                             } else if (messageType == "C") { // Coloured
                                 m_Chat.AddGameLabs(chatParams);
                                 return;
+                            } else if (messageType == "X") { // Customizable notification
+                                string payload = message.Substring(prefix_position + m_Chat.MESSAGE_HANDLER_PREFIX.Length() + 1, message.Length() - (prefix_position + m_Chat.MESSAGE_HANDLER_PREFIX.Length() + 1));
+                                float nDuration; string nIcon; string nTitle; string nText;
+                                if (GameLabsUtil.ParseNotificationCommand(payload, nDuration, nIcon, nTitle, nText)) {
+                                    NotificationSystem.AddNotificationExtended(nDuration, nTitle, nText, nIcon);
+                                }
+                                return;
                             }
                         }
                     }
