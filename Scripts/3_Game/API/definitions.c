@@ -310,17 +310,19 @@ class _Response_ServerPlayers : _Response {
 class _Payload_PlayerDeath : _Payload {
     string weapon;
     string weaponNiceName;
+    string reason;
     float distance;
 
     ref _LogPlayer player;
     ref _LogPlayer murderer;
 
-    void _Payload_PlayerDeath(_LogPlayer _player, _LogPlayer _murderer, string _weapon, string _weaponNiceName) {
+    void _Payload_PlayerDeath(_LogPlayer _player, _LogPlayer _murderer, string _weapon, string _weaponNiceName, string _reason = "") {
         this.player = _player;
         this.murderer = _murderer;
 
         if(_weapon) this.weapon = _weapon;
         if(_weaponNiceName) this.weaponNiceName = _weaponNiceName;
+        if(_reason) this.reason = _reason;
         if(this.murderer) {
             this.distance = vector.Distance(player.position, murderer.position);
         }

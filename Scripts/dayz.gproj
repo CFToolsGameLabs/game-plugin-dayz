@@ -76,7 +76,6 @@ GameProjectClass {
 					Paths {
 						"scripts/editor/Workbench"
 						"scripts/editor/plugins"
-						"GameLabs/Scripts/Workbench/Editor/Plugins"
 					} 
 					EntryPoint ""
 				} 

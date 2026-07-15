@@ -1,0 +1,113 @@
+{
+    "name": "Starter Kit",
+    "items": [
+        {
+            "className": "TShirt_Black",
+            "quantity": -1,
+            "health": -1,
+            "attachments": [],
+            "cargo": []
+        },
+        {
+            "className": "CargoPants_Black",
+            "quantity": -1,
+            "health": -1,
+            "attachments": [],
+            "cargo": []
+        },
+        {
+            "className": "AthleticShoes_Black",
+            "quantity": -1,
+            "health": -1,
+            "attachments": [],
+            "cargo": []
+        },
+        {
+            "className": "PlateCarrierVest",
+            "quantity": -1,
+            "health": -1,
+            "attachments": [
+                {
+                    "className": "PlateCarrierPouches",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                }
+            ],
+            "cargo": [
+                {
+                    "className": "Mag_STANAG_30Rnd",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                },
+                {
+                    "className": "Mag_STANAG_30Rnd",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                }
+            ]
+        },
+        {
+            "className": "M4A1",
+            "quantity": -1,
+            "health": 1.0,
+            "attachments": [
+                {
+                    "className": "M4_RISHndgrd",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                },
+                {
+                    "className": "M4_MPBttstck",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                },
+                {
+                    "className": "ACOGOptic",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                },
+                {
+                    "className": "Mag_STANAG_30Rnd",
+                    "quantity": -1,
+                    "health": -1,
+                    "attachments": [],
+                    "cargo": []
+                }
+            ],
+            "cargo": []
+        },
+        {
+            "className": "TacticalBaconCan",
+            "quantity": -1,
+            "health": -1,
+            "attachments": [],
+            "cargo": []
+        },
+        {
+            "className": "SodaCan_Cola",
+            "quantity": 355,
+            "health": -1,
+            "attachments": [],
+            "cargo": []
+        },
+        {
+            "className": "Rag",
+            "quantity": 6,
+            "health": -1,
+            "attachments": [],
+            "cargo": []
+        }
+    ]
+}

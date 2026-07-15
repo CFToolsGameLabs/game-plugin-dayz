@@ -1,9 +1,10 @@
 class GameLabsCore {
-    private const string modControlledVersionIdentifier = "1.964";
+    private const string modControlledVersionIdentifier = "1.1394";
 
     private ref GameLabsAPI api;
     private ref GameLabsLogger logger;
     private ref GameLabsConfiguration configuration;
+    private ref GLLoadoutManager loadoutManager;
 
     private bool blockProcessing = false;
     private bool isServer = false;
@@ -70,14 +71,18 @@ class GameLabsCore {
         this.isServer = GetGame().IsDedicatedServer();
         this.configuration = GameLabsConfiguration();
         if(!this.configuration.CheckDiskPresence()) {
-            // Shut down when no config is present on server
+            // No config present. On a dedicated server, write a template the
+            // operator can fill in, then continue booting. The server is only
+            // stopped later if the (still empty/default) credentials are invalid.
             if(GetGame().IsDedicatedServer()) {
-                this.errorFlag = true;
+                this.configuration.WriteTemplateToDisk();
             } else {
                 // Instance logger with logging disabled
                 this.logger = GameLabsLogger("GameLabsCore", false);
             }
-        } else {
+        }
+
+        if(this.configuration.CheckDiskPresence()) {
             this.configuration.LoadFromDisk();
             this.logger = GameLabsLogger("GameLabsCore", this.GetDebugStatus());
 
@@ -115,6 +120,12 @@ class GameLabsCore {
             FileHandle file = OpenFile("$profile:@GameLabsStorage\\@DO_NOT_PLACE_GAMELABS_CFG_HERE", FileMode.WRITE);
             CloseFile(file);
         }
+
+        this.loadoutManager = new GLLoadoutManager(this.logger);
+        if(this.isServer) {
+            this.loadoutManager.EnsureExamplePreset();
+            this.loadoutManager.LoadPresets();
+        }
     }
 
     string GetVersionIdentifier() { return this.modControlledVersionIdentifier; }
@@ -123,6 +134,7 @@ class GameLabsCore {
     GameLabsAPI GetApi() { return this.api; }
     GameLabsLogger GetLogger() { return this.logger; }
     GameLabsConfiguration GetConfiguration() { return this.configuration; }
+    GLLoadoutManager GetLoadoutManager() { return this.loadoutManager; }
 
     // Config getter passthrough
     bool GetDebugStatus() { return this.configuration.GetDebugStatus(); }
@@ -406,7 +418,7 @@ class GameLabsCore {
         }
     }
 
-    void AddGameLabsAction(ref GameLabsContextAction action) {
+    void AddGameLabsAction(GameLabsContextAction action) {
         ErrorEx("[Deprecated] :: Use 'AddGameLabsActionEx' instead", ErrorExSeverity.WARNING);	
         this._gamelabsActions.Insert(action);
     }

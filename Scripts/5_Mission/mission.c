@@ -6,6 +6,9 @@ modded class MissionServer {
     private ref GameLabsRPC gameLabsRPC;
     private ref GameLabsReporter gameLabsReporter;
 
+    private bool gl_bootstrapRetryScheduled = false;
+    private int gl_bootstrapAttempts = 0;
+
     private bool gl_MissionLoaded = false;
 
     static ref array<string> _testClients = {
@@ -124,6 +127,8 @@ modded class MissionServer {
         CFCloud_SpawnPlayerItem().Register();
         CFCloud_StripPlayer().Register();
         CFCloud_ExplodePlayer().Register();
+        CFCloud_SetPlayerVitals().Register();
+        CFCloud_GivePlayerLoadout().Register();
         //CFCloud_PlayerDropItem().Register(); // TODO: not working
 
         // Vehicle
@@ -143,6 +148,7 @@ modded class MissionServer {
         CFCloud_WorldWipeAI().Register();
         CFCloud_WorldWipeVehicles().Register();
         CFCloud_SpawnItemWorld().Register();
+        CFCloud_SpawnVehicle().Register();
 
         // Object
         CFCloud_ObjectDelete().Register();
@@ -203,26 +209,44 @@ modded class MissionServer {
             GetGameLabs().GetLogger().Info("Server locked on start");
         }
 
+        this.gameLabs.GetLogger().Debug("Loaded MissionServer");
+
+        this._GLBootstrapAttempt();
+
+        if(GetGameLabs().GetConfiguration().GetSpeedCheckStatus()) {
+            GetGameLabs().GetLogger().Info("Experimental speed check is enabled");
+        }
+    }
+
+    // Runs the GameLabs auth chain (Register -> Enable -> Verify -> _Setup).
+    // On transient failures (unreachable, verify race, internal error) it keeps a
+    // repeating retry timer alive so the reporter/RPC come online once the API recovers.
+    // Genuine misconfiguration (bad credentials, mod licensing, outdated) stays fatal.
+    private void _GLBootstrapAttempt() {
+        // Already bootstrapped by an earlier attempt - nothing to do.
+        if(this.gameLabsReporter) {
+            this._GLStopBootstrapRetry();
+            return;
+        }
+
+        // Credentials not configured yet (e.g. freshly written template).
+        // Do not attempt registration and never stop the server - just leave
+        // GameLabs disabled so the operator can fill in gamelabs.cfg and restart.
+        if(!this.gameLabs.GetConfiguration().GetServerId() || !this.gameLabs.GetConfiguration().GetApiKey()) {
+            this.gameLabs.GetApi().Disable();
+            this.gameLabs.GetLogger().Warn("GameLabs serverId and/or apiKey are not configured. GameLabs will stay disabled while the server keeps running. Fill in gamelabs.cfg and restart to enable it.");
+            this._GLStopBootstrapRetry(); // Empty credentials will not self-heal at runtime
+            return;
+        }
+
+        this.gl_bootstrapAttempts++;
+
         string shutdownHeader, shutdownTitle, shutdownContent, shutdownFooter;
         shutdownHeader = "************* GAME LABS *************";
         shutdownFooter = "*************************************";
-        if(this.gameLabs.errorFlag) {
-            FileHandle file = OpenFile("$profile:@CREATE_GAMELABS_CFG_HERE", FileMode.WRITE);
-            CloseFile(file);
-
-            shutdownTitle = "YOUR SERVER WAS FORCEFULLY CLOSED";
-            shutdownContent = "You are missing a gamelabs.cfg, server can not start without it";
-            Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
-            PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
-            GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
-            GetGame().RequestExit(1);
-            return;
-        } else {
-            this.gameLabs.GetLogger().Debug("Loaded MissionServer");
-        }
 
         RegisterResult apiRegisterResult = this.gameLabs.GetApi().Register();
-        this.gameLabs.GetLogger().Debug(string.Format("API-Register status=%1, error=%2", apiRegisterResult.status, apiRegisterResult.error));
+        this.gameLabs.GetLogger().Debug(string.Format("API-Register status=%1, error=%2, attempt=%3", apiRegisterResult.status, apiRegisterResult.error, this.gl_bootstrapAttempts));
         if(apiRegisterResult.status == 2) { // Credentials OK
             if(this.gameLabs.errorFlag) { // Mod licensing error
                 shutdownTitle = string.Format("Server not authorized to use %1", this.gameLabs.modLicensingOffender);
@@ -231,6 +255,7 @@ modded class MissionServer {
                 Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
                 PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
                 GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
+                this._GLStopBootstrapRetry(); // Fatal - do not retry
                 GetGame().RequestExit(1);
                 return;
             }
@@ -239,6 +264,7 @@ modded class MissionServer {
             if(apiStatus == 1) {
                 this.gameLabs.GetLogger().Info(string.Format("Server up (GameLabs v%1; terrain=%2;)", this.gameLabs.GetVersionIdentifier(), GL_GetTerrainName()));
                 this._Setup();
+                this._GLStopBootstrapRetry(); // Success - stop retrying
             } else {
                 shutdownTitle = string.Format("Failed to verify api registration (apiStatus=%1)", apiStatus);
                 shutdownContent = "A race condition caused a GameLabs error, verify your server is booting in time";
@@ -246,35 +272,47 @@ modded class MissionServer {
                 Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
                 PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
                 GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
-                GetGame().RequestExit(1); // This should never happen
+                // Transient/race condition - keep GameLabs disabled but never stop the server, and retry.
+                this.gameLabs.GetApi().Disable();
+                this.gameLabs.GetLogger().Warn("GameLabs remains disabled, but the server will continue running.");
+                this._GLScheduleBootstrapRetry();
             }
-        } else { // Unreachable
+        } else { // Registration did not return "Credentials OK"
             this.gameLabs.GetApi().Disable();
 
-            bool ignoreConnectionVerification = false;
+            // The server is only stopped when the credentials are actually invalid.
+            // Any other condition (outdated, unreachable, internal error) leaves
+            // GameLabs disabled while the server keeps running.
+            bool credentialsInvalid = false;
+            bool fatal = false;
             if(apiRegisterResult.error) {
                 switch(apiRegisterResult.error) {
                     case "outdated": {
-                        ignoreConnectionVerification = true; // Outdated versions may cause detrimental effects on server performance
-
+                        fatal = true;
                         shutdownTitle = "GAMELABS OUTDATED";
                         shutdownContent = string.Format("Your current installed GameLabs version (version=%1) is outdated", this.gameLabs.GetVersionIdentifier());
                         break;
                     }
 
                     case "invalid": {
+                        credentialsInvalid = true;
+                        fatal = true;
                         shutdownTitle = "INVALID CREDENTIALS";
                         shutdownContent = "The configured serverId does not exist or your configuration is outdated.";
                         break;
                     }
 
                     case "bad-key": {
+                        credentialsInvalid = true;
+                        fatal = true;
                         shutdownTitle = "INVALID CREDENTIALS";
                         shutdownContent = "The configured GameLabs API credentials do not match any of our records. Please review your configuration";
                         break;
                     }
 
                     case "bad-server": {
+                        credentialsInvalid = true;
+                        fatal = true;
                         shutdownTitle = "BAD SERVER CONFIGURATION";
                         shutdownContent = "You are attempting to start GameLabs with API credentials of a different server. Startup is denied to ensure data integrity.";
                         break;
@@ -296,20 +334,39 @@ modded class MissionServer {
             PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
             GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
 
-            if(this.gameLabs.GetConnectionVerificationStatus() == false && !ignoreConnectionVerification) {
+            if(credentialsInvalid && this.gameLabs.GetConnectionVerificationStatus() != false) {
+                this._GLStopBootstrapRetry(); // Fatal - do not retry
+                GetGame().RequestExit(1);
+            } else if(fatal) {
+                // Misconfiguration that cannot self-heal (invalid creds with verification off, or outdated).
+                this._GLStopBootstrapRetry();
                 this.gameLabs.GetLogger().Warn(string.Format("CONNECTION VERIFICATION DISABLED - SERVER WILL NOT EXIT"));
             } else {
-                GetGame().RequestExit(1);
+                // Transient (unreachable / internal error) - keep the server running and retry.
+                this.gameLabs.GetLogger().Warn("GameLabs remains disabled, but the server will continue running.");
+                this._GLScheduleBootstrapRetry();
             }
-            return;
         }
+    }
 
-        if(GetGameLabs().GetConfiguration().GetSpeedCheckStatus()) {
-            GetGameLabs().GetLogger().Info("Experimental speed check is enabled");
+    private void _GLScheduleBootstrapRetry() {
+        if(this.gl_bootstrapRetryScheduled) return; // Already scheduled
+        this.gameLabs.GetLogger().Warn("GameLabs bootstrap failed transiently, will retry every 30s until the API recovers.");
+        // MissionServer does not extend Managed, so Timer.Run() cannot target it.
+        // Use the call queue with a bound func, which repeats without a Managed target.
+        this.gl_bootstrapRetryScheduled = true;
+        GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(this._GLBootstrapAttempt, 30000, true);
+    }
+
+    private void _GLStopBootstrapRetry() {
+        if(this.gl_bootstrapRetryScheduled) {
+            GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(this._GLBootstrapAttempt);
+            this.gl_bootstrapRetryScheduled = false;
         }
     }
 
     void ~MissionServer() {
+        this._GLStopBootstrapRetry();
         if(this.gameLabsReporter) this.gameLabsReporter.Disable();
         if(this.gameLabs) this.gameLabs.Exit();
         if(this.gameLabs.GetLogger()) {
@@ -393,6 +450,7 @@ modded class MissionServer {
     }
 
     private void _Setup() {
+        if(this.gameLabsReporter) return; // Already set up - never create a second reporter/RPC
         this.gameLabsRPC = new GameLabsRPC();
         this.gameLabsReporter = new GameLabsReporter();
     }
