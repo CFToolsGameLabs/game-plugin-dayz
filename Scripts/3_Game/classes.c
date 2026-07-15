@@ -92,7 +92,9 @@ class GameLabsActionContext {
     }
 
     Object GetReferencedObject() {
-        return Object.Cast(this.referencedObject);
+        Object obj;
+        Class.CastTo(obj, this.referencedObject);
+        return obj;
     }
 };
 
