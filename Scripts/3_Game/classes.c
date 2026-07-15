@@ -92,9 +92,7 @@ class GameLabsActionContext {
     }
 
     Object GetReferencedObject() {
-        Object casted = Object.Cast(this.referencedObject);
-        if(casted == NULL) return this.referencedObject;
-        return casted;
+        return Object.Cast(this.referencedObject);
     }
 };
 
