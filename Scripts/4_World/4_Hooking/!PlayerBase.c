@@ -4,6 +4,22 @@ modded class PlayerBase extends ManBase {
         "76561198084367441"
     };
 
+    static const string GL_DEATH_REASON_PLAYER = "PLAYER";
+    static const string GL_DEATH_REASON_EXPANSION_AI = "EXPANSION_AI";
+    static const string GL_DEATH_REASON_INFECTED = "INFECTED";
+    static const string GL_DEATH_REASON_ANIMAL = "ANIMAL";
+    static const string GL_DEATH_REASON_OBJECT = "OBJECT";
+    static const string GL_DEATH_REASON_SUICIDE = "SUICIDE";
+    static const string GL_DEATH_REASON_EXPLOSION = "EXPLOSION";
+    static const string GL_DEATH_REASON_FALL_DAMAGE = "FALL_DAMAGE";
+    static const string GL_DEATH_REASON_BLOOD_LOSS = "BLOOD_LOSS";
+    static const string GL_DEATH_REASON_STARVATION = "STARVATION";
+    static const string GL_DEATH_REASON_DEHYDRATION = "DEHYDRATION";
+    static const string GL_DEATH_REASON_SICKNESS = "SICKNESS";
+    static const string GL_DEATH_REASON_POISONING = "POISONING";
+    static const string GL_DEATH_REASON_HYPOTHERMIA = "HYPOTHERMIA";
+    static const string GL_DEATH_REASON_ENVIRONMENT = "ENVIRONMENT";
+
     private int gl_lastDamageType;
     private string gl_lastDamageAmmo;
     private EntityAI gl_lastDamagingEntity;
@@ -325,6 +341,28 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("OnVehicleSwitchSeat(this=%1, seatIndex=%2)", this, seatIndex));
     }
 
+    string GLResolveEnvironmentReason() {
+        if(this.GetBleedingManagerServer() && this.GetBleedingManagerServer().GetBleedingSourcesCount() > 0)
+            return GL_DEATH_REASON_BLOOD_LOSS;
+        if(this.GetHealth("GlobalHealth", "Blood") <= 0)
+            return GL_DEATH_REASON_BLOOD_LOSS;
+
+        ModifiersManager mm = this.GetModifiersManager();
+        if(mm) {
+            if(mm.IsModifierActive(eModifiers.MDF_POISONING) || mm.IsModifierActive(eModifiers.MDF_TOXICITY) || mm.IsModifierActive(eModifiers.MDF_CONTAMINATION1) || mm.IsModifierActive(eModifiers.MDF_CONTAMINATION2) || mm.IsModifierActive(eModifiers.MDF_CONTAMINATION3) || mm.IsModifierActive(eModifiers.MDF_AREAEXPOSURE))
+                return GL_DEATH_REASON_POISONING;
+            if(mm.IsModifierActive(eModifiers.MDF_CHOLERA) || mm.IsModifierActive(eModifiers.MDF_INFLUENZA) || mm.IsModifierActive(eModifiers.MDF_SALMONELLA) || mm.IsModifierActive(eModifiers.MDF_WOUND_INFECTION1) || mm.IsModifierActive(eModifiers.MDF_WOUND_INFECTION2) || mm.IsModifierActive(eModifiers.MDF_BRAIN) || mm.IsModifierActive(eModifiers.MDF_FEVER))
+                return GL_DEATH_REASON_SICKNESS;
+        }
+
+        if(this.GetStatEnergy() && this.GetStatEnergy().Get() <= 0) return GL_DEATH_REASON_STARVATION;
+        if(this.GetStatWater() && this.GetStatWater().Get() <= 0) return GL_DEATH_REASON_DEHYDRATION;
+        if(this.GetStatHeatComfort() && this.GetStatHeatComfort().Get() <= this.GetStatHeatComfort().GetMin())
+            return GL_DEATH_REASON_HYPOTHERMIA;
+
+        return GL_DEATH_REASON_ENVIRONMENT;
+    }
+
     void GLProcessKill(Object killer) {
         string cftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(this.GetPlainId());
         if(cftoolsId) {
@@ -350,14 +388,18 @@ modded class PlayerBase extends ManBase {
 
         if(murderer) {
             logObjectMurderer = new _LogPlayerEx(murderer);
-            payload = new _Payload_PlayerDeath(logObjectPlayer, logObjectMurderer, killer.GetType(), killer.GetDisplayName());
+            string murdererReason = GL_DEATH_REASON_PLAYER;
+            #ifdef EXPANSIONMODAI
+            if(murderer.Expansion_IsAI()) murdererReason = GL_DEATH_REASON_EXPANSION_AI;
+            #endif
+            payload = new _Payload_PlayerDeath(logObjectPlayer, logObjectMurderer, killer.GetType(), killer.GetDisplayName(), murdererReason);
         } else if(this == killer) { // Suicide, potentially Environmental death
             if(weapon) {
-                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, killer.GetType(), killer.GetDisplayName());
+                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, killer.GetType(), killer.GetDisplayName(), GL_DEATH_REASON_SUICIDE);
             } else if(this.CommitedSuicide() || this.CommitedSuicide()) {
                 weapon = this.GetItemInHands();
-                if(weapon) payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Suicide", weapon.GetType());
-                else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Suicide", "");
+                if(weapon) payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Suicide", weapon.GetType(), GL_DEATH_REASON_SUICIDE);
+                else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Suicide", "", GL_DEATH_REASON_SUICIDE);
             }
             else {
                 if(this.gl_lastDamageType) {
@@ -366,28 +408,28 @@ modded class PlayerBase extends ManBase {
 
                     switch(this.gl_lastDamageType) {
                         case DT_EXPLOSION: {
-                            payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Explosion", refType);
+                            payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Explosion", refType, GL_DEATH_REASON_EXPLOSION);
                             break;
                         }
                         case DT_CUSTOM: {
-                            if(this.gl_lastDamageAmmo == "FallDamage") payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__FallDamage", refType);
-                            else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Environment", refType);
+                            if(this.gl_lastDamageAmmo == "FallDamage") payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__FallDamage", refType, GL_DEATH_REASON_FALL_DAMAGE);
+                            else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Environment", refType, this.GLResolveEnvironmentReason());
                             break;
                         }
                         default: {
-                            payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Environment", refType);
+                            payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Environment", refType, this.GLResolveEnvironmentReason());
                             break;
                         }
                     }
-                } else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Environment", "");
+                } else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Environment", "", this.GLResolveEnvironmentReason());
             }
 
         } else { // Non player AI
             if(killer.IsInherited(ZombieBase)) {
-                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Infected", killer.GetType());
+                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Infected", killer.GetType(), GL_DEATH_REASON_INFECTED);
             } else if(killer.IsInherited(AnimalBase)) {
-                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Animal", killer.GetDisplayName());
-            } else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Object", killer.GetType());
+                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Animal", killer.GetDisplayName(), GL_DEATH_REASON_ANIMAL);
+            } else payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, "__Object", killer.GetType(), GL_DEATH_REASON_OBJECT);
         }
 
         GetGameLabs().GetApi().PlayerDeath(new _Callback(), payload);
