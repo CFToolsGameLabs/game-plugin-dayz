@@ -6,7 +6,7 @@ modded class MissionServer {
     private ref GameLabsRPC gameLabsRPC;
     private ref GameLabsReporter gameLabsReporter;
 
-    private ref Timer gl_bootstrapRetry;
+    private bool gl_bootstrapRetryScheduled = false;
     private int gl_bootstrapAttempts = 0;
 
     private bool gl_MissionLoaded = false;
@@ -229,6 +229,16 @@ modded class MissionServer {
             return;
         }
 
+        // Credentials not configured yet (e.g. freshly written template).
+        // Do not attempt registration and never stop the server - just leave
+        // GameLabs disabled so the operator can fill in gamelabs.cfg and restart.
+        if(!this.gameLabs.GetConfiguration().GetServerId() || !this.gameLabs.GetConfiguration().GetApiKey()) {
+            this.gameLabs.GetApi().Disable();
+            this.gameLabs.GetLogger().Warn("GameLabs serverId and/or apiKey are not configured. GameLabs will stay disabled while the server keeps running. Fill in gamelabs.cfg and restart to enable it.");
+            this._GLStopBootstrapRetry(); // Empty credentials will not self-heal at runtime
+            return;
+        }
+
         this.gl_bootstrapAttempts++;
 
         string shutdownHeader, shutdownTitle, shutdownContent, shutdownFooter;
@@ -340,16 +350,18 @@ modded class MissionServer {
     }
 
     private void _GLScheduleBootstrapRetry() {
-        if(this.gl_bootstrapRetry) return; // Already scheduled
+        if(this.gl_bootstrapRetryScheduled) return; // Already scheduled
         this.gameLabs.GetLogger().Warn("GameLabs bootstrap failed transiently, will retry every 30s until the API recovers.");
-        this.gl_bootstrapRetry = new Timer(CALL_CATEGORY_SYSTEM);
-        this.gl_bootstrapRetry.Run(30, this, "_GLBootstrapAttempt", NULL, true);
+        // MissionServer does not extend Managed, so Timer.Run() cannot target it.
+        // Use the call queue with a bound func, which repeats without a Managed target.
+        this.gl_bootstrapRetryScheduled = true;
+        GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(this._GLBootstrapAttempt, 30000, true);
     }
 
     private void _GLStopBootstrapRetry() {
-        if(this.gl_bootstrapRetry) {
-            this.gl_bootstrapRetry.Stop();
-            this.gl_bootstrapRetry = NULL;
+        if(this.gl_bootstrapRetryScheduled) {
+            GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(this._GLBootstrapAttempt);
+            this.gl_bootstrapRetryScheduled = false;
         }
     }
 
