@@ -406,7 +406,7 @@ class GameLabsCore {
         }
     }
 
-    void AddGameLabsAction(ref GameLabsContextAction action) {
+    void AddGameLabsAction(GameLabsContextAction action) {
         ErrorEx("[Deprecated] :: Use 'AddGameLabsActionEx' instead", ErrorExSeverity.WARNING);	
         this._gamelabsActions.Insert(action);
     }
