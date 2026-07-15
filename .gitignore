@@ -5,4 +5,8 @@ GSource
 thing.obf
 .idea
 Scripts\3_Game\3_Hooking\!AnalyticsClient.c
+*AnalyticsClient.c
 /@GameSource/
+gamelabs_direct/
+gamelabs_dynamicinspector/
+gamelabs_prism/
