@@ -1,0 +1,29 @@
+PanelWidgetClass GameLabsReportMenuButtonRoot {
+ clipchildren 0
+ color 0 0 0 0
+ position 20 20
+ size 220 44
+ valign bottom_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ priority 50
+ {
+  ButtonWidgetClass bReport {
+   visible 1
+   color 0.7569 0.0941 0.0941 0.9
+   position 0 0
+   size 220 44
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   userID 1
+   style EmptyHighlight
+   text "Report Player"
+   text_proportion 0.5
+   font "gui/fonts/sdf_MetronBook24"
+  }
+ }
+}

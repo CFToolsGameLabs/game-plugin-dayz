@@ -642,3 +642,19 @@ class _Payload_DiscordWebHook : _Payload {
     }
     override string ToJson() { return JsonFileLoader<_Payload_DiscordWebHook>.JsonMakeData(this); }
 };
+
+// Internal (non-Discord) reporting webhook payload. Posted as plain JSON to the
+// configured reportingWebhookUrl when reportingWebhookUrlType == "internal".
+class _Payload_ReportInternal : _Payload {
+    string steam64;
+    string cftoolsId;
+    string date;
+    string element;
+    string message;
+    string reporterName;
+    string target;      // target steam64 (server-side only), empty when no target
+    string targetName;
+    string targetCftoolsId;
+
+    override string ToJson() { return JsonFileLoader<_Payload_ReportInternal>.JsonMakeData(this); }
+};

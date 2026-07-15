@@ -490,9 +490,47 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetApi().PlayerDeath(new _Callback(), payload);
     }
 
+    // Sends killer context to the victim's client so the death-screen report can
+    // pre-fill the target. Only a display name and an opaque pseudo id are sent;
+    // the real steam id never leaves the server.
+    void GLSendReportDeathContext(Object killer) {
+        if(!GetGame().IsServer()) return;
+        if(!this.GetIdentity()) return;
+
+        GameLabsReportDeathContext deathContext = new GameLabsReportDeathContext();
+        deathContext.hasPlayerKiller = false;
+
+        PlayerBase murderer;
+        if(killer) {
+            if(killer.IsWeapon() || killer.IsMeleeWeapon()) {
+                EntityAI killerWeapon = EntityAI.Cast(killer);
+                if(killerWeapon) murderer = PlayerBase.Cast(killerWeapon.GetHierarchyParent());
+            }
+            if(!murderer) murderer = PlayerBase.Cast(killer);
+        }
+
+        if(murderer && murderer != this && murderer.GetIdentity()) {
+            string killerSteam64 = murderer.GetPlainId();
+            if(killerSteam64 != "") {
+                deathContext.hasPlayerKiller = true;
+                deathContext.killerName = murderer.GetPlayerName();
+                deathContext.killerPseudoId = GetGameLabs().RegisterReportPseudo(killerSteam64);
+            }
+        }
+
+        Param1<ref GameLabsReportDeathContext> payload = new Param1<ref GameLabsReportDeathContext>(deathContext);
+        GetGame().RPCSingleParam(null, GameLabsRPCS.RE_REPORTDEATHCTX, payload, true, this.GetIdentity());
+    }
+
     override void EEKilled(Object killer) {
         super.EEKilled(killer);
         if(!GetGame().IsServer()) return;
+
+        // In-game reporting death context is independent of statistics reporting.
+        if(GetGameLabs() && GetGameLabs().GetConfiguration() && GetGameLabs().GetConfiguration().IsReportingAvailable()) {
+            this.GLSendReportDeathContext(killer);
+        }
+
         if(!GetGameLabs().IsStatReportingEnabled()) return;
         if(this.gl_deathProcessed) return;
         this.gl_deathProcessed = true;
