@@ -37,6 +37,7 @@ class GameLabsConfiguration {
 
     [NonSerialized()]
     private const string path = "$profile:gamelabs.cfg";
+    [NonSerialized()]
     private const string metricsPath = "$profile:gamelabs_metrics.json";
 
     void GameLabsConfiguration() {
@@ -50,6 +51,12 @@ class GameLabsConfiguration {
     void LoadFromDisk() {
         JsonFileLoader<GameLabsConfiguration>.JsonLoadFile(this.path, this);
         this._ValidateAndExtend();
+    }
+
+    // Writes the current (default) configuration to disk as a template so the
+    // operator can fill in their credentials, instead of the server refusing to start.
+    void WriteTemplateToDisk() {
+        JsonFileLoader<GameLabsConfiguration>.JsonSaveFile(this.path, this);
     }
 
     float GetPlayerTickInterval() { return this.playerTickInterval; }

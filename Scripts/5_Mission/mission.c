@@ -206,20 +206,7 @@ modded class MissionServer {
         string shutdownHeader, shutdownTitle, shutdownContent, shutdownFooter;
         shutdownHeader = "************* GAME LABS *************";
         shutdownFooter = "*************************************";
-        if(this.gameLabs.errorFlag) {
-            FileHandle file = OpenFile("$profile:@CREATE_GAMELABS_CFG_HERE", FileMode.WRITE);
-            CloseFile(file);
-
-            shutdownTitle = "YOUR SERVER WAS FORCEFULLY CLOSED";
-            shutdownContent = "You are missing a gamelabs.cfg, server can not start without it";
-            Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
-            PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
-            GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
-            GetGame().RequestExit(1);
-            return;
-        } else {
-            this.gameLabs.GetLogger().Debug("Loaded MissionServer");
-        }
+        this.gameLabs.GetLogger().Debug("Loaded MissionServer");
 
         RegisterResult apiRegisterResult = this.gameLabs.GetApi().Register();
         this.gameLabs.GetLogger().Debug(string.Format("API-Register status=%1, error=%2", apiRegisterResult.status, apiRegisterResult.error));
@@ -246,35 +233,40 @@ modded class MissionServer {
                 Print(shutdownHeader); Print(shutdownTitle); Print(shutdownContent); Print(shutdownFooter);
                 PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
                 GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
-                GetGame().RequestExit(1); // This should never happen
+                // Transient/race condition - keep GameLabs disabled but never stop the server.
+                this.gameLabs.GetLogger().Warn("GameLabs remains disabled, but the server will continue running.");
             }
-        } else { // Unreachable
+        } else { // Registration did not return "Credentials OK"
             this.gameLabs.GetApi().Disable();
 
-            bool ignoreConnectionVerification = false;
+            // The server is only stopped when the credentials are actually invalid.
+            // Any other condition (outdated, unreachable, internal error) leaves
+            // GameLabs disabled while the server keeps running.
+            bool credentialsInvalid = false;
             if(apiRegisterResult.error) {
                 switch(apiRegisterResult.error) {
                     case "outdated": {
-                        ignoreConnectionVerification = true; // Outdated versions may cause detrimental effects on server performance
-
                         shutdownTitle = "GAMELABS OUTDATED";
                         shutdownContent = string.Format("Your current installed GameLabs version (version=%1) is outdated", this.gameLabs.GetVersionIdentifier());
                         break;
                     }
 
                     case "invalid": {
+                        credentialsInvalid = true;
                         shutdownTitle = "INVALID CREDENTIALS";
                         shutdownContent = "The configured serverId does not exist or your configuration is outdated.";
                         break;
                     }
 
                     case "bad-key": {
+                        credentialsInvalid = true;
                         shutdownTitle = "INVALID CREDENTIALS";
                         shutdownContent = "The configured GameLabs API credentials do not match any of our records. Please review your configuration";
                         break;
                     }
 
                     case "bad-server": {
+                        credentialsInvalid = true;
                         shutdownTitle = "BAD SERVER CONFIGURATION";
                         shutdownContent = "You are attempting to start GameLabs with API credentials of a different server. Startup is denied to ensure data integrity.";
                         break;
@@ -296,10 +288,12 @@ modded class MissionServer {
             PrintToRPT(shutdownHeader); PrintToRPT(shutdownTitle); PrintToRPT(shutdownContent); PrintToRPT(shutdownFooter);
             GetGame().AdminLog(shutdownHeader); GetGame().AdminLog(shutdownTitle); GetGame().AdminLog(shutdownContent); GetGame().AdminLog(shutdownFooter);
 
-            if(this.gameLabs.GetConnectionVerificationStatus() == false && !ignoreConnectionVerification) {
+            if(credentialsInvalid && this.gameLabs.GetConnectionVerificationStatus() != false) {
+                GetGame().RequestExit(1);
+            } else if(credentialsInvalid) {
                 this.gameLabs.GetLogger().Warn(string.Format("CONNECTION VERIFICATION DISABLED - SERVER WILL NOT EXIT"));
             } else {
-                GetGame().RequestExit(1);
+                this.gameLabs.GetLogger().Warn("GameLabs remains disabled, but the server will continue running.");
             }
             return;
         }

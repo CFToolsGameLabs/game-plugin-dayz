@@ -70,14 +70,18 @@ class GameLabsCore {
         this.isServer = GetGame().IsDedicatedServer();
         this.configuration = GameLabsConfiguration();
         if(!this.configuration.CheckDiskPresence()) {
-            // Shut down when no config is present on server
+            // No config present. On a dedicated server, write a template the
+            // operator can fill in, then continue booting. The server is only
+            // stopped later if the (still empty/default) credentials are invalid.
             if(GetGame().IsDedicatedServer()) {
-                this.errorFlag = true;
+                this.configuration.WriteTemplateToDisk();
             } else {
                 // Instance logger with logging disabled
                 this.logger = GameLabsLogger("GameLabsCore", false);
             }
-        } else {
+        }
+
+        if(this.configuration.CheckDiskPresence()) {
             this.configuration.LoadFromDisk();
             this.logger = GameLabsLogger("GameLabsCore", this.GetDebugStatus());
 
