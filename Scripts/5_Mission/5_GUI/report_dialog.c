@@ -46,15 +46,27 @@ class GameLabsReportDialog : ScriptedWidgetEventHandler {
 
         if(element == "deathScreen") {
             if(m_Caption) m_Caption.SetText("Report your killer");
-            if(deathContext && deathContext.hasPlayerKiller) {
-                if(m_TargetLabel) m_TargetLabel.SetText(string.Format("Target: %1", deathContext.killerName));
-                m_FixedTargetPseudo = deathContext.killerPseudoId;
-            } else {
-                if(m_TargetLabel) m_TargetLabel.SetText("Target: none (no player killer)");
-                m_FixedTargetPseudo = "";
-            }
-            if(m_TargetLabel) m_TargetLabel.Show(true);
+            // Never show a selectable target list on the death screen.
             if(m_TargetCombo) m_TargetCombo.Show(false);
+
+            if(deathContext && deathContext.hasPlayerKiller) {
+                // Pseudo id still binds the report; do not render any killer identity.
+                m_FixedTargetPseudo = deathContext.killerPseudoId;
+                if(m_Client && m_Client.IsDeathScreenAnonymous()) {
+                    if(m_TargetLabel) m_TargetLabel.Show(false);
+                } else {
+                    if(m_TargetLabel) {
+                        m_TargetLabel.SetText(string.Format("Target: %1", deathContext.killerName));
+                        m_TargetLabel.Show(true);
+                    }
+                }
+            } else {
+                m_FixedTargetPseudo = "";
+                if(m_TargetLabel) {
+                    m_TargetLabel.SetText("Target: none (no player killer)");
+                    m_TargetLabel.Show(true);
+                }
+            }
         } else {
             if(m_Caption) m_Caption.SetText("Report a player");
             if(m_TargetLabel) m_TargetLabel.Show(false);

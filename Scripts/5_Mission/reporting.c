@@ -8,6 +8,7 @@ void GLSendReportConfig(PlayerIdentity identity) {
     reportConfig.available = cfg.IsReportingAvailable();
     reportConfig.deathScreen = cfg.IsReportingElementEnabled("deathScreen");
     reportConfig.escapeMenu = cfg.IsReportingElementEnabled("escapeMenu");
+    reportConfig.deathScreenAnonymous = cfg.GetReportingDeathScreenAnonymous();
 
     Param1<ref GameLabsReportConfig> payload = new Param1<ref GameLabsReportConfig>(reportConfig);
     GetGame().RPCSingleParam(null, GameLabsRPCS.RE_REPORTCONFIG, payload, true, identity);

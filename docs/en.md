@@ -32,6 +32,7 @@ For the configuration, create a file called **gamelabs.cfg** in your profiles di
 	"reportingWebhookUrl": "",
 	"reportingWebhookUrlType": "discord",
 	"reportingEnabled": 0,
+	"reportingDeathScreenAnonymous": 0,
 	"reportingElements": [
 		"deathScreen",
 		"escapeMenu"
@@ -93,6 +94,8 @@ The display options can be overriden by modding the elements GameLabs has implem
 
 - `deathScreen` will render a report button when a player is killed (PVP kills only)
 - `escapeMenu` will render a report button when the player opens their menu via ESC
+
+Set `reportingDeathScreenAnonymous` to `1` to hide the killer entirely on the death-screen report dialog (no name, no target selection). The report is still bound to the killer server-side.
 
 **GameLabs MUST be launched on the client side for reporting**
 

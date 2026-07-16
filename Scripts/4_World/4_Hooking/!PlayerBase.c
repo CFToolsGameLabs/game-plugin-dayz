@@ -495,9 +495,7 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetApi().PlayerDeath(new _Callback(), payload);
     }
 
-    // Sends killer context to the victim's client so the death-screen report can
-    // pre-fill the target. Only a display name and an opaque pseudo id are sent;
-    // the real steam id never leaves the server.
+
     void GLSendReportDeathContext(Object killer) {
         if(!GetGame().IsServer()) return;
         if(!this.GetIdentity()) return;
@@ -518,8 +516,10 @@ modded class PlayerBase extends ManBase {
             string killerSteam64 = murderer.GetPlainId();
             if(killerSteam64 != "") {
                 deathContext.hasPlayerKiller = true;
-                deathContext.killerName = murderer.GetPlayerName();
                 deathContext.killerPseudoId = GetGameLabs().RegisterReportPseudo(killerSteam64);
+                if(!GetGameLabs().GetConfiguration().GetReportingDeathScreenAnonymous()) {
+                    deathContext.killerName = murderer.GetPlayerName();
+                }
             }
         }
 

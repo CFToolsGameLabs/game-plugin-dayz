@@ -34,6 +34,7 @@ class GameLabsConfiguration {
     private string reportingWebhookUrl = "";
     private string reportingWebhookUrlType = "discord"; // discord | internal
     private bool reportingEnabled = false;
+    private bool reportingDeathScreenAnonymous = false;
     private ref array<string> reportingElements;
 
     private bool lockServerOnStart = false;
@@ -83,6 +84,7 @@ class GameLabsConfiguration {
     string GetReportingWebhookUrl() { return this.reportingWebhookUrl; }
     string GetReportingWebhookUrlType() { return this.reportingWebhookUrlType; }
     bool GetReportingEnabled() { return this.reportingEnabled; }
+    bool GetReportingDeathScreenAnonymous() { return this.reportingDeathScreenAnonymous; }
     // Reporting is only offered to clients when it is enabled and a webhook is configured.
     bool IsReportingAvailable() { return this.reportingEnabled && this.reportingWebhookUrl != ""; }
     bool IsReportingElementEnabled(string element) {

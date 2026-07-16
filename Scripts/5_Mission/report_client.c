@@ -10,7 +10,7 @@ class GameLabsReportClient {
     void SetConfig(GameLabsReportConfig cfg) {
         this.config = cfg;
         if(GetGameLabs() && GetGameLabs().GetLogger()) {
-            GetGameLabs().GetLogger().Info(string.Format("[Reporting] Config received (available=%1, deathScreen=%2, escapeMenu=%3)", cfg.available, cfg.deathScreen, cfg.escapeMenu));
+            GetGameLabs().GetLogger().Info(string.Format("[Reporting] Config received (available=%1, deathScreen=%2, escapeMenu=%3, deathScreenAnonymous=%4)", cfg.available, cfg.deathScreen, cfg.escapeMenu, cfg.deathScreenAnonymous));
         }
     }
 
@@ -19,6 +19,7 @@ class GameLabsReportClient {
     bool IsAvailable() { return this.config != NULL && this.config.available; }
     bool IsDeathScreenEnabled() { return this.IsAvailable() && this.config.deathScreen; }
     bool IsEscapeMenuEnabled() { return this.IsAvailable() && this.config.escapeMenu; }
+    bool IsDeathScreenAnonymous() { return this.config != NULL && this.config.deathScreenAnonymous; }
 
     void SetDeathContext(GameLabsReportDeathContext ctx) { this.deathContext = ctx; }
     void ClearDeathContext() { this.deathContext = NULL; }

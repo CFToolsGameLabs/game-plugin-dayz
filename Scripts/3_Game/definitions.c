@@ -46,6 +46,8 @@ class GameLabsReportConfig {
     bool available;
     bool deathScreen;
     bool escapeMenu;
+    // When true, death-screen reports hide the killer's display name from the victim.
+    bool deathScreenAnonymous;
 };
 
 // A single reportable target as shown to the client. Only a name and an opaque
