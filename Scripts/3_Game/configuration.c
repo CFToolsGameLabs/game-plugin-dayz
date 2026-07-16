@@ -30,6 +30,12 @@ class GameLabsConfiguration {
 
     private string reportingEndpointMagicBullet = "";
 
+    // In-game player reporting (death screen / escape menu / hotkey)
+    private string reportingWebhookUrl = "";
+    private string reportingWebhookUrlType = "discord"; // discord | internal
+    private bool reportingEnabled = false;
+    private ref array<string> reportingElements;
+
     private bool lockServerOnStart = false;
     private bool debugAutoCompleteConstruction = false;
 
@@ -42,6 +48,9 @@ class GameLabsConfiguration {
 
     void GameLabsConfiguration() {
         // TODO: Ensure configuration structure
+        this.reportingElements = new array<string>;
+        this.reportingElements.Insert("deathScreen");
+        this.reportingElements.Insert("escapeMenu");
     }
 
     bool CheckDiskPresence() {
@@ -70,6 +79,15 @@ class GameLabsConfiguration {
     bool GetMagicBulletInvalidateEnabled() { return this.enableMagicBulletInvalidation; }
     void SetMagicBulletInvalidateEnabled(bool value) { this.enableMagicBulletInvalidation = value; }
     string GetReportingEndpointMagicBullet() { return this.reportingEndpointMagicBullet; }
+
+    string GetReportingWebhookUrl() { return this.reportingWebhookUrl; }
+    string GetReportingWebhookUrlType() { return this.reportingWebhookUrlType; }
+    bool GetReportingEnabled() { return this.reportingEnabled; }
+    // Reporting is only offered to clients when it is enabled and a webhook is configured.
+    bool IsReportingAvailable() { return this.reportingEnabled && this.reportingWebhookUrl != ""; }
+    bool IsReportingElementEnabled(string element) {
+        return this.reportingElements != NULL && this.reportingElements.Find(element) != -1;
+    }
 
     bool GetChatSanitizeBattlEyeJoinLeave() { return this.chatSanitizeBattlEyeJoinLeave; }
     bool GetChatSanitizeBattlEyePrefix() { return this.chatSanitizeBattlEyePrefix; }
@@ -101,5 +119,9 @@ class GameLabsConfiguration {
         if(this.playerTickInterval < 1) this.playerTickInterval = 2.5;
         if(this.speedCheckThresholdFoot <= 1) this.speedCheckThresholdFoot = 8.0;
         if(this.speedCheckThresholdVehicle <= 1) this.speedCheckThresholdVehicle = 100.0;
+        if(this.reportingElements == NULL) this.reportingElements = new array<string>;
+        if(this.reportingWebhookUrlType != "discord" && this.reportingWebhookUrlType != "internal") {
+            this.reportingWebhookUrlType = "discord";
+        }
     }
 };

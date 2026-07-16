@@ -43,6 +43,7 @@ class CfgMods
 		name = "GameLabs";
 		credits = "GameLabs";
 		creditsJson = "GameLabs/Scripts/Data/Credits.json";
+		inputs = "GameLabs/Scripts/Data/inputs.xml";
 		author = "GameLabs by CFTools";
 		authorID = "0"; 
 		version = "1.0";

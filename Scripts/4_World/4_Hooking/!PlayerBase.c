@@ -442,12 +442,17 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("EEKilled(this=%1, killer=%2, weapon=%3, murderer=%4)", this, killer, weapon, murderer));
 
         if(murderer) {
-            logObjectMurderer = new _LogPlayerEx(murderer);
             string murdererReason = GL_DEATH_REASON_PLAYER;
             #ifdef EXPANSIONMODAI
             if(murderer.Expansion_IsAI()) murdererReason = GL_DEATH_REASON_EXPANSION_AI;
             #endif
-            payload = new _Payload_PlayerDeath(logObjectPlayer, logObjectMurderer, killer.GetType(), killer.GetDisplayName(), murdererReason);
+            
+            if(murderer.GetPlainId() != "") {
+                logObjectMurderer = new _LogPlayerEx(murderer);
+                payload = new _Payload_PlayerDeath(logObjectPlayer, logObjectMurderer, killer.GetType(), killer.GetDisplayName(), murdererReason);
+            } else {
+                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, killer.GetType(), killer.GetDisplayName(), murdererReason);
+            }
         } else if(this == killer) { // Suicide, potentially Environmental death
             if(weapon) {
                 payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, killer.GetType(), killer.GetDisplayName(), GL_DEATH_REASON_SUICIDE);
@@ -490,9 +495,47 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetApi().PlayerDeath(new _Callback(), payload);
     }
 
+    // Sends killer context to the victim's client so the death-screen report can
+    // pre-fill the target. Only a display name and an opaque pseudo id are sent;
+    // the real steam id never leaves the server.
+    void GLSendReportDeathContext(Object killer) {
+        if(!GetGame().IsServer()) return;
+        if(!this.GetIdentity()) return;
+
+        GameLabsReportDeathContext deathContext = new GameLabsReportDeathContext();
+        deathContext.hasPlayerKiller = false;
+
+        PlayerBase murderer;
+        if(killer) {
+            if(killer.IsWeapon() || killer.IsMeleeWeapon()) {
+                EntityAI killerWeapon = EntityAI.Cast(killer);
+                if(killerWeapon) murderer = PlayerBase.Cast(killerWeapon.GetHierarchyParent());
+            }
+            if(!murderer) murderer = PlayerBase.Cast(killer);
+        }
+
+        if(murderer && murderer != this && murderer.GetIdentity()) {
+            string killerSteam64 = murderer.GetPlainId();
+            if(killerSteam64 != "") {
+                deathContext.hasPlayerKiller = true;
+                deathContext.killerName = murderer.GetPlayerName();
+                deathContext.killerPseudoId = GetGameLabs().RegisterReportPseudo(killerSteam64);
+            }
+        }
+
+        Param1<ref GameLabsReportDeathContext> payload = new Param1<ref GameLabsReportDeathContext>(deathContext);
+        GetGame().RPCSingleParam(null, GameLabsRPCS.RE_REPORTDEATHCTX, payload, true, this.GetIdentity());
+    }
+
     override void EEKilled(Object killer) {
         super.EEKilled(killer);
         if(!GetGame().IsServer()) return;
+
+        // In-game reporting death context is independent of statistics reporting.
+        if(GetGameLabs() && GetGameLabs().GetConfiguration() && GetGameLabs().GetConfiguration().IsReportingAvailable()) {
+            this.GLSendReportDeathContext(killer);
+        }
+
         if(!GetGameLabs().IsStatReportingEnabled()) return;
         if(this.gl_deathProcessed) return;
         this.gl_deathProcessed = true;
@@ -507,6 +550,7 @@ modded class PlayerBase extends ManBase {
         super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
         if(!GetGame().IsServer()) return;
         if(!GetGameLabs().IsStatReportingEnabled()) return;
+        if(!damageResult) return; // NULL for some scripted damage sources
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy.EVAL (deathSync=%1, suicide=%2)", this.m_DeathSyncSent, this.CommitedSuicide()));
         if(this.m_DeathSyncSent || this.CommitedSuicide()) return; // Prevent logging of hits for dead bodies
@@ -556,6 +600,10 @@ modded class PlayerBase extends ManBase {
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy(this=%1, murderer=%2, source=%3, component=%4, dmgZone=%5, ammo=%6, modelPos=%7, speedCoef=%8)", this, murderer, source, component, dmgZone, ammo, modelPos, speedCoef));
         GetGameLabs().GetLogger().Debug(string.Format("^EEHitBy(GetDamage(%1), GetHighestDamage(%2))", damageResult.GetDamage(dmgZone, "Health"), damageResult.GetHighestDamage("Health")));
+
+        // AI attackers (e.g. Expansion AI) have no upstream identity
+        if(murderer.GetPlainId() == "") return;
+
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);

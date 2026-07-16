@@ -1,0 +1,32 @@
+WindowWidgetClass GameLabsReportDeathScreenRoot {
+ clipchildren 0
+ color 0 0 0 0
+ position 0 0
+ size 260 56
+ halign center_ref
+ valign bottom_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ priority 3900
+ scriptclass "GameLabsReportDeathOverlay"
+ {
+  ButtonWidgetClass bReport {
+   visible 1
+   color 0.7569 0.0941 0.0941 0.9
+   position 0 0
+   size 260 44
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   userID 1
+   style EmptyHighlight
+   text "Report your killer"
+   text_proportion 0.5
+   font "gui/fonts/sdf_MetronBook24"
+  }
+ }
+}

@@ -30,6 +30,7 @@ class _Callback_RegisterAsync : _Callback {
         if(response.status == 2) {
             GetGameLabs().GetLogger().Warn(string.Format("RegisterAsync re-authorized"));
             GetGameLabs()._PropagateFeatures(response); // Access features outside of API class
+            GetGameLabs().GetApi().ApplyRegisterFeatures(response); // Keep poll protocol / KV in sync with sync path
             GetGameLabs().GetApi().SetAuthkey(response.authKey);
             GetGameLabs().GetApi().Enable();
         } else {
@@ -89,6 +90,12 @@ class GameLabsAPI {
         this.pollProtocolVersion = version;
     }
 
+    void ApplyRegisterFeatures(_Response_Register response) {
+        if(!response || !response.features) return;
+        this.SetPollProtocolVersion(response.features.pollProtocolVersion);
+        this.SetKVEnabled(response.features.kvEnabled);
+    }
+
     int GetPollProtocolVersion() {
         return this.pollProtocolVersion;
     }
@@ -108,8 +115,7 @@ class GameLabsAPI {
         _Response_Register response = new _Response_Register(this.restContext.POST_now("/v1/auth/register?trace="+this.gamePort, payload.ToJson()));
         if(response.status == 2) {
             GetGameLabs()._PropagateFeatures(response); // Access features outside of API class
-            this.SetPollProtocolVersion(response.features.pollProtocolVersion);
-            this.SetKVEnabled(response.features.kvEnabled);
+            this.ApplyRegisterFeatures(response);
             this.SetAuthkey(response.authKey);
         }
         return new RegisterResult(response.status, response.error);
