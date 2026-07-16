@@ -5,6 +5,7 @@ modded class MissionServer {
 
     private ref GameLabsRPC gameLabsRPC;
     private ref GameLabsReporter gameLabsReporter;
+    private ref GLReportManager gameLabsReportManager;
 
     private bool gl_bootstrapRetryScheduled = false;
     private int gl_bootstrapAttempts = 0;
@@ -91,6 +92,10 @@ modded class MissionServer {
                 Param2 <bool, ref GameLabsClientSync> payloadSync = new Param2<bool, ref GameLabsClientSync>(GetGameLabs().GetDebugStatus(), clientSync);
                 GetGame().RPCSingleParam(null, GameLabsRPCS.RE_SYNC, payloadSync, true, identity);
             }
+
+            // Reporting config is static server config; push it on every connect
+            // regardless of the identity resolution path taken above.
+            GLSendReportConfig(identity);
         }
 
         super.InvokeOnConnect(player, identity);
@@ -453,6 +458,11 @@ modded class MissionServer {
         if(this.gameLabsReporter) return; // Already set up - never create a second reporter/RPC
         this.gameLabsRPC = new GameLabsRPC();
         this.gameLabsReporter = new GameLabsReporter();
+        this.gameLabsReportManager = new GLReportManager();
+    }
+
+    GLReportManager GetGLReportManager() {
+        return this.gameLabsReportManager;
     }
 
     override void OnMissionStart() {
@@ -482,6 +492,7 @@ modded class MissionGameplay extends MissionBase {
     private ref GameLabsClient gameLabsClient;
 
     private ref GameLabsRPC gameLabsRPC;
+    private ref GameLabsReportClient gameLabsReportClient;
 
     bool chatSanitizeBattlEyeJoinLeave = false;
     bool chatSanitizeBattlEyePrefix = false;
@@ -499,8 +510,18 @@ modded class MissionGameplay extends MissionBase {
         this.gameLabsClient = new GameLabsClient();
 
         this.gameLabsRPC = new GameLabsRPC();
+        this.gameLabsReportClient = new GameLabsReportClient();
         this.gameLabs.GetLogger().Info("Loaded MissionGameplay (Client)");
         this.gameLabs.GetLogger().Info(string.Format("Player name: %1", this.gl_name));
+    }
+
+    GameLabsReportClient GetGLReportClient() {
+        return this.gameLabsReportClient;
+    }
+
+    override void OnUpdate(float timeslice) {
+        super.OnUpdate(timeslice);
+        if(this.gameLabsReportClient) this.gameLabsReportClient.OnUpdate();
     }
 
     void ~MissionGameplay() {

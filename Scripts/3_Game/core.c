@@ -16,6 +16,11 @@ class GameLabsCore {
     private ref map<string, string> upstreamIdentityMap = new map<string, string>;
     private ref map<string, ref GLPlayerStatistics> playerStatisticsMap = new map<string, ref GLPlayerStatistics>;
 
+    // In-game reporting: opaque pseudo id -> steam64. Clients only ever see the
+    // pseudo id and a display name; real steam ids never leave the server.
+    private ref map<string, string> reportPseudoMap = new map<string, string>;
+    private int reportPseudoCounter = 0;
+
     private int _computedServerFps = 0;
     private float _computedTickTimeAvg = 0.0;
     private float _computedTickTimeLow = 0.0;
@@ -175,6 +180,25 @@ class GameLabsCore {
     string GetPlayerGamesessionId(string steam64) {
         if(!this.IsServer()) return "";
         return this.gamesessionIdMap.Get(steam64);
+    }
+
+    // Registers an opaque, non-guessable pseudo id for a steam64 so it can be
+    // referenced by clients (report target dropdown / death screen) without ever
+    // exposing the real steam id. Returns the pseudo id.
+    string RegisterReportPseudo(string steam64) {
+        if(!this.IsServer()) return "";
+        if(steam64 == "") return "";
+        this.reportPseudoCounter++;
+        string pseudo = string.Format("r%1x%2", this.reportPseudoCounter, Math.RandomInt(100000, 999999));
+        this.reportPseudoMap.Set(pseudo, steam64);
+        return pseudo;
+    }
+
+    // Resolves a previously registered pseudo id back to the real steam64.
+    string ResolveReportPseudo(string pseudoId) {
+        if(!this.IsServer()) return "";
+        if(pseudoId == "") return "";
+        return this.reportPseudoMap.Get(pseudoId);
     }
 
     GLPlayerStatistics GetPlayerStatisticsByCFToolsId(string cftoolsId) {

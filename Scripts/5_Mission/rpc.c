@@ -68,6 +68,36 @@ class GameLabsRPC {
                 }
                 return;
             }
+            case GameLabsRPCS.RE_REPORTCONFIG: {
+                Param1<ref GameLabsReportConfig> reportConfigData = new Param1<ref GameLabsReportConfig>(null);
+                if(ctx.Read(reportConfigData) && reportConfigData.param1) {
+                    MissionGameplay reportMission = MissionGameplay.Cast(GetGame().GetMission());
+                    if(reportMission && reportMission.GetGLReportClient()) {
+                        reportMission.GetGLReportClient().SetConfig(reportConfigData.param1);
+                    }
+                }
+                return;
+            }
+            case GameLabsRPCS.RE_REPORTPLAYERS: {
+                Param1<ref array<ref GameLabsReportTarget>> reportPlayersData = new Param1<ref array<ref GameLabsReportTarget>>(null);
+                if(ctx.Read(reportPlayersData) && reportPlayersData.param1) {
+                    MissionGameplay playersMission = MissionGameplay.Cast(GetGame().GetMission());
+                    if(playersMission && playersMission.GetGLReportClient()) {
+                        playersMission.GetGLReportClient().OnReportPlayersReceived(reportPlayersData.param1);
+                    }
+                }
+                return;
+            }
+            case GameLabsRPCS.RE_REPORTDEATHCTX: {
+                Param1<ref GameLabsReportDeathContext> deathCtxData = new Param1<ref GameLabsReportDeathContext>(null);
+                if(ctx.Read(deathCtxData) && deathCtxData.param1) {
+                    MissionGameplay deathMission = MissionGameplay.Cast(GetGame().GetMission());
+                    if(deathMission && deathMission.GetGLReportClient()) {
+                        deathMission.GetGLReportClient().SetDeathContext(deathCtxData.param1);
+                    }
+                }
+                return;
+            }
         }
     }
 
@@ -175,6 +205,47 @@ class GameLabsRPC {
                     }
 
                 }
+                return;
+            }
+            case GameLabsRPCS.RQ_REPORTPLAYERS: {
+                if(!GetGameLabs().GetConfiguration().IsReportingAvailable()) return;
+
+                player = this.GetPlayerByIdentity(sender);
+                if(!player) return;
+
+                MissionServer reportPlayersMission = MissionServer.Cast(GetGame().GetMission());
+                if(!reportPlayersMission || !reportPlayersMission.GetGLReportManager()) return;
+
+                array<ref GameLabsReportTarget> targets = reportPlayersMission.GetGLReportManager().BuildOnlinePlayerList(player);
+                Param1<ref array<ref GameLabsReportTarget>> reportPlayersPayload = new Param1<ref array<ref GameLabsReportTarget>>(targets);
+                GetGame().RPCSingleParam(null, GameLabsRPCS.RE_REPORTPLAYERS, reportPlayersPayload, true, sender);
+                return;
+            }
+            case GameLabsRPCS.RQ_SUBMITREPORT: {
+                Param1<ref GameLabsReportSubmission> submissionData = new Param1<ref GameLabsReportSubmission>(null);
+                if(!ctx.Read(submissionData) || !submissionData.param1) return;
+                if(!GetGameLabs().GetConfiguration().IsReportingAvailable()) return;
+
+                player = this.GetPlayerByIdentity(sender);
+                if(!player) return;
+
+                GameLabsReportSubmission submission = submissionData.param1;
+
+                // Server-authoritative validation - client flags are only UI hints.
+                if(!GetGameLabs().GetConfiguration().IsReportingElementEnabled(submission.element)) {
+                    GetGameLabs().GetLogger().Warn(string.Format("[Reporting] Rejected report from steam64=%1: element '%2' not enabled", player.GetPlainId(), submission.element));
+                    return;
+                }
+                if(submission.message == "") return;
+
+                MissionServer submitMission = MissionServer.Cast(GetGame().GetMission());
+                if(!submitMission || !submitMission.GetGLReportManager()) return;
+
+                GLReportManager reportManager = submitMission.GetGLReportManager();
+                string reportMessage = reportManager.SanitizeMessage(submission.message);
+                string reportTargetSteam64 = reportManager.ResolveTargetSteam64(submission.targetPseudoId);
+                reportManager.SendWebhook(player, submission.element, reportMessage, reportTargetSteam64);
+                return;
             }
         }
     }
