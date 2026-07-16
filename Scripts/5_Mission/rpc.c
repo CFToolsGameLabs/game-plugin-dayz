@@ -243,8 +243,8 @@ class GameLabsRPC {
 
                 GLReportManager reportManager = submitMission.GetGLReportManager();
                 string reportMessage = reportManager.SanitizeMessage(submission.message);
-                PlayerBase reportTarget = reportManager.ResolveTarget(submission.targetPseudoId);
-                reportManager.SendWebhook(player, submission.element, reportMessage, reportTarget);
+                string reportTargetSteam64 = reportManager.ResolveTargetSteam64(submission.targetPseudoId);
+                reportManager.SendWebhook(player, submission.element, reportMessage, reportTargetSteam64);
                 return;
             }
         }

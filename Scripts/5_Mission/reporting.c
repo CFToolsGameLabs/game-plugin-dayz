@@ -21,8 +21,13 @@ class GLReportManager {
 
     // Builds the list of online players a requester may report, assigning a fresh
     // pseudo id to each. Only name + pseudo id are exposed to the client.
+    // The requester is only included (enabling self-reports) when the server is
+    // launched with -gamelabstesting, so testers can report while alone.
     array<ref GameLabsReportTarget> BuildOnlinePlayerList(PlayerBase requester) {
         array<ref GameLabsReportTarget> result = new array<ref GameLabsReportTarget>;
+
+        string tmp;
+        bool allowSelf = GetGame().CommandlineGetParam("gamelabstesting", tmp);
 
         array<Man> players = new array<Man>;
         GetGame().GetWorld().GetPlayerList(players);
@@ -30,26 +35,31 @@ class GLReportManager {
         for(int i = 0; i < players.Count(); i++) {
             PlayerBase player = PlayerBase.Cast(players.Get(i));
             if(!player) continue;
-            if(requester && player == requester) continue;
             if(!player.GetIdentity()) continue;
+
+            bool isSelf = (requester && player == requester);
+            if(isSelf && !allowSelf) continue;
 
             string steam64 = player.GetPlainId();
             if(steam64 == "") continue;
 
             GameLabsReportTarget target = new GameLabsReportTarget();
             target.pseudoId = GetGameLabs().RegisterReportPseudo(steam64);
-            target.name = player.GetPlayerName();
+            if(isSelf) {
+                target.name = string.Format("%1 (You)", player.GetPlayerName());
+            } else {
+                target.name = player.GetPlayerName();
+            }
             result.Insert(target);
         }
 
         return result;
     }
 
-    // Resolves a pseudo id (from a submission) back to the online PlayerBase, or NULL.
-    PlayerBase ResolveTarget(string pseudoId) {
-        string steam64 = GetGameLabs().ResolveReportPseudo(pseudoId);
-        if(steam64 == "") return NULL;
-        return GLGetPlayerBySteam64(steam64);
+    // Resolves a pseudo id (from a submission) back to the target steam64, even if
+    // the target is no longer online. Returns "" when the pseudo is unknown.
+    string ResolveTargetSteam64(string pseudoId) {
+        return GetGameLabs().ResolveReportPseudo(pseudoId);
     }
 
     string SanitizeMessage(string message) {
@@ -64,6 +74,11 @@ class GLReportManager {
         return value.ToString();
     }
 
+    // Human-readable "x, y, z" for Discord embeds (rounded to whole units).
+    private string _FormatPosition(vector position) {
+        return string.Format("%1, %2, %3", Math.Round(position[0]), Math.Round(position[1]), Math.Round(position[2]));
+    }
+
     private string _CurrentDate() {
         int year, month, day, hour, minute, second;
         GetYearMonthDayUTC(year, month, day);
@@ -73,7 +88,8 @@ class GLReportManager {
 
     // Forwards a report to the configured webhook. The reporter identity is taken
     // from the (server-trusted) reporter PlayerBase, never from the client payload.
-    void SendWebhook(PlayerBase reporter, string element, string message, PlayerBase target) {
+    // targetSteam64 identifies who was reported (may be "" when no target was set).
+    void SendWebhook(PlayerBase reporter, string element, string message, string targetSteam64) {
         if(!reporter) return;
 
         GameLabsConfiguration cfg = GetGameLabs().GetConfiguration();
@@ -84,14 +100,24 @@ class GLReportManager {
         string steam64 = reporter.GetPlainId();
         string cftoolsId = reporter.GetUpstreamIdentity();
         string date = this._CurrentDate();
+        vector reporterPosition = reporter.GetPosition();
 
         string targetName = "";
-        string targetSteam64 = "";
         string targetCftoolsId = "";
-        if(target) {
-            targetName = target.GetPlayerName();
-            targetSteam64 = target.GetPlainId();
-            targetCftoolsId = target.GetUpstreamIdentity();
+        vector targetPosition = "0 0 0";
+        bool hasTargetPosition = false;
+        if(targetSteam64 != "") {
+            // Prefer live data from the online player; fall back to cached upstream
+            // identity so the report still states who was reported if they left.
+            PlayerBase target = GLGetPlayerBySteam64(targetSteam64);
+            if(target) {
+                targetName = target.GetPlayerName();
+                targetCftoolsId = target.GetUpstreamIdentity();
+                targetPosition = target.GetPosition();
+                hasTargetPosition = true;
+            } else {
+                targetCftoolsId = GetGameLabs().GetPlayerUpstreamIdentity(targetSteam64);
+            }
         }
 
         RestContext ctx = GetRestApi().GetRestContext(url);
@@ -105,9 +131,11 @@ class GLReportManager {
             payload.element = element;
             payload.message = message;
             payload.reporterName = reporterName;
+            payload.position = reporterPosition;
             payload.target = targetSteam64;
             payload.targetName = targetName;
             payload.targetCftoolsId = targetCftoolsId;
+            if(hasTargetPosition) payload.targetPosition = targetPosition;
             ctx.POST(new _Callback(), "", payload.ToJson());
         } else {
             _Payload_DiscordWebHook webhook = new _Payload_DiscordWebHook();
@@ -115,8 +143,11 @@ class GLReportManager {
             embed.SetTitle("New Player Report");
             embed.SetColor(3447003); // Discord blue
 
-            if(targetName != "") {
-                embed.SetDescription(string.Format("%1 reported %2", reporterName, targetName));
+            string targetDisplay = targetName;
+            if(targetDisplay == "" && targetSteam64 != "") targetDisplay = targetSteam64;
+
+            if(targetDisplay != "") {
+                embed.SetDescription(string.Format("%1 reported %2", reporterName, targetDisplay));
             } else {
                 embed.SetDescription(string.Format("%1 submitted a report", reporterName));
             }
@@ -125,11 +156,13 @@ class GLReportManager {
             embed.AddField("Steam64", steam64, true);
             embed.AddField("CFTools Id", cftoolsId, true);
             embed.AddField("Source", element, true);
+            embed.AddField("Reporter Position", this._FormatPosition(reporterPosition), true);
 
-            if(targetName != "") {
-                embed.AddField("Target", targetName, true);
-                if(targetSteam64 != "") embed.AddField("Target Steam64", targetSteam64, true);
+            if(targetSteam64 != "") {
+                if(targetName != "") embed.AddField("Target", targetName, true);
+                embed.AddField("Target Steam64", targetSteam64, true);
                 if(targetCftoolsId != "") embed.AddField("Target CFTools Id", targetCftoolsId, true);
+                if(hasTargetPosition) embed.AddField("Target Position", this._FormatPosition(targetPosition), true);
             }
 
             embed.AddField("Date", date, false);
@@ -139,6 +172,6 @@ class GLReportManager {
             ctx.POST(new _Callback(), "", webhook.ToJson());
         }
 
-        GetGameLabs().GetLogger().Info(string.Format("[Reporting] Report submitted by %1 [steam64=%2] element=%3 target=%4", reporterName, steam64, element, targetName));
+        GetGameLabs().GetLogger().Info(string.Format("[Reporting] Report submitted by %1 [steam64=%2] element=%3 targetName=%4 targetSteam64=%5", reporterName, steam64, element, targetName, targetSteam64));
     }
 };

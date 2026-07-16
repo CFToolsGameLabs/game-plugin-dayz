@@ -442,12 +442,17 @@ modded class PlayerBase extends ManBase {
         GetGameLabs().GetLogger().Debug(string.Format("EEKilled(this=%1, killer=%2, weapon=%3, murderer=%4)", this, killer, weapon, murderer));
 
         if(murderer) {
-            logObjectMurderer = new _LogPlayerEx(murderer);
             string murdererReason = GL_DEATH_REASON_PLAYER;
             #ifdef EXPANSIONMODAI
             if(murderer.Expansion_IsAI()) murdererReason = GL_DEATH_REASON_EXPANSION_AI;
             #endif
-            payload = new _Payload_PlayerDeath(logObjectPlayer, logObjectMurderer, killer.GetType(), killer.GetDisplayName(), murdererReason);
+            
+            if(murderer.GetPlainId() != "") {
+                logObjectMurderer = new _LogPlayerEx(murderer);
+                payload = new _Payload_PlayerDeath(logObjectPlayer, logObjectMurderer, killer.GetType(), killer.GetDisplayName(), murdererReason);
+            } else {
+                payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, killer.GetType(), killer.GetDisplayName(), murdererReason);
+            }
         } else if(this == killer) { // Suicide, potentially Environmental death
             if(weapon) {
                 payload = new _Payload_PlayerDeath(logObjectPlayer, NULL, killer.GetType(), killer.GetDisplayName(), GL_DEATH_REASON_SUICIDE);
@@ -545,6 +550,7 @@ modded class PlayerBase extends ManBase {
         super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
         if(!GetGame().IsServer()) return;
         if(!GetGameLabs().IsStatReportingEnabled()) return;
+        if(!damageResult) return; // NULL for some scripted damage sources
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy.EVAL (deathSync=%1, suicide=%2)", this.m_DeathSyncSent, this.CommitedSuicide()));
         if(this.m_DeathSyncSent || this.CommitedSuicide()) return; // Prevent logging of hits for dead bodies
@@ -594,6 +600,10 @@ modded class PlayerBase extends ManBase {
 
         GetGameLabs().GetLogger().Debug(string.Format("EEHitBy(this=%1, murderer=%2, source=%3, component=%4, dmgZone=%5, ammo=%6, modelPos=%7, speedCoef=%8)", this, murderer, source, component, dmgZone, ammo, modelPos, speedCoef));
         GetGameLabs().GetLogger().Debug(string.Format("^EEHitBy(GetDamage(%1), GetHighestDamage(%2))", damageResult.GetDamage(dmgZone, "Health"), damageResult.GetHighestDamage("Health")));
+
+        // AI attackers (e.g. Expansion AI) have no upstream identity
+        if(murderer.GetPlainId() == "") return;
+
         logObjectMurderer = new _LogPlayerEx(murderer);
         payload = new _Payload_PlayerDamage(logObjectPlayer, logObjectMurderer, source, damageResult.GetDamage(dmgZone, "Health"), dmgZone);
         GetGameLabs().GetApi().PlayerDamage(new _Callback(), payload);

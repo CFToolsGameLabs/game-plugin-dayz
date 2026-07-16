@@ -80,7 +80,7 @@ class _Response_Register : _Response {
     int modLicensingStatus = 1;
     string modLicensingOffender;
 
-    _Response_Register_Features features;
+    ref _Response_Register_Features features = new _Response_Register_Features();
 
     array<ref string> monitoredActions;
     void _Response_Register(string content) { JsonFileLoader<_Response_Register>.JsonLoadData(content, this); }
@@ -652,9 +652,11 @@ class _Payload_ReportInternal : _Payload {
     string element;
     string message;
     string reporterName;
+    vector position;            // reporter position (server-side, authoritative)
     string target;      // target steam64 (server-side only), empty when no target
     string targetName;
     string targetCftoolsId;
+    vector targetPosition;      // target position when the target is online
 
     override string ToJson() { return JsonFileLoader<_Payload_ReportInternal>.JsonMakeData(this); }
 };

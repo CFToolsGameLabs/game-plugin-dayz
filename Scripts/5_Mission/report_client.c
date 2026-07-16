@@ -42,12 +42,13 @@ class GameLabsReportClient {
         if(element == "") {
             PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
             bool isDead = (player == NULL || !player.IsAlive());
-            if(isDead && this.IsDeathScreenEnabled()) element = "deathScreen";
+            if(isDead && this.IsDeathScreenEnabled() && this.WasKilledByPlayer()) element = "deathScreen";
             else if(this.IsEscapeMenuEnabled()) element = "escapeMenu";
-            else if(this.IsDeathScreenEnabled()) element = "deathScreen";
         }
 
         if(element == "deathScreen" && !this.IsDeathScreenEnabled()) return;
+        // Death-screen reports are only valid when the killer was another player.
+        if(element == "deathScreen" && !this.WasKilledByPlayer()) return;
         if(element == "escapeMenu" && !this.IsEscapeMenuEnabled()) return;
         if(element == "") return;
 
@@ -70,6 +71,12 @@ class GameLabsReportClient {
         }
     }
 
+    // True only when the local player died to another player. The report option on
+    // the death screen is limited to this case (no reporting environmental/AI/self deaths).
+    bool WasKilledByPlayer() {
+        return this.deathContext != NULL && this.deathContext.hasPlayerKiller;
+    }
+
     private void UpdateDeathScreenOverlay() {
         if(!this.IsDeathScreenEnabled()) {
             this._RemoveDeathOverlay();
@@ -79,13 +86,17 @@ class GameLabsReportClient {
         PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
         bool dead = (player != NULL && !player.IsAlive());
 
-        if(dead) {
+        // Only offer the death-screen report when the killer was another player.
+        if(dead && this.WasKilledByPlayer()) {
             if(!this.deathOverlay && !this.dialog) {
                 this.deathOverlay = GameLabsReportDeathOverlay.Create(this);
             }
-        } else {
+        } else if(!dead) {
             this._RemoveDeathOverlay();
             this.ClearDeathContext();
+        } else {
+            // Dead, but not to a player (or context not yet received) - no overlay.
+            this._RemoveDeathOverlay();
         }
     }
 

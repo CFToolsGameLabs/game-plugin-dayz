@@ -81,15 +81,13 @@ class GameLabsReportDialog : ScriptedWidgetEventHandler {
 
     void DoUpdate(float tDelta) {
         GetGame().GetUIManager().ShowUICursor(true);
-        if(GetGame().GetPlayer()) {
-            GetUApi().ActivateExclude("menu");
-            GetUApi().UpdateControls();
-        }
+        GetUApi().ActivateExclude("menu");
+        GetUApi().UpdateControls();
     }
 
     void Submit() {
         string message = "";
-        if(m_Message) message = m_Message.GetText();
+        if(m_Message) m_Message.GetText(message);
         if(message == "") {
             NotificationSystem.AddNotificationExtended(4.0, "Report", "Please enter a message before submitting.");
             return;

@@ -26,7 +26,7 @@ modded class InGameMenu {
     override bool OnClick(Widget w, int x, int y, int button) {
         if(this.gl_reportButton && w == this.gl_reportButton) {
             MissionGameplay mission = MissionGameplay.Cast(GetGame().GetMission());
-            GetGame().GetUIManager().Close(this);
+            GetGame().GetUIManager().HideScriptedMenu(this);
             if(mission && mission.GetGLReportClient()) {
                 mission.GetGLReportClient().OpenReportDialog("escapeMenu");
             }
