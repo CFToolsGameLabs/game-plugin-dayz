@@ -20,7 +20,7 @@ class CFCloud_SpawnVehicle extends GameLabsContextAction {
                 if(scope != 2)
                     continue;
 
-                if(!GetGame().IsKindOf(strName, "CarScript") && !GetGame().IsKindOf(strName, "BoatScript"))
+                if(!GetGame().IsKindOf(strName, "CarScript") && !GetGame().IsKindOf(strName, "BoatScript") && !GetGame().IsKindOf(strName, "MotorbikeScript"))
                     continue;
 
                 string displayName = "";

@@ -31,6 +31,15 @@ class CFCloud_UnstuckVehicle extends GameLabsContextAction {
                 boatEntity.SetPosition(position);
 
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1", boatEntity));
+            } else if(vehicle.VehicleType() == "bike") {
+                Motorbike bikeEntity;
+                Motorbike.CastTo(bikeEntity, vehicle.Ref());
+
+                position = bikeEntity.GetPosition();
+                position[1] = GetGame().SurfaceY(position[0], position[2]) + 1;
+                bikeEntity.SetPosition(position);
+
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1", bikeEntity));
             } else {
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Unstuck] %1 is not categorized and can not be deleted.", vehicle));
             }

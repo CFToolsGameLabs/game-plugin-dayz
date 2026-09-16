@@ -36,6 +36,15 @@ class CFCloud_RefuelVehicle extends GameLabsContextAction {
                 boatEntityScript.SetSynchDirty();
                 boatEntityScript.Synchronize();
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1", boatEntity));
+            } else if(vehicle.VehicleType() == "bike") {
+                Motorbike bikeEntity;
+                Motorbike.CastTo(bikeEntity, vehicle.Ref());
+                MotorbikeScript bikeEntityScript = MotorbikeScript.Cast(bikeEntity);
+                fuel = bikeEntityScript.GetFluidCapacity(MotorbikeFluid.FUEL) - (bikeEntityScript.GetFluidCapacity(MotorbikeFluid.FUEL) * bikeEntityScript.GetFluidFraction(MotorbikeFluid.FUEL));
+                bikeEntityScript.Fill(MotorbikeFluid.FUEL, fuel);
+                bikeEntityScript.SetSynchDirty();
+                bikeEntityScript.Synchronize();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1", bikeEntity));
             } else {
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Refuel] %1 is not categorized and can not be deleted.", vehicle));
             }

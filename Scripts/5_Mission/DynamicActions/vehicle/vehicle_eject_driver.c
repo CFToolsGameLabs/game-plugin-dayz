@@ -52,6 +52,24 @@ class CFCloud_VehicleEjectDriver extends GameLabsContextAction {
                     }
                 }
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 - no driver found", boatEntity));
+            } else if(vehicle.VehicleType() == "bike") {
+                Motorbike bikeEntity;
+                Motorbike.CastTo(bikeEntity, vehicle.Ref());
+                for(c = 0; c < bikeEntity.CrewSize(); ++c) {
+                    crew = bikeEntity.CrewMember(c);
+                    if(!crew)
+                        continue;
+
+                    if(Class.CastTo(player, crew)) {
+                        if(bikeEntity.CrewMemberIndex(player) == DayZPlayerConstants.VEHICLESEAT_DRIVER) {
+                            vehCommand = player.GetCommand_Vehicle();
+                            vehCommand.GetOutVehicle();
+                            GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 driver=%2", bikeEntity, player));
+                            return true;
+                        }
+                    }
+                }
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 - no driver found", bikeEntity));
             } else {
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EjectDriver] %1 is not categorized and can not be deleted.", vehicle));
             }

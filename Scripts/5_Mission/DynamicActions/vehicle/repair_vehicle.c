@@ -108,6 +108,79 @@ class CFCloud_RepairVehicle extends GameLabsContextAction {
                 boatEntityScript.SetSynchDirty();
                 boatEntityScript.Synchronize();
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1", boatEntity));
+            } else if(vehicle.VehicleType() == "bike") {
+                Motorbike bikeEntity;
+                Motorbike.CastTo(bikeEntity, vehicle.Ref());
+                EntityAI bikeEntityAI = bikeEntity;
+
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1", bikeEntity));
+
+                bikeEntityAI.SetHealthMax("", "Health");
+                bikeEntityAI.SetHealthMax();
+
+                MotorbikeScript bikeEntityScript = MotorbikeScript.Cast(bikeEntity);
+                fuel = bikeEntityScript.GetFluidCapacity(MotorbikeFluid.FUEL) - (bikeEntityScript.GetFluidCapacity(MotorbikeFluid.FUEL) * bikeEntityScript.GetFluidFraction(MotorbikeFluid.FUEL));
+                bikeEntityScript.Fill(MotorbikeFluid.FUEL, fuel);
+                bikeEntityScript.SetSynchDirty();
+                bikeEntityScript.Synchronize();
+
+                string bike_cfg_path = string.Format("%1 %2 DamageSystem", CFG_VEHICLESPATH, bikeEntity.GetType());
+                if(GetGame().ConfigIsExisting(bike_cfg_path)) {
+                    string bike_child_zone;
+                    string bike_child_class;
+                    array<string> bike_damaged_zones = new array<string>;
+
+                    int bike_zone_count = GetGame().ConfigGetChildrenCount(bike_cfg_path);
+                    if(bike_zone_count > 0) {
+                        for(int bx = 0; bx < bike_zone_count; ++bx) {
+                            GetGame().ConfigGetChildName(bike_cfg_path, bx, bike_child_class);
+                            bike_child_class.ToLower();
+                            if(bike_child_class == "damagezones") {
+                                for (int by = 0; by < GetGame().ConfigGetChildrenCount(string.Format("%1 DamageZones", bike_cfg_path)); ++by) {
+                                    GetGame().ConfigGetChildName(string.Format("%1 DamageZones", bike_cfg_path), by, bike_child_zone);
+                                    bike_damaged_zones.Insert(bike_child_zone);
+                                }
+                            }
+                        }
+                    }
+
+                    if(bike_damaged_zones.Count() > 0) {
+                        foreach(string bikeZone: bike_damaged_zones) {
+                            bikeEntityAI.SetHealthMax(bikeZone, "Health");
+                        }
+                    }
+                }
+
+                TStringArray bike_slots = new TStringArray;
+                bike_cfg_path = string.Format("%1 %2 attachments", CFG_VEHICLESPATH, bikeEntity.GetType());
+                GetGame().ConfigGetTextArray(bike_cfg_path, bike_slots);
+
+                foreach(string bikeSlot : bike_slots) {
+                    bikeSlot.ToLower();
+
+                    int bike_slot_id = InventorySlots.GetSlotIdFromString(bikeSlot);
+                    EntityAI bikeAttachment = bikeEntity.GetInventory().FindAttachment(bike_slot_id);
+                    if(!bikeAttachment) {
+                        if(GetGameLabs()._vehicleSlotMap[bikeSlot] == NULL) continue;
+                        string bikeType = GetGameLabs()._vehicleSlotMap[bikeSlot].GetRandomElement();
+                        bikeType.ToLower();
+                        if(bikeType.Contains("_ruined")) {
+                            bikeType = GetGameLabs()._vehicleSlotMap[bikeSlot][0];
+                        }
+                        bikeEntity.GetInventory().CreateAttachmentEx(bikeType, bike_slot_id);
+                    } else {
+                        string bikePart = bikeAttachment.GetType();
+                        bikePart.ToLower();
+                        if(bikePart.Contains("_ruined")) {
+                            bikePart.Replace("_ruined", "");
+                            GetGame().ObjectDelete(bikeAttachment);
+                            bikeEntity.GetInventory().CreateInInventory(bikePart);
+                        } else {
+                            bikeAttachment.SetHealthMax("", "Health");
+                            bikeAttachment.SetSynchDirty();
+                        }
+                    }
+                }
             } else {
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Repair] %1 is not categorized and can not be deleted.", vehicle));
             }

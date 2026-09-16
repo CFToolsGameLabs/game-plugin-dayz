@@ -10,6 +10,7 @@ class CFCloud_LockedContainerOpen extends GameLabsContextAction {
             this.actionContextFilter.Insert("Land_ContainerLocked_Yellow_DE");
             this.actionContextFilter.Insert("Land_ContainerLocked_Orange_DE");
             this.actionContextFilter.Insert("Land_ContainerLocked_Red_DE");
+            this.actionContextFilter.Insert("Land_Mil_ContainerHabitat_Armory_Locked_Green_DE");
         }
 
         override bool Execute(GameLabsActionContext context) {

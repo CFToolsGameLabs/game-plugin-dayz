@@ -232,7 +232,12 @@ class _ServerVehicle {
                         this.speed = 0.0;
                     }
                 } else {
-                    this.speed = 0.0;
+                    Motorbike _bike = Motorbike.Cast(vehicle.Ref());
+                    if(_bike != NULL) {
+                        this.speed = _bike.GetSpeedometerAbsolute();
+                    } else {
+                        this.speed = 0.0;
+                    }
                 }
 
             }

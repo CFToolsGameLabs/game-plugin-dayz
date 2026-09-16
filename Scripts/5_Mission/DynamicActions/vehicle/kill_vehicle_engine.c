@@ -21,6 +21,11 @@ class CFCloud_KillVehicleEngine extends GameLabsContextAction {
                 Boat.CastTo(boatEntity, vehicle.Ref());
                 BoatScript.Cast(boatEntity).EngineStop();
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1", boatEntity));
+            } else if(vehicle.VehicleType() == "bike") {
+                Motorbike bikeEntity;
+                Motorbike.CastTo(bikeEntity, vehicle.Ref());
+                MotorbikeScript.Cast(bikeEntity).EngineStop();
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1", bikeEntity));
             } else {
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-EngineStop] %1 is not categorized and can not be deleted.", vehicle));
             }

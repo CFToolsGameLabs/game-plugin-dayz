@@ -21,6 +21,11 @@ class CFCloud_VehicleExplode extends GameLabsContextAction {
                 Boat.CastTo(boatEntity, vehicle.Ref());
                 boatEntity.Explode(DT_EXPLOSION, "LandFuelFeed_Ammo");
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1", boatEntity));
+            } else if(vehicle.VehicleType() == "bike") {
+                Motorbike bikeEntity;
+                Motorbike.CastTo(bikeEntity, vehicle.Ref());
+                bikeEntity.Explode(DT_EXPLOSION, "LandFuelFeed_Ammo");
+                GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1", bikeEntity));
             } else {
                 GetGameLabs().GetLogger().Warn(string.Format("[Vehicle-Explode] %1 is not categorized and can not be deleted.", vehicle));
             }
