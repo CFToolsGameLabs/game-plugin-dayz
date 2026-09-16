@@ -32,8 +32,8 @@ modded class CombinationLock extends ItemBase {
         this.GL_Save(true);
     }
 
-    override void UnlockServer( EntityAI player, EntityAI parent ) {
-        super.UnlockServer(player, parent);
+    override void UnlockOnServer( EntityAI player, EntityAI parent, bool isInsideLock = false ) {
+        super.UnlockOnServer(player, parent, isInsideLock);
         this.GL_Save(true);
     }
 
