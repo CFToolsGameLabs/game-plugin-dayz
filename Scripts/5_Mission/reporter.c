@@ -213,7 +213,7 @@ class GameLabsReporter {
             if(vehicle.HasUpdated()) updated.Insert(vehicle);
         }
 
-        if(GetGameLabs()._serverEventsBufferAdded.Count() || GetGameLabs()._serverEventsBufferRemoved.Count() || updated.Count() || this.isFirstReport) {
+        if(GetGameLabs()._serverVehiclesBufferAdded.Count() || GetGameLabs()._serverVehiclesBufferRemoved.Count() || updated.Count() || this.isFirstReport) {
             _Payload_ServerVehicles payloadVehicles = new _Payload_ServerVehicles(this.isFirstReport, this.effectiveInterval, GetGameLabs()._serverVehiclesBufferAdded, updated, GetGameLabs()._serverVehiclesBufferRemoved);
 
             GetGameLabs().GetApi().ServerVehicles(new _Callback_ServerDummy(), payloadVehicles);
